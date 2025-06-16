@@ -1,13 +1,23 @@
-#========================================
-# General settings
-#========================================
-logging:
-  level:
-    root: INFO
+spring:
+  application:
+    name: digital-registered-letter
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+  flyway:
+    enabled: false
+  jpa:
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: none
+
 openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}
   version: '@project.version@'
-spring:
-  application:
-    name: template
+
+logging:
+  level:
+    root: INFO
