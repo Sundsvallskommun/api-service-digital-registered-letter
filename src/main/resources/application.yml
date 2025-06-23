@@ -12,12 +12,10 @@ spring:
           schema-generation:
             database:
               action: none
-
 openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}
   version: '@project.version@'
-
 logging:
   level:
     root: INFO

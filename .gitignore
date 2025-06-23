@@ -47,6 +47,7 @@ hs_err_pid*
 
 # Local environment
 .env
+docker-compose.yaml
 
 # Mac OS
 .DS_Store 

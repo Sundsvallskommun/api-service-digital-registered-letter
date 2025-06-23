@@ -11,11 +11,11 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 
 @Builder
 @Schema(description = "Paginated response containing a list of letters")
-public record LetterResponses(
+public record Letters(
 
 	@JsonProperty("_meta") @Schema(implementation = PagingAndSortingMetaData.class, accessMode = READ_ONLY) PagingAndSortingMetaData metaData,
 
-	@ArraySchema(schema = @Schema(implementation = LetterResponse.class, accessMode = READ_ONLY)) List<LetterResponse> letters
+	@ArraySchema(schema = @Schema(implementation = Letter.class, accessMode = READ_ONLY)) List<Letter> letters
 
 ) {
 
