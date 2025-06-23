@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:52798
+  - url: http://localhost:52726
     description: Generated server url
 tags:
   - name: Letter Resource
@@ -57,7 +57,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LetterResponses"
+                $ref: "#/components/schemas/Letters"
         "400":
           description: Bad request
           content:
@@ -88,8 +88,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LetterRequest"
-        required: true
+              required:
+                - letter
+                - letterAttachments
+              type: object
+              properties:
+                letter:
+                  $ref: "#/components/schemas/LetterRequest"
+                letterAttachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         "201":
           description: Successful operation - Created
@@ -136,7 +146,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LetterResponse"
+                $ref: "#/components/schemas/Letter"
         "404":
           description: Not Found
           content:
@@ -176,8 +186,62 @@ paths:
 components:
   schemas:
     LetterRequest:
+      required:
+        - body
+        - contentType
+        - partyId
+        - subject
+        - supportInfo
       type: object
-      description: Request to send a digital registered letter
+      properties:
+        partyId:
+          type: string
+          description: Party ID of the recipient
+          example: 123e4567-e89b-12d3-a456-426614174000
+        subject:
+          minLength: 1
+          type: string
+          description: Subject of the letter
+          example: Important Notification
+        supportInfo:
+          $ref: "#/components/schemas/SupportInfo"
+        contentType:
+          type: string
+          description: "Content type of the letter body, e.g., 'text/plain' or 'text/html'"
+          example: text/plain
+        body:
+          minLength: 1
+          type: string
+          description: Body of the letter
+          example: This is the content of the letter. Plain-text body
+      description: LetterRequest as a JSON string
+    SupportInfo:
+      required:
+        - contactInformationEmail
+        - contactInformationPhoneNumber
+        - contactInformationUrl
+        - supportText
+      type: object
+      properties:
+        supportText:
+          minLength: 1
+          type: string
+          description: Support text for the letter
+          example: "For support, please contact us at the information below."
+        contactInformationUrl:
+          minLength: 1
+          type: string
+          description: URL for contact
+          example: https://example.com/support
+        contactInformationPhoneNumber:
+          type: string
+          description: Phone number for contact
+          example: "+46123456789"
+        contactInformationEmail:
+          type: string
+          description: Email address for contact
+          example: support@email.com
+      description: Support information for the letter
     Problem:
       type: object
       properties:
@@ -193,9 +257,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
         title:
+          type: string
+        detail:
           type: string
     StatusType:
       type: object
@@ -328,9 +392,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
         title:
+          type: string
+        detail:
           type: string
         suppressed:
           type: array
@@ -372,6 +436,23 @@ components:
           type: string
         message:
           type: string
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Unique identifier for the attachment, used for fetching the\
+            \ attachment content"
+          example: 123e4567-e89b-12d3-a456-426614174001
+        fileName:
+          type: string
+          description: Name of the attachment file
+          example: document.pdf
+        contentType:
+          type: string
+          description: Content type of the attachment
+          example: application/pdf
+      description: List of attachments for the letter
     Direction:
       type: string
       description: The sort order direction
@@ -379,11 +460,46 @@ components:
       enum:
         - ASC
         - DESC
-    LetterResponse:
+    Letter:
       type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the letter
+          example: 123e4567-e89b-12d3-a456-426614174000
+        municipalityId:
+          type: string
+          description: Municipality ID for the sender of the letter
+          example: "2281"
+        status:
+          type: string
+          description: Status of the letter
+        body:
+          type: string
+          description: The letter body
+        contentType:
+          type: string
+          description: Content type of the letter body
+          example: text/html
+        created:
+          type: string
+          description: When the letter was sent
+          format: date-time
+          example: 2023-10-09T12:34:56Z
+        updated:
+          type: string
+          description: When the letter was last updated
+          format: date-time
+          example: 2023-10-09T12:34:56Z
+        supportInfo:
+          $ref: "#/components/schemas/SupportInfo"
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
       description: Digital registered letter response
       readOnly: true
-    LetterResponses:
+    Letters:
       type: object
       properties:
         _meta:
@@ -392,7 +508,7 @@ components:
           type: array
           readOnly: true
           items:
-            $ref: "#/components/schemas/LetterResponse"
+            $ref: "#/components/schemas/Letter"
       description: Paginated response containing a list of letters
     PagingAndSortingMetaData:
       type: object

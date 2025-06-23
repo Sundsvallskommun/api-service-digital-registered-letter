@@ -8,6 +8,7 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
+import static se.sundsvall.digitalregisteredletter.service.util.ValidationUtil.validate;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -15,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +24,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
+import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
-import se.sundsvall.digitalregisteredletter.api.model.LetterResponse;
-import se.sundsvall.digitalregisteredletter.api.model.LetterResponses;
+import se.sundsvall.digitalregisteredletter.api.model.Letters;
+import se.sundsvall.digitalregisteredletter.api.validation.ValidPdf;
 import se.sundsvall.digitalregisteredletter.service.LetterService;
 
 @RestController
@@ -52,7 +56,7 @@ class LetterResource {
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Get all letters", description = "Retrieves all letters for a municipality", responses = @ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true))
-	ResponseEntity<LetterResponses> getLetters(@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId, @ParameterObject final Pageable pageable) {
+	ResponseEntity<Letters> getLetters(@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId, @ParameterObject final Pageable pageable) {
 		return ok(letterService.getLetters(municipalityId, pageable));
 	}
 
@@ -61,7 +65,7 @@ class LetterResource {
 		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 	})
-	ResponseEntity<LetterResponse> getLetter(@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId, @PathVariable(name = "letterId") final String letterId) {
+	ResponseEntity<Letter> getLetter(@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId, @PathVariable(name = "letterId") final String letterId) {
 		return ok(letterService.getLetter(municipalityId, letterId));
 	}
 
@@ -69,9 +73,24 @@ class LetterResource {
 	@Operation(summary = "Send letter",
 		description = "Send a digital registered letter using Kivra",
 		responses = @ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
-	ResponseEntity<Void> sendLetter(@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId, @RequestBody @Valid final LetterRequest request) {
+	ResponseEntity<Void> sendLetter(
+		@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId,
+		@RequestPart(name = "letter") @Schema(description = "LetterRequest as a JSON string", implementation = LetterRequest.class) final String letterString,
+		@RequestPart(name = "letterAttachments") @ValidPdf final List<MultipartFile> files) {
+		// Parses the letter string to an actual LetterRequest object and validates it.
+		var letterRequest = letterService.parseLetterRequest(letterString);
+		validate(letterRequest);
+
+		// Places the multipart files into an Attachments object and validates it.
+		var attachments = AttachmentsBuilder.create()
+			.withFiles(files)
+			.build();
+		validate(attachments);
+
+		var id = letterService.sendLetter(municipalityId, letterRequest, attachments);
+
 		return created(fromPath("/{municipalityId}/letters/{letterId}")
-			.buildAndExpand(municipalityId, letterService.sendLetter(municipalityId, request)).toUri())
+			.buildAndExpand(municipalityId, id).toUri())
 			.header(CONTENT_TYPE, ALL_VALUE)
 			.build();
 	}
