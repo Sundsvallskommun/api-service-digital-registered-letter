@@ -66,7 +66,7 @@ class LetterServiceTest {
 		assertThat(capturedLetterEntity).isNotNull();
 		assertThat(capturedLetterEntity.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(capturedLetterEntity.getAttachments()).containsExactly(attachmentEntity);
-		// TODO: This tes
+		// TODO: This test is only partially done, complete when service logic is implemented.
 
 	}
 
