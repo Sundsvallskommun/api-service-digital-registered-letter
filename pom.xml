@@ -13,7 +13,7 @@
 	<version>1.0</version>
 	<name>api-service-digital-registered-letter</name>
 	<properties>
-		<jilt.version>1.7</jilt.version>
+		<jilt.version>1.8.1</jilt.version>
 	</properties>
 	<dependencies>
 		<dependency>
