@@ -4,7 +4,7 @@ spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
   flyway:
-    enabled: false
+    enabled: true
   jpa:
     properties:
       jakarta:
@@ -12,6 +12,13 @@ spring:
           schema-generation:
             database:
               action: none
+  security:
+    oauth2:
+      client:
+        registration:
+          party:
+            authorization-grant-type: client_credentials
+            provider: party
 openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}
@@ -19,3 +26,7 @@ openapi:
 logging:
   level:
     root: INFO
+integration:
+  party:
+    connectTimeout: 5
+    readTimeout: 30
