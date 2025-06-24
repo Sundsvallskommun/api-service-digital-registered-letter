@@ -13,6 +13,8 @@
 	<version>1.0</version>
 	<name>api-service-digital-registered-letter</name>
 	<properties>
+		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
+		<generated-sources-java-path>src/main/java</generated-sources-java-path>
 		<jilt.version>1.8.1</jilt.version>
 	</properties>
 	<dependencies>
@@ -73,6 +75,41 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<configuration>
+					<output>${generated-sources-path}</output>
+					<generatorName>spring</generatorName>
+					<generateApis>false</generateApis>
+					<generateSupportingFiles>false</generateSupportingFiles>
+					<configOptions>
+						<useSpringBoot3>true</useSpringBoot3>
+						<sourceFolder>${generated-sources-java-path}</sourceFolder>
+						<dateLibrary>java8</dateLibrary>
+						<apiPackage>generated</apiPackage>
+						<openApiNullable>false</openApiNullable>
+						<generatePom>false</generatePom>
+						<useBeanValidation>true</useBeanValidation>
+						<useSwaggerAnnotations>true</useSwaggerAnnotations>
+						<interfaceOnly>true</interfaceOnly>
+					</configOptions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>party-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/integrations/party-2.0.yml</inputSpec>
+							<configOptions>
+								<modelPackage>generated.se.sundsvall.party</modelPackage>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

@@ -21,3 +21,18 @@ spring:
             scripts:
               action: create
               create-target: target/database/generated-schema.sql
+  security:
+    oauth2:
+      client:
+        registration:
+          party:
+            client-id: the-client-id
+            client-secret: the-client-secret
+        provider:
+          party:
+            token-uri: http://token.url
+integration:
+  party:
+    connectTimeout: 5
+    readTimeout: 30
+    url: http://localhost:8080/party
