@@ -20,8 +20,13 @@ spring:
           party:
             client-id: the-client-id
             client-secret: the-client-secret
+          kivra:
+            client-id: the-client-id
+            client-secret: the-client-secret
         provider:
           party:
+            token-uri: http://localhost:${wiremock.server.port:}/api-gateway/token
+          kivra:
             token-uri: http://localhost:${wiremock.server.port:}/api-gateway/token
 integration:
   party:

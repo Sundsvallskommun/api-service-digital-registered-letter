@@ -28,8 +28,13 @@ spring:
           party:
             client-id: the-client-id
             client-secret: the-client-secret
+          kivra:
+            client-id: the-client-id
+            client-secret: the-client-secret
         provider:
           party:
+            token-uri: http://token.url
+          kivra:
             token-uri: http://token.url
 integration:
   party:

@@ -40,6 +40,12 @@ public class LetterEntity {
 	@Column(name = "status", length = 40)
 	private String status;
 
+	@Column(name = "subject")
+	private String subject;
+
+	@Column(name = "party_id", length = 36)
+	private String partyId;
+
 	@Column(name = "deleted", nullable = false)
 	private boolean deleted = Boolean.FALSE;
 
@@ -71,6 +77,32 @@ public class LetterEntity {
 	@PreUpdate
 	void onUpdate() {
 		this.updated = OffsetDateTime.now();
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(final String subject) {
+		this.subject = subject;
+	}
+
+	public LetterEntity withSubject(final String subject) {
+		this.subject = subject;
+		return this;
+	}
+
+	public String getPartyId() {
+		return partyId;
+	}
+
+	public void setPartyId(final String partyId) {
+		this.partyId = partyId;
+	}
+
+	public LetterEntity withPartyId(final String partyId) {
+		this.partyId = partyId;
+		return this;
 	}
 
 	public static LetterEntity create() {
@@ -215,6 +247,8 @@ public class LetterEntity {
 			", body='" + body + '\'' +
 			", contentType='" + contentType + '\'' +
 			", status='" + status + '\'' +
+			", subject='" + subject + '\'' +
+			", partyId='" + partyId + '\'' +
 			", deleted=" + deleted +
 			", created=" + created +
 			", updated=" + updated +
@@ -229,12 +263,12 @@ public class LetterEntity {
 			return false;
 		LetterEntity that = (LetterEntity) o;
 		return deleted == that.deleted && Objects.equals(id, that.id) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(body, that.body) && Objects.equals(contentType, that.contentType)
-			&& Objects.equals(status, that.status) && Objects.equals(created, that.created) && Objects.equals(updated, that.updated) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(
-				attachments, that.attachments);
+			&& Objects.equals(status, that.status) && Objects.equals(subject, that.subject) && Objects.equals(partyId, that.partyId) && Objects.equals(created, that.created) && Objects.equals(updated,
+				that.updated) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments, that.attachments);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, municipalityId, body, contentType, status, deleted, created, updated, supportInfo, attachments);
+		return Objects.hash(id, municipalityId, body, contentType, status, subject, partyId, deleted, created, updated, supportInfo, attachments);
 	}
 }

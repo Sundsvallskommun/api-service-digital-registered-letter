@@ -108,6 +108,21 @@
 							</configOptions>
 						</configuration>
 					</execution>
+					<execution>
+						<id>kivra-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/integrations/kivra.yml</inputSpec>
+							<skipValidateSpec>true</skipValidateSpec>
+							<generateSupportingFiles>true</generateSupportingFiles>
+							<configOptions>
+								<modelPackage>generated.com.kivra</modelPackage>
+								<interfaceOnly>false</interfaceOnly>
+							</configOptions>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
