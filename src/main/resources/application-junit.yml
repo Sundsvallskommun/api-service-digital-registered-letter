@@ -41,3 +41,7 @@ integration:
     connectTimeout: 5
     readTimeout: 30
     url: http://localhost:8080/party
+  kivra:
+    connect-timeout: 5
+    read-timeout: 30
+    url: http://localhost:8080/kivra

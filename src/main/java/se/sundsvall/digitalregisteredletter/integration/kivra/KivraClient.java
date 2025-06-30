@@ -3,19 +3,19 @@ package se.sundsvall.digitalregisteredletter.integration.kivra;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static se.sundsvall.digitalregisteredletter.integration.kivra.configuration.KivraConfiguration.CLIENT_ID;
 
-import generated.com.kivra.ContentUser;
-import generated.com.kivra.ContentUserV2;
-import generated.com.kivra.UserMatchV2SSN;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import se.sundsvall.digitalregisteredletter.integration.kivra.configuration.KivraConfiguration;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUser;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 
 @FeignClient(
 	name = CLIENT_ID,
-	url = "${integration.kivra.api-url}",
+	url = "${integration.kivra.url}",
 	configuration = KivraConfiguration.class)
 @CircuitBreaker(name = CLIENT_ID)
 public interface KivraClient {

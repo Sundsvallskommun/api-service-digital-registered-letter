@@ -5,8 +5,6 @@ import static org.zalando.problem.Status.BAD_GATEWAY;
 import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toCheckEligibilityRequest;
 import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toSendContentRequest;
 
-import generated.com.kivra.ContentUser;
-import generated.com.kivra.UserMatchV2SSN;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -14,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUser;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 
 @Component
 public class KivraIntegration {
@@ -37,7 +37,7 @@ public class KivraIntegration {
 			LOG.info("Checking Kivra eligibility for legal ids: {}", legalIds);
 			var response = kivraClient.checkEligibility(request);
 			LOG.info("Kivra eligibility check successful");
-			return Optional.ofNullable(response.getBody()).map(UserMatchV2SSN::getList).orElse(emptyList());
+			return Optional.ofNullable(response.getBody()).map(UserMatchV2SSN::legalIds).orElse(emptyList());
 		} catch (Exception e) {
 			LOG.error("Exception occurred when checking Kivra eligibility for legal ids: {}, exception message: {}", legalIds, e.getMessage(), e);
 			throw Problem.valueOf(BAD_GATEWAY, "Exception occurred while checking Kivra eligibility for legal ids: " + legalIds);

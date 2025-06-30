@@ -44,6 +44,8 @@ class LetterEntityTest {
 		var created = offsetDateTime.minusDays(1);
 		var updated = offsetDateTime.minusHours(1);
 		var body = "body";
+		var subject = "subject";
+		var partyId = "partyId";
 		var contentType = "text/plain";
 		var status = "status";
 		var deleted = true;
@@ -64,6 +66,8 @@ class LetterEntityTest {
 			.withStatus(status)
 			.withDeleted(deleted)
 			.withAttachments(attachments)
+			.withPartyId(partyId)
+			.withSubject(subject)
 			.withSupportInfo(supportInfo);
 
 		assertThat(letterEntity.getAttachments()).isEqualTo(attachments);
@@ -76,6 +80,8 @@ class LetterEntityTest {
 		assertThat(letterEntity.getStatus()).isEqualTo(status);
 		assertThat(letterEntity.isDeleted()).isEqualTo(deleted);
 		assertThat(letterEntity.getSupportInfo()).isEqualTo(supportInfo);
+		assertThat(letterEntity.getPartyId()).isEqualTo(partyId);
+		assertThat(letterEntity.getSubject()).isEqualTo(subject);
 
 		assertThat(letterEntity).hasNoNullFieldsOrProperties();
 	}

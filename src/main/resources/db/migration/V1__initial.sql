@@ -15,6 +15,8 @@ CREATE TABLE letter
     body                      LONGTEXT     NULL,
     content_type              VARCHAR(50)  NULL,
     status                    VARCHAR(40)  NULL,
+    subject                   VARCHAR(255) NULL,
+    party_id                  VARCHAR(36)  NULL,
     deleted                   BIT(1)       NOT NULL,
     created                   datetime     NULL,
     updated                   datetime     NULL,
