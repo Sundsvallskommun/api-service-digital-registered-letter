@@ -19,6 +19,9 @@ spring:
           party:
             authorization-grant-type: client_credentials
             provider: party
+          kivra:
+            authorization-grant-type: client_credentials
+            provider: kivra
 openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}

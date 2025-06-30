@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.sql.Blob;
+import java.sql.SQLException;
 import org.hibernate.LobHelper;
 import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
@@ -94,6 +95,17 @@ class BlobUtilTest {
 		var result = spy.convertToBlob(multipartFile);
 
 		assertThat(result).isEqualTo(blob);
+	}
+
+	@Test
+	void convertBlobToBase64StringTest() throws SQLException {
+		var blob = Mockito.mock(Blob.class);
+
+		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
+
+		var result = BlobUtil.convertBlobToBase64String(blob);
+
+		assertThat(result).isEqualTo("dGVzdA==");
 	}
 
 }

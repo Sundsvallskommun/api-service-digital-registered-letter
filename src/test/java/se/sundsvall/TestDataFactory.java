@@ -12,6 +12,10 @@ import se.sundsvall.digitalregisteredletter.api.model.LettersBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfo;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.PartsResponsiveBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterHiddenBuilder;
 
 public class TestDataFactory {
 
@@ -56,5 +60,28 @@ public class TestDataFactory {
 			.withFileName("file.txt")
 			.withContentType("text/plain")
 			.withContent(null);
+	}
+
+	public static ContentUserV2.PartsResponsive createPartsResponsive() {
+		return PartsResponsiveBuilder.create()
+			.withData("data")
+			.withName("name")
+			.withContentType("text/plain")
+			.build();
+	}
+
+	public static ContentUserV2.RegisteredLetter createRegisteredLetter() {
+		return RegisteredLetterBuilder.create()
+			.withSenderReference("senderReference")
+			.withExpiresAt("2025-06-18")
+			.withHidden(createRegisteredLetterHidden())
+			.build();
+	}
+
+	public static ContentUserV2.RegisteredLetter.RegisteredLetterHidden createRegisteredLetterHidden() {
+		return RegisteredLetterHiddenBuilder.create()
+			.withSender(false)
+			.withSubject(false)
+			.build();
 	}
 }

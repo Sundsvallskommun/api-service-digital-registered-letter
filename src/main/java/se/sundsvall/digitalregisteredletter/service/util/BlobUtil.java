@@ -5,6 +5,7 @@ import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import jakarta.persistence.EntityManager;
 import java.sql.Blob;
+import java.util.Base64;
 import java.util.Optional;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -40,5 +41,21 @@ public class BlobUtil {
 			LOG.warn("Failed to create Blob from MultipartFile: {}", e.getMessage(), e);
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert file with name [ %s ] to database object".formatted(multipartFile.getOriginalFilename()));
 		}
+	}
+
+	/**
+	 * Converts a Blob to a Base64 encoded string.
+	 *
+	 * @param  blob the Blob to convert
+	 * @return      the Base64 encoded string representation of the Blob
+	 */
+	public static String convertBlobToBase64String(final Blob blob) {
+		try {
+			var bytes = blob.getBytes(1, (int) blob.length());
+			return Base64.getEncoder().encodeToString(bytes);
+		} catch (Exception e) {
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert Blob to Base64 string: " + e.getMessage());
+		}
+
 	}
 }
