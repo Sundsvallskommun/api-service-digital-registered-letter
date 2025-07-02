@@ -16,16 +16,16 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Schema(description = "Request to send a digital registered letter")
 public record LetterRequest(
 
-	@ValidUuid @Schema(description = "Party ID of the recipient", example = "123e4567-e89b-12d3-a456-426614174000", requiredMode = REQUIRED) String partyId,
+	@ValidUuid @Schema(description = "Party ID of the recipient", example = "7ca29702-a07f-4e13-a66a-4ebc27929cfd", requiredMode = REQUIRED) String partyId,
 
 	@NotBlank @Schema(description = "Subject of the letter", example = "Important Notification", requiredMode = REQUIRED) String subject,
 
 	@Valid @NotNull @Schema(implementation = SupportInfo.class, description = "Support information for the letter") SupportInfo supportInfo,
 
-	@OneOf( {
+	@OneOf({
 		TEXT_PLAIN_VALUE, TEXT_HTML_VALUE
 	}) @Schema(description = "Content type of the letter body, e.g., 'text/plain' or 'text/html'", example = "text/plain", requiredMode = REQUIRED) String contentType,
 
-	@NotBlank @Schema(description = "Body of the letter", example = "This is the content of the letter. Plain-text body", requiredMode = REQUIRED) String body){
+	@NotBlank @Schema(description = "Body of the letter", example = "This is the content of the letter. Plain-text body", requiredMode = REQUIRED) String body) {
 
 }

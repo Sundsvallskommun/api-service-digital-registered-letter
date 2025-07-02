@@ -11,7 +11,7 @@ import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper
 
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 
 @ExtendWith(MockitoExtension.class)
 class KivraMapperTest {
@@ -64,8 +65,8 @@ class KivraMapperTest {
 				assertThat(content.data()).isEqualTo("dGVzdA=="); // Base64 encoded "test"
 			});
 			assertThat(contentUserV2.registered()).isNotNull().satisfies(registeredLetter -> {
-				assertThat(LocalDateTime.parse(registeredLetter.expiresAt())).isCloseTo(LocalDateTime.now().plusDays(30).format(DateTimeFormatter.ISO_DATE_TIME), within(1, ChronoUnit.SECONDS));
-				assertThat(registeredLetter.senderReference()).isEqualTo(letterId);
+				assertThat(registeredLetter.expiresAt()).isCloseTo(OffsetDateTime.now().plusDays(30).format(DateTimeFormatter.ISO_DATE_TIME), within(1, ChronoUnit.SECONDS));
+				assertThat(registeredLetter.senderReference()).isEqualTo(new ContentUserV2.RegisteredLetter.SenderReference(letterId));
 				assertThat(registeredLetter.hidden()).isNotNull().satisfies(hidden -> {
 					assertThat(hidden.sender()).isFalse();
 					assertThat(hidden.subject()).isFalse();
@@ -82,8 +83,8 @@ class KivraMapperTest {
 		var result = toRegisteredLetter(reference);
 
 		assertThat(result).isNotNull().satisfies(registeredLetter -> {
-			assertThat(LocalDateTime.parse(registeredLetter.expiresAt())).isCloseTo(LocalDateTime.now().plusDays(30), within(1, ChronoUnit.SECONDS));
-			assertThat(registeredLetter.senderReference()).isEqualTo(reference);
+			assertThat(registeredLetter.expiresAt()).isCloseTo(OffsetDateTime.now().plusDays(30), within(1, ChronoUnit.SECONDS));
+			assertThat(registeredLetter.senderReference()).isEqualTo(new ContentUserV2.RegisteredLetter.SenderReference(reference));
 			assertThat(registeredLetter.hidden()).isNotNull().satisfies(hidden -> {
 				assertThat(hidden.sender()).isFalse();
 				assertThat(hidden.subject()).isFalse();

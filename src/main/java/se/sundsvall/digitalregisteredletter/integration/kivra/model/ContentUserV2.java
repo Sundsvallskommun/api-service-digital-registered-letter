@@ -1,6 +1,7 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.OffsetDateTime;
 import java.util.List;
 import se.sundsvall.digitalregisteredletter.support.Builder;
 
@@ -19,14 +20,18 @@ public record ContentUserV2(
 	public record PartsResponsive(
 		String name,
 		String data,
-		String contentType) {
+		@JsonProperty("content_type") String contentType) {
 	}
 
 	@Builder
 	public record RegisteredLetter(
-		String expiresAt,
-		String senderReference,
+		@JsonProperty("expires_at") OffsetDateTime expiresAt,
+		@JsonProperty("sender_reference") SenderReference senderReference,
 		RegisteredLetterHidden hidden) {
+
+		public record SenderReference(
+			@JsonProperty("sender_internal_id") String senderInternalId) {
+		}
 
 		@Builder
 		public record RegisteredLetterHidden(

@@ -2,6 +2,7 @@ package se.sundsvall.digitalregisteredletter.integration.kivra.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +14,7 @@ class ContentUserV2Test {
 	private static final String PARTS_RESPONSIVE_NAME = "partsResponsiveName";
 	private static final String PARTS_RESPONSIVE_DATA = "partsResponsiveData";
 	private static final String PARTS_RESPONSIVE_CONTENT_TYPE = "partsResponsiveContentType";
-	private static final String REGISTERED_LETTER_EXPIRES_AT = "registeredLetterExpiresAt";
+	private static final OffsetDateTime REGISTERED_LETTER_EXPIRES_AT = OffsetDateTime.now();
 	private static final String REGISTERED_LETTER_SENDER_REFERENCE = "registeredLetterSenderReference";
 	private static final Boolean REGISTERED_LETTER_HIDDEN_SENDER = false;
 	private static final Boolean REGISTERED_LETTER_HIDDEN_SUBJECT = false;
@@ -22,7 +23,8 @@ class ContentUserV2Test {
 	void testConstructor() {
 		var partsResponsive = new ContentUserV2.PartsResponsive(PARTS_RESPONSIVE_NAME, PARTS_RESPONSIVE_DATA, PARTS_RESPONSIVE_CONTENT_TYPE);
 		var registeredLetterHidden = new ContentUserV2.RegisteredLetter.RegisteredLetterHidden(REGISTERED_LETTER_HIDDEN_SENDER, REGISTERED_LETTER_HIDDEN_SUBJECT);
-		var registeredLetter = new ContentUserV2.RegisteredLetter(REGISTERED_LETTER_EXPIRES_AT, REGISTERED_LETTER_SENDER_REFERENCE, registeredLetterHidden);
+		var senderReference = new ContentUserV2.RegisteredLetter.SenderReference(REGISTERED_LETTER_SENDER_REFERENCE);
+		var registeredLetter = new ContentUserV2.RegisteredLetter(REGISTERED_LETTER_EXPIRES_AT, senderReference, registeredLetterHidden);
 
 		var contentUser = new ContentUserV2(LEGAL_ID, SUBJECT, TYPE, registeredLetter, List.of(partsResponsive));
 
@@ -32,7 +34,7 @@ class ContentUserV2Test {
 		assertThat(contentUser.registered()).isEqualTo(registeredLetter);
 		assertThat(contentUser.registered()).satisfies(registered -> {
 			assertThat(registered.expiresAt()).isEqualTo(REGISTERED_LETTER_EXPIRES_AT);
-			assertThat(registered.senderReference()).isEqualTo(REGISTERED_LETTER_SENDER_REFERENCE);
+			assertThat(registered.senderReference()).isEqualTo(new ContentUserV2.RegisteredLetter.SenderReference(REGISTERED_LETTER_SENDER_REFERENCE));
 			assertThat(registered.hidden()).satisfies(hidden -> {
 				assertThat(hidden.sender()).isEqualTo(REGISTERED_LETTER_HIDDEN_SENDER);
 				assertThat(hidden.subject()).isEqualTo(REGISTERED_LETTER_HIDDEN_SUBJECT);
@@ -48,6 +50,7 @@ class ContentUserV2Test {
 
 	@Test
 	void testBuilder() {
+		var senderReference = new ContentUserV2.RegisteredLetter.SenderReference(REGISTERED_LETTER_SENDER_REFERENCE);
 		var partsResponsive = PartsResponsiveBuilder.create()
 			.withData(PARTS_RESPONSIVE_DATA)
 			.withName(PARTS_RESPONSIVE_NAME)
@@ -61,7 +64,7 @@ class ContentUserV2Test {
 
 		var registeredLetter = RegisteredLetterBuilder.create()
 			.withExpiresAt(REGISTERED_LETTER_EXPIRES_AT)
-			.withSenderReference(REGISTERED_LETTER_SENDER_REFERENCE)
+			.withSenderReference(senderReference)
 			.withHidden(registeredLetterHidden)
 			.build();
 
@@ -79,7 +82,7 @@ class ContentUserV2Test {
 		assertThat(contentUser.registered()).isEqualTo(registeredLetter);
 		assertThat(contentUser.registered()).satisfies(registered -> {
 			assertThat(registered.expiresAt()).isEqualTo(REGISTERED_LETTER_EXPIRES_AT);
-			assertThat(registered.senderReference()).isEqualTo(REGISTERED_LETTER_SENDER_REFERENCE);
+			assertThat(registered.senderReference()).isEqualTo(new ContentUserV2.RegisteredLetter.SenderReference(REGISTERED_LETTER_SENDER_REFERENCE));
 			assertThat(registered.hidden()).satisfies(hidden -> {
 				assertThat(hidden.sender()).isEqualTo(REGISTERED_LETTER_HIDDEN_SENDER);
 				assertThat(hidden.subject()).isEqualTo(REGISTERED_LETTER_HIDDEN_SUBJECT);
