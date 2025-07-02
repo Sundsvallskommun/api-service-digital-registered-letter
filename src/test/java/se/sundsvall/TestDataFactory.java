@@ -1,5 +1,6 @@
 package se.sundsvall;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import se.sundsvall.digitalregisteredletter.api.model.Attachments;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
@@ -12,12 +13,28 @@ import se.sundsvall.digitalregisteredletter.api.model.LettersBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfo;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.PartsResponsiveBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterHiddenBuilder;
 
 public class TestDataFactory {
+
+	public static final OffsetDateTime NOW = OffsetDateTime.now();
+
+	public static LetterEntity createLetterEntity() {
+		return LetterEntity.create()
+			.withId("letter-id")
+			.withMunicipalityId("municipality-id")
+			.withBody("This is the body of the letter")
+			.withContentType("text/plain")
+			.withStatus("NEW")
+			.withAttachments(List.of(createAttachmentEntity()))
+			.withSupportInfo(createLetterEntitySupportInfo())
+			.withCreated(NOW)
+			.withUpdated(NOW);
+	}
 
 	public static LetterRequest createLetterRequest() {
 		return LetterRequestBuilder.create()
@@ -43,6 +60,14 @@ public class TestDataFactory {
 	public static Letters createLetters() {
 		return LettersBuilder.create()
 			.build();
+	}
+
+	public static se.sundsvall.digitalregisteredletter.integration.db.SupportInfo createLetterEntitySupportInfo() {
+		return se.sundsvall.digitalregisteredletter.integration.db.SupportInfo.create()
+			.withSupportText("Support text")
+			.withContactInformationUrl("https://example.com/support")
+			.withContactInformationEmail("support@email.com")
+			.withContactInformationPhoneNumber("+46123456789");
 	}
 
 	public static SupportInfo createSupportInfo() {
@@ -72,8 +97,8 @@ public class TestDataFactory {
 
 	public static ContentUserV2.RegisteredLetter createRegisteredLetter() {
 		return RegisteredLetterBuilder.create()
-			.withSenderReference("senderReference")
-			.withExpiresAt("2025-06-18")
+			.withSenderReference(new ContentUserV2.RegisteredLetter.SenderReference("senderReference"))
+			.withExpiresAt(OffsetDateTime.now())
 			.withHidden(createRegisteredLetterHidden())
 			.build();
 	}

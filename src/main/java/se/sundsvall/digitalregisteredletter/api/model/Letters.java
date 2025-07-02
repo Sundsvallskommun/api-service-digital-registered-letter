@@ -15,8 +15,6 @@ public record Letters(
 
 	@JsonProperty("_meta") @Schema(implementation = PagingAndSortingMetaData.class, accessMode = READ_ONLY) PagingAndSortingMetaData metaData,
 
-	@ArraySchema(schema = @Schema(implementation = Letter.class, accessMode = READ_ONLY)) List<Letter> letters
-
-) {
+	@ArraySchema(schema = @Schema(implementation = Letter.class, accessMode = READ_ONLY)) List<Letter> letters) {
 
 }

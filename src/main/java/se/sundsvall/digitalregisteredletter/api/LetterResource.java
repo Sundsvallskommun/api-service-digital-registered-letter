@@ -5,9 +5,11 @@ import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
+import static se.sundsvall.digitalregisteredletter.service.util.ParseUtil.parseLetterRequest;
 import static se.sundsvall.digitalregisteredletter.service.util.ValidationUtil.validate;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,7 +71,7 @@ class LetterResource {
 		return ok(letterService.getLetter(municipalityId, letterId));
 	}
 
-	@PostMapping(produces = ALL_VALUE)
+	@PostMapping(produces = ALL_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
 	@Operation(summary = "Send letter",
 		description = "Send a digital registered letter using Kivra",
 		responses = @ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
@@ -78,7 +80,7 @@ class LetterResource {
 		@RequestPart(name = "letter") @Schema(description = "LetterRequest as a JSON string", implementation = LetterRequest.class) final String letterString,
 		@RequestPart(name = "letterAttachments") @ValidPdf final List<MultipartFile> files) {
 		// Parses the letter string to an actual LetterRequest object and validates it.
-		var letterRequest = letterService.parseLetterRequest(letterString);
+		var letterRequest = parseLetterRequest(letterString);
 		validate(letterRequest);
 
 		// Places the multipart files into an Attachments object and validates it.

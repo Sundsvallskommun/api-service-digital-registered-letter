@@ -3,8 +3,7 @@ package se.sundsvall.digitalregisteredletter.integration.kivra;
 import static java.util.Collections.emptyList;
 import static se.sundsvall.digitalregisteredletter.service.util.BlobUtil.convertBlobToBase64String;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,8 +42,8 @@ public final class KivraMapper {
 	 */
 	public static ContentUserV2.RegisteredLetter toRegisteredLetter(final String reference) {
 		return RegisteredLetterBuilder.create()
-			.withExpiresAt(LocalDateTime.now().plusDays(30).format(DateTimeFormatter.ISO_DATE_TIME))
-			.withSenderReference(reference)
+			.withExpiresAt(OffsetDateTime.now().plusDays(30))
+			.withSenderReference(new ContentUserV2.RegisteredLetter.SenderReference(reference))
 			.withHidden(createRegisteredLetterHidden())
 			.build();
 	}

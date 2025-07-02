@@ -99,7 +99,6 @@ class LetterResourceTest {
 		multipartBodyBuilder.part("letterAttachments", "file-content").filename("tesst2.txt").contentType(APPLICATION_PDF);
 		multipartBodyBuilder.part("letter", createLetterRequest);
 
-		when(letterServiceMock.parseLetterRequest(any())).thenReturn(createLetterRequest);
 		when(letterServiceMock.sendLetter(any(), any(), any())).thenReturn(letterId);
 
 		webTestClient.post()
@@ -110,7 +109,6 @@ class LetterResourceTest {
 			.expectStatus().isCreated()
 			.expectHeader().valueEquals("Location", "/%s/letters/%s".formatted(MUNICIPALITY_ID, letterId));
 
-		verify(letterServiceMock).parseLetterRequest(any());
 		verify(letterServiceMock).sendLetter(any(), any(), any());
 	}
 }

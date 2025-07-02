@@ -2,6 +2,8 @@ package se.sundsvall.digitalregisteredletter.service.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityManager;
@@ -44,6 +46,8 @@ class BlobUtilTest {
 		var spy = Mockito.spy(blobUtil);
 		var multipartFile = Mockito.mock(MultipartFile.class);
 
+		when(multipartFile.getBytes()).thenReturn(new byte[123]);
+
 		var session = Mockito.mock(Session.class);
 		when(spy.getSession()).thenReturn(session);
 
@@ -51,7 +55,7 @@ class BlobUtilTest {
 		when(session.getLobHelper()).thenReturn(lobHelper);
 
 		var blob = Mockito.mock(Blob.class);
-		when(lobHelper.createBlob(multipartFile.getInputStream(), multipartFile.getSize())).thenReturn(blob);
+		when(lobHelper.createBlob(any(), eq(123L))).thenReturn(blob);
 
 		var result = spy.createBlob(multipartFile);
 
@@ -64,13 +68,7 @@ class BlobUtilTest {
 		var multipartFile = Mockito.mock(MultipartFile.class);
 		when(multipartFile.getOriginalFilename()).thenReturn("TestFile.txt");
 
-		when(multipartFile.getInputStream()).thenThrow(new IOException("Test exception"));
-
-		var session = Mockito.mock(Session.class);
-		when(spy.getSession()).thenReturn(session);
-
-		var lobHelper = Mockito.mock(LobHelper.class);
-		when(session.getLobHelper()).thenReturn(lobHelper);
+		when(multipartFile.getBytes()).thenThrow(new IOException("Test exception"));
 
 		assertThatThrownBy(() -> spy.createBlob(multipartFile))
 			.isInstanceOf(Problem.class)
@@ -79,9 +77,11 @@ class BlobUtilTest {
 	}
 
 	@Test
-	void convertToBlobTest() {
+	void convertToBlobTest() throws IOException {
 		var spy = Mockito.spy(blobUtil);
 		var multipartFile = Mockito.mock(MultipartFile.class);
+
+		when(multipartFile.getBytes()).thenReturn(new byte[123]);
 
 		var session = Mockito.mock(Session.class);
 		when(spy.getSession()).thenReturn(session);
