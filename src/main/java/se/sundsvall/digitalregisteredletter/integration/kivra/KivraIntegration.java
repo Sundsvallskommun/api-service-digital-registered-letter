@@ -29,8 +29,8 @@ public class KivraIntegration {
 	/**
 	 * Checks if the provided legal IDs are eligible for Kivra.
 	 *
-	 * @param legalIds List of legal IDs to check eligibility for.
-	 * @return List of legal IDs that are eligible for Kivra.
+	 * @param  legalIds List of legal IDs to check eligibility for.
+	 * @return          List of legal IDs that are eligible for Kivra.
 	 */
 	public List<String> checkEligibility(final List<String> legalIds) {
 		try {
@@ -48,9 +48,9 @@ public class KivraIntegration {
 	/**
 	 * Sends content to Kivra for the specified letter entity and legal ID.
 	 *
-	 * @param letterEntity The letter entity containing the content to be sent.
-	 * @param legalId The legal ID of the recipient.
-	 * @return The status that indicates whether the content was sent successfully or if there was an error.
+	 * @param  letterEntity The letter entity containing the content to be sent.
+	 * @param  legalId      The legal ID of the recipient.
+	 * @return              The status that indicates whether the content was sent successfully or if there was an error.
 	 */
 	public String sendContent(final LetterEntity letterEntity, final String legalId) {
 		try {
@@ -94,8 +94,8 @@ public class KivraIntegration {
 	/**
 	 * Retrieves a specific registered letter response from Kivra using the provided response key.
 	 *
-	 * @param responseKey The key of the response to retrieve.
-	 * @return The RegisteredLetterResponse object containing the details of the response.
+	 * @param  responseKey The key of the response to retrieve.
+	 * @return             The RegisteredLetterResponse object containing the details of the response.
 	 */
 	public RegisteredLetterResponse getRegisteredLetterResponse(final String responseKey) {
 		try {

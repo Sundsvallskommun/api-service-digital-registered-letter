@@ -27,14 +27,17 @@ public class KivraConfiguration {
 		this.properties = properties;
 	}
 
-	/*@Bean
-	FeignBuilderCustomizer feignBuilderCustomizer(final KivraProperties kivraProperties, final ClientRegistrationRepository clientRegistrationRepository) {
-		return FeignMultiCustomizer.create()
-			.withErrorDecoder(new JsonPathErrorDecoder(CLIENT_ID, new JsonPathErrorDecoder.JsonPathSetup("$.long_message")))
-			.withRequestTimeoutsInSeconds(kivraProperties.connectTimeout(), kivraProperties.readTimeout())
-			.withRetryableOAuth2InterceptorForClientRegistration(clientRegistrationRepository.findByRegistrationId(CLIENT_ID))
-			.composeCustomizersToOne();
-	}*/
+	/*
+	 * @Bean
+	 * FeignBuilderCustomizer feignBuilderCustomizer(final KivraProperties kivraProperties, final
+	 * ClientRegistrationRepository clientRegistrationRepository) {
+	 * return FeignMultiCustomizer.create()
+	 * .withErrorDecoder(new JsonPathErrorDecoder(CLIENT_ID, new JsonPathErrorDecoder.JsonPathSetup("$.long_message")))
+	 * .withRequestTimeoutsInSeconds(kivraProperties.connectTimeout(), kivraProperties.readTimeout())
+	 * .withRetryableOAuth2InterceptorForClientRegistration(clientRegistrationRepository.findByRegistrationId(CLIENT_ID))
+	 * .composeCustomizersToOne();
+	 * }
+	 */
 
 	@Bean
 	FeignBuilderCustomizer feignBuilderCustomizer() {

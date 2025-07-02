@@ -264,7 +264,7 @@ public class LetterEntity {
 		LetterEntity that = (LetterEntity) o;
 		return deleted == that.deleted && Objects.equals(id, that.id) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(body, that.body) && Objects.equals(contentType, that.contentType)
 			&& Objects.equals(status, that.status) && Objects.equals(subject, that.subject) && Objects.equals(partyId, that.partyId) && Objects.equals(created, that.created) && Objects.equals(updated,
-			that.updated) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments, that.attachments);
+				that.updated) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments, that.attachments);
 	}
 
 	@Override
