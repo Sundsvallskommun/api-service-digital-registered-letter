@@ -49,8 +49,8 @@ public class BlobUtil {
 	/**
 	 * Converts a Blob to a Base64 encoded string.
 	 *
-	 * @param blob the Blob to convert
-	 * @return the Base64 encoded string representation of the Blob
+	 * @param  blob the Blob to convert
+	 * @return      the Base64 encoded string representation of the Blob
 	 */
 	public static String convertBlobToBase64String(final Blob blob) {
 		try {

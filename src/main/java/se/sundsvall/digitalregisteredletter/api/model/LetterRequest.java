@@ -22,10 +22,10 @@ public record LetterRequest(
 
 	@Valid @NotNull @Schema(implementation = SupportInfo.class, description = "Support information for the letter") SupportInfo supportInfo,
 
-	@OneOf({
+	@OneOf( {
 		TEXT_PLAIN_VALUE, TEXT_HTML_VALUE
 	}) @Schema(description = "Content type of the letter body, e.g., 'text/plain' or 'text/html'", example = "text/plain", requiredMode = REQUIRED) String contentType,
 
-	@NotBlank @Schema(description = "Body of the letter", example = "This is the content of the letter. Plain-text body", requiredMode = REQUIRED) String body) {
+	@NotBlank @Schema(description = "Body of the letter", example = "This is the content of the letter. Plain-text body", requiredMode = REQUIRED) String body){
 
 }

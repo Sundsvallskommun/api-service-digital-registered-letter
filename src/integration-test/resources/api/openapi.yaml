@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:61447
+  - url: http://localhost:60724
     description: Generated server url
 tags:
   - name: Letter Resource
@@ -86,7 +86,7 @@ paths:
             type: string
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               required:
                 - letter
@@ -197,7 +197,7 @@ components:
         partyId:
           type: string
           description: Party ID of the recipient
-          example: 123e4567-e89b-12d3-a456-426614174000
+          example: 7ca29702-a07f-4e13-a66a-4ebc27929cfd
         subject:
           minLength: 1
           type: string
