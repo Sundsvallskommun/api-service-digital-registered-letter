@@ -7,12 +7,44 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:60724
+  - url: http://localhost:64405
     description: Generated server url
 tags:
+  - name: Scheduler Resource
+    description: Manually trigger scheduled tasks
   - name: Letter Resource
     description: Send and manage digital registered letters
 paths:
+  /{municipalityId}/scheduler:
+    post:
+      tags:
+        - Scheduler Resource
+      summary: Trigger update letter statuses task
+      description: Triggers the task that updates letter statuses
+      operationId: updateLetterStatuses
+      parameters:
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful Operation - OK
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/letters:
     get:
       tags:
@@ -185,63 +217,6 @@ paths:
       x-wso2-mutual-ssl: Optional
 components:
   schemas:
-    LetterRequest:
-      required:
-        - body
-        - contentType
-        - partyId
-        - subject
-        - supportInfo
-      type: object
-      properties:
-        partyId:
-          type: string
-          description: Party ID of the recipient
-          example: 7ca29702-a07f-4e13-a66a-4ebc27929cfd
-        subject:
-          minLength: 1
-          type: string
-          description: Subject of the letter
-          example: Important Notification
-        supportInfo:
-          $ref: "#/components/schemas/SupportInfo"
-        contentType:
-          type: string
-          description: "Content type of the letter body, e.g., 'text/plain' or 'text/html'"
-          example: text/plain
-        body:
-          minLength: 1
-          type: string
-          description: Body of the letter
-          example: This is the content of the letter. Plain-text body
-      description: LetterRequest as a JSON string
-    SupportInfo:
-      required:
-        - contactInformationEmail
-        - contactInformationPhoneNumber
-        - contactInformationUrl
-        - supportText
-      type: object
-      properties:
-        supportText:
-          minLength: 1
-          type: string
-          description: Support text for the letter
-          example: "For support, please contact us at the information below."
-        contactInformationUrl:
-          minLength: 1
-          type: string
-          description: URL for contact
-          example: https://example.com/support
-        contactInformationPhoneNumber:
-          type: string
-          description: Phone number for contact
-          example: "+46123456789"
-        contactInformationEmail:
-          type: string
-          description: Email address for contact
-          example: support@email.com
-      description: Support information for the letter
     Problem:
       type: object
       properties:
@@ -436,6 +411,63 @@ components:
           type: string
         message:
           type: string
+    LetterRequest:
+      required:
+        - body
+        - contentType
+        - partyId
+        - subject
+        - supportInfo
+      type: object
+      properties:
+        partyId:
+          type: string
+          description: Party ID of the recipient
+          example: 7ca29702-a07f-4e13-a66a-4ebc27929cfd
+        subject:
+          minLength: 1
+          type: string
+          description: Subject of the letter
+          example: Important Notification
+        supportInfo:
+          $ref: "#/components/schemas/SupportInfo"
+        contentType:
+          type: string
+          description: "Content type of the letter body, e.g., 'text/plain' or 'text/html'"
+          example: text/plain
+        body:
+          minLength: 1
+          type: string
+          description: Body of the letter
+          example: This is the content of the letter. Plain-text body
+      description: LetterRequest as a JSON string
+    SupportInfo:
+      required:
+        - contactInformationEmail
+        - contactInformationPhoneNumber
+        - contactInformationUrl
+        - supportText
+      type: object
+      properties:
+        supportText:
+          minLength: 1
+          type: string
+          description: Support text for the letter
+          example: "For support, please contact us at the information below."
+        contactInformationUrl:
+          minLength: 1
+          type: string
+          description: URL for contact
+          example: https://example.com/support
+        contactInformationPhoneNumber:
+          type: string
+          description: Phone number for contact
+          example: "+46123456789"
+        contactInformationEmail:
+          type: string
+          description: Email address for contact
+          example: support@email.com
+      description: Support information for the letter
     Attachment:
       type: object
       properties:

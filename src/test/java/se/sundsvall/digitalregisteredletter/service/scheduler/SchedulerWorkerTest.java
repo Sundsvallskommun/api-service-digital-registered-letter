@@ -1,14 +1,16 @@
-package se.sundsvall.digitalregisteredletter.service;
+package se.sundsvall.digitalregisteredletter.service.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.TestDataFactory.NOW;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,7 +18,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.dao.LetterRepository;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
@@ -25,22 +26,24 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLe
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponseBuilder;
 
 @ExtendWith(MockitoExtension.class)
-class SchedulerServiceTest {
+class SchedulerWorkerTest {
 
 	@Mock
-	private KivraIntegration kivraIntegration;
+	private KivraIntegration kivraIntegrationMock;
 
 	@Mock
-	private LetterRepository letterRepository;
-
-	@Mock
-	private Dept44HealthUtility dept44HealthUtility;
+	private LetterRepository letterRepositoryMock;
 
 	@Captor
 	private ArgumentCaptor<LetterEntity> letterEntityCaptor;
 
 	@InjectMocks
-	private SchedulerService schedulerService;
+	private SchedulerWorker schedulerWorker;
+
+	@AfterEach
+	void ensureNoInteractionsWereMissed() {
+		verifyNoMoreInteractions(kivraIntegrationMock, letterRepositoryMock);
+	}
 
 	@Test
 	void updateLetterStatuses() {
@@ -53,19 +56,18 @@ class SchedulerServiceTest {
 		var registeredLetterResponse = RegisteredLetterResponseBuilder.create()
 			.withSignedAt(NOW).withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter.getId())).build();
 
-		when(kivraIntegration.getAllResponses()).thenReturn(keyValues);
-		when(kivraIntegration.getRegisteredLetterResponse("responseKey")).thenReturn(registeredLetterResponse);
-		when(letterRepository.findByIdAndDeleted(letter.getId(), false)).thenReturn(Optional.of(letter));
+		when(kivraIntegrationMock.getAllResponses()).thenReturn(keyValues);
+		when(kivraIntegrationMock.getRegisteredLetterResponse("responseKey")).thenReturn(registeredLetterResponse);
+		when(letterRepositoryMock.findByIdAndDeleted(letter.getId(), false)).thenReturn(Optional.of(letter));
 
-		schedulerService.updateLetterStatuses();
+		schedulerWorker.updateLetterStatuses();
 
-		verify(kivraIntegration).getAllResponses();
-		verify(kivraIntegration, times(2)).getRegisteredLetterResponse("responseKey");
-		verify(letterRepository, times(2)).findByIdAndDeleted(letter.getId(), false);
-		verify(letterRepository, times(2)).save(letterEntityCaptor.capture());
+		verify(kivraIntegrationMock).getAllResponses();
+		verify(kivraIntegrationMock, times(2)).getRegisteredLetterResponse("responseKey");
+		verify(letterRepositoryMock, times(2)).findByIdAndDeleted(letter.getId(), false);
+		verify(letterRepositoryMock, times(2)).save(letterEntityCaptor.capture());
 		var savedLetter = letterEntityCaptor.getValue();
 		assertThat(savedLetter.getStatus()).isEqualTo(status.toUpperCase());
-		verify(kivraIntegration, times(2)).deleteResponse("responseKey");
+		verify(kivraIntegrationMock, times(2)).deleteResponse("responseKey");
 	}
-
 }

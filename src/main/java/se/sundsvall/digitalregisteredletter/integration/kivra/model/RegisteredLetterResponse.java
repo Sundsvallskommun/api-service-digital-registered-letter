@@ -11,6 +11,6 @@ public record RegisteredLetterResponse(
 	@JsonProperty("sender_reference") SenderReference senderReference) {
 
 	public record SenderReference(
-		@JsonProperty("internal_id") String internalId) {
+		@JsonProperty("sender_internal_id") String internalId) {
 	}
 }

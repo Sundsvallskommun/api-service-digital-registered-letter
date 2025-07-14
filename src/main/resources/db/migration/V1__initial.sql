@@ -5,7 +5,7 @@ CREATE TABLE attachment
     content_type VARCHAR(50)  NULL,
     content      LONGBLOB     NULL,
     letter_id    VARCHAR(36)  NOT NULL,
-    CONSTRAINT pk_attachment PRIMARY KEY (id)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE letter
@@ -18,14 +18,23 @@ CREATE TABLE letter
     subject                   VARCHAR(255) NULL,
     party_id                  VARCHAR(36)  NULL,
     deleted                   BIT(1)       NOT NULL,
-    created                   datetime     NULL,
-    updated                   datetime     NULL,
+    created                   DATETIME     NULL,
+    updated                   DATETIME     NULL,
     support_text              VARCHAR(255) NULL,
     support_information_url   VARCHAR(255) NULL,
     support_information_email VARCHAR(255) NULL,
     support_information_phone VARCHAR(255) NULL,
-    CONSTRAINT pk_letter PRIMARY KEY (id)
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE shedlock
+(
+    name       VARCHAR(64)  NOT NULL,
+    lock_until TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    locked_at  TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    locked_by  VARCHAR(255) NOT NULL,
+    PRIMARY KEY (name)
 );
 
 ALTER TABLE attachment
-    ADD CONSTRAINT FK_ATTACHMENT_ON_LETTER FOREIGN KEY (letter_id) REFERENCES letter (id);
+    ADD CONSTRAINT fk_attachment_letter FOREIGN KEY (letter_id) REFERENCES letter (id);

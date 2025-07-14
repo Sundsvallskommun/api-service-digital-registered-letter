@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.TestDataFactory.NOW;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,13 +35,18 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2S
 class KivraIntegrationTest {
 
 	@Mock
-	private KivraMapper kivraMapper;
+	private KivraMapper kivraMapperMock;
 
 	@Mock
-	private KivraClient kivraClient;
+	private KivraClient kivraClientMock;
 
 	@InjectMocks
 	private KivraIntegration kivraIntegration;
+
+	@AfterEach
+	void ensureNoInteractionsWereMissed() {
+		verifyNoMoreInteractions(kivraMapperMock, kivraClientMock);
+	}
 
 	@Test
 	void checkEligibilityTest() {
@@ -47,8 +54,8 @@ class KivraIntegrationTest {
 		var userMatchV2SSN = new UserMatchV2SSN(legalIds);
 		var requestCaptor = ArgumentCaptor.forClass(UserMatchV2SSN.class);
 
-		when(kivraMapper.toCheckEligibilityRequest(legalIds)).thenReturn(userMatchV2SSN);
-		when(kivraClient.checkEligibility(requestCaptor.capture())).thenReturn(userMatchV2SSN);
+		when(kivraMapperMock.toCheckEligibilityRequest(legalIds)).thenReturn(userMatchV2SSN);
+		when(kivraClientMock.checkEligibility(requestCaptor.capture())).thenReturn(userMatchV2SSN);
 
 		var result = kivraIntegration.checkEligibility(legalIds);
 		assertThat(result).isNotNull().hasSize(1).containsExactly(legalIds.getFirst());
@@ -57,7 +64,8 @@ class KivraIntegrationTest {
 		assertThat(capturedRequest).isNotNull();
 		assertThat(capturedRequest.legalIds()).hasSize(1).containsExactly(legalIds.getFirst());
 
-		verify(kivraClient).checkEligibility(capturedRequest);
+		verify(kivraMapperMock).toCheckEligibilityRequest(legalIds);
+		verify(kivraClientMock).checkEligibility(capturedRequest);
 	}
 
 	@Test
@@ -65,14 +73,14 @@ class KivraIntegrationTest {
 		var legalId = "1234567890";
 		var legalIds = List.of(legalId);
 		var request = new UserMatchV2SSN(legalIds);
-		when(kivraMapper.toCheckEligibilityRequest(legalIds)).thenReturn(request);
-		when(kivraClient.checkEligibility(request)).thenThrow(new RuntimeException("Kivra service error"));
+		when(kivraMapperMock.toCheckEligibilityRequest(legalIds)).thenReturn(request);
+		when(kivraClientMock.checkEligibility(request)).thenThrow(new RuntimeException("Kivra service error"));
 
 		assertThatThrownBy(() -> kivraIntegration.checkEligibility(legalIds))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Exception occurred while checking Kivra eligibility for legal ids: %s", legalIds);
 
-		verify(kivraClient).checkEligibility(request);
+		verify(kivraClientMock).checkEligibility(request);
 	}
 
 	@ParameterizedTest
@@ -87,8 +95,8 @@ class KivraIntegrationTest {
 			.build());
 
 		var requestCaptor = ArgumentCaptor.forClass(ContentUserV2.class);
-		when(kivraMapper.toSendContentRequest(letterEntity, legalId)).thenCallRealMethod();
-		when(kivraClient.sendContent(requestCaptor.capture())).thenReturn(response);
+		when(kivraMapperMock.toSendContentRequest(letterEntity, legalId)).thenCallRealMethod();
+		when(kivraClientMock.sendContent(requestCaptor.capture())).thenReturn(response);
 
 		var result = kivraIntegration.sendContent(letterEntity, legalId);
 
@@ -100,7 +108,10 @@ class KivraIntegrationTest {
 		assertThat(capturedRequest.legalId()).isEqualTo(legalId);
 		assertThat(capturedRequest.type()).isEqualTo("registered.letter");
 
-		verify(kivraClient).sendContent(capturedRequest);
+		verify(kivraMapperMock).toSendContentRequest(letterEntity, legalId);
+		verify(kivraMapperMock).toRegisteredLetter(letterEntity.getId());
+		verify(kivraMapperMock).toPartsResponsives(letterEntity.getAttachments());
+		verify(kivraClientMock).sendContent(capturedRequest);
 	}
 
 	private static Stream<Arguments> provideSendContentResponses() {
@@ -115,13 +126,14 @@ class KivraIntegrationTest {
 	void sendContentKivraThrows() {
 		var letterEntity = new LetterEntity();
 		var legalId = "1234567890";
-		when(kivraClient.sendContent(any())).thenThrow(new RuntimeException("Kivra service error"));
+		when(kivraClientMock.sendContent(any())).thenThrow(new RuntimeException("Kivra service error"));
 
 		assertThatThrownBy(() -> kivraIntegration.sendContent(letterEntity, legalId))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Exception occurred while sending content to Kivra for legal id: %s", legalId);
 
-		verify(kivraClient).sendContent(any());
+		verify(kivraClientMock).sendContent(any());
+		verify(kivraMapperMock).toSendContentRequest(letterEntity, legalId);
 	}
 
 	@Test
@@ -134,7 +146,7 @@ class KivraIntegrationTest {
 			.build();
 		var keyValues = List.of(keyValue);
 
-		when(kivraClient.getAllResponses()).thenReturn(keyValues);
+		when(kivraClientMock.getAllResponses()).thenReturn(keyValues);
 
 		var result = kivraIntegration.getAllResponses();
 
@@ -147,13 +159,13 @@ class KivraIntegrationTest {
 
 	@Test
 	void getAllResponsesKivraThrows() {
-		when(kivraClient.getAllResponses()).thenThrow(new RuntimeException("Kivra service error"));
+		when(kivraClientMock.getAllResponses()).thenThrow(new RuntimeException("Kivra service error"));
 
 		assertThatThrownBy(() -> kivraIntegration.getAllResponses())
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Exception occurred while retrieving Kivra responses");
 
-		verify(kivraClient).getAllResponses();
+		verify(kivraClientMock).getAllResponses();
 	}
 
 	@Test
@@ -165,7 +177,7 @@ class KivraIntegrationTest {
 			.withSenderReference(new RegisteredLetterResponse.SenderReference("internalId"))
 			.build();
 
-		when(kivraClient.getResponseDetails(responseKey)).thenReturn(registeredLetterResponse);
+		when(kivraClientMock.getResponseDetails(responseKey)).thenReturn(registeredLetterResponse);
 
 		var result = kivraIntegration.getRegisteredLetterResponse(responseKey);
 
@@ -174,19 +186,19 @@ class KivraIntegrationTest {
 		assertThat(result.signedAt()).isEqualTo(NOW);
 		assertThat(result.senderReference().internalId()).isEqualTo("internalId");
 
-		verify(kivraClient).getResponseDetails(responseKey);
+		verify(kivraClientMock).getResponseDetails(responseKey);
 	}
 
 	@Test
 	void getRegisteredLetterResponseKivraThrows() {
 		var responseKey = "responseKey";
-		when(kivraClient.getResponseDetails(responseKey)).thenThrow(new RuntimeException("Kivra service error"));
+		when(kivraClientMock.getResponseDetails(responseKey)).thenThrow(new RuntimeException("Kivra service error"));
 
 		assertThatThrownBy(() -> kivraIntegration.getRegisteredLetterResponse(responseKey))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Exception occurred while retrieving Kivra registered letter response for responseKey: %s", responseKey);
 
-		verify(kivraClient).getResponseDetails(responseKey);
+		verify(kivraClientMock).getResponseDetails(responseKey);
 	}
 
 	@Test
@@ -195,18 +207,18 @@ class KivraIntegrationTest {
 
 		kivraIntegration.deleteResponse(responseKey);
 
-		verify(kivraClient).deleteResponse(responseKey);
+		verify(kivraClientMock).deleteResponse(responseKey);
 	}
 
 	@Test
 	void deleteResponseKivraThrows() {
 		var responseKey = "responseKey";
-		when(kivraClient.deleteResponse(responseKey)).thenThrow(new RuntimeException("Kivra service error"));
+		when(kivraClientMock.deleteResponse(responseKey)).thenThrow(new RuntimeException("Kivra service error"));
 
 		assertThatThrownBy(() -> kivraIntegration.deleteResponse(responseKey))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Exception occurred while deleting Kivra response for responseKey: %s", responseKey);
 
-		verify(kivraClient).deleteResponse(responseKey);
+		verify(kivraClientMock).deleteResponse(responseKey);
 	}
 }

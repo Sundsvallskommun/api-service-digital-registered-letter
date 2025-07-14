@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityManager;
@@ -12,6 +14,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import org.hibernate.LobHelper;
 import org.hibernate.Session;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,16 +28,21 @@ import org.zalando.problem.Problem;
 class BlobUtilTest {
 
 	@Mock
-	private EntityManager entityManager;
+	private EntityManager entityManagerMock;
 
 	@InjectMocks
 	private BlobUtil blobUtil;
+
+	@AfterEach
+	void ensureNoInteractionsWereMissed() {
+		verifyNoMoreInteractions(entityManagerMock);
+	}
 
 	@Test
 	void getSessionTest() {
 
 		var session = Mockito.mock(Session.class);
-		when(entityManager.unwrap(Session.class)).thenReturn(session);
+		when(entityManagerMock.unwrap(Session.class)).thenReturn(session);
 
 		var result = blobUtil.getSession();
 
@@ -60,6 +68,7 @@ class BlobUtilTest {
 		var result = spy.createBlob(multipartFile);
 
 		assertThat(result).isEqualTo(blob);
+		verify(entityManagerMock).unwrap(any());
 	}
 
 	@Test
@@ -94,6 +103,7 @@ class BlobUtilTest {
 		var result = spy.convertToBlob(multipartFile);
 
 		assertThat(result).isEqualTo(blob);
+		verify(entityManagerMock).unwrap(any());
 	}
 
 	@Test

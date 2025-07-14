@@ -3,11 +3,13 @@ package se.sundsvall.digitalregisteredletter.integration.party;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import generated.se.sundsvall.party.PartyType;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +25,11 @@ class PartyIntegrationTest {
 
 	@InjectMocks
 	private PartyIntegration partyIntegration;
+
+	@AfterEach
+	void ensureNoInteractionsWereMissed() {
+		verifyNoMoreInteractions(partyClient);
+	}
 
 	@Test
 	void getLegalIdByPartyId() {

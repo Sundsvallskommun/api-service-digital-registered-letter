@@ -83,7 +83,12 @@ public class KivraIntegration {
 	public List<KeyValue> getAllResponses() {
 		try {
 			LOG.info("Retrieving all Kivra responses");
+
 			var keyValues = kivraClient.getAllResponses();
+			if (keyValues == null || keyValues.isEmpty()) {
+				LOG.info("No Kivra responses found");
+				return emptyList();
+			}
 			LOG.info("Successfully retrieved {} Kivra responses", keyValues.size());
 			return keyValues;
 		} catch (Exception e) {

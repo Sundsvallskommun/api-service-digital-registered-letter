@@ -26,11 +26,11 @@ public class KivraMapper {
 		this.blobUtil = blobUtil;
 	}
 
-	public UserMatchV2SSN toCheckEligibilityRequest(final List<String> legalIds) {
+	UserMatchV2SSN toCheckEligibilityRequest(final List<String> legalIds) {
 		return new UserMatchV2SSN(legalIds);
 	}
 
-	public ContentUserV2 toSendContentRequest(final LetterEntity letterEntity, final String legalId) {
+	ContentUserV2 toSendContentRequest(final LetterEntity letterEntity, final String legalId) {
 		return ContentUserV2Builder.create()
 			.withLegalId(legalId)
 			.withSubject(letterEntity.getSubject())
@@ -46,7 +46,7 @@ public class KivraMapper {
 	 *
 	 * @return RegisteredLetter with visibility settings, expiration date and a sender reference.
 	 */
-	public ContentUserV2.RegisteredLetter toRegisteredLetter(final String reference) {
+	ContentUserV2.RegisteredLetter toRegisteredLetter(final String reference) {
 		return RegisteredLetterBuilder.create()
 			.withExpiresAt(OffsetDateTime.now().plusDays(30))
 			.withSenderReference(new ContentUserV2.RegisteredLetter.SenderReference(reference))
@@ -60,7 +60,7 @@ public class KivraMapper {
 	 *
 	 * @return RegisteredLetterHidden object that configures the visibility of the subject and sender in the Kivra inbox.
 	 */
-	public ContentUserV2.RegisteredLetter.RegisteredLetterHidden createRegisteredLetterHidden() {
+	ContentUserV2.RegisteredLetter.RegisteredLetterHidden createRegisteredLetterHidden() {
 		return RegisteredLetterHiddenBuilder.create()
 			// Setting sender to true means that the sender name and icon will be hidden in the Kivra Inbox.
 			.withSender(false)
@@ -69,7 +69,7 @@ public class KivraMapper {
 			.build();
 	}
 
-	public List<ContentUserV2.PartsResponsive> toPartsResponsives(final List<AttachmentEntity> entities) {
+	List<ContentUserV2.PartsResponsive> toPartsResponsives(final List<AttachmentEntity> entities) {
 		return Optional.ofNullable(entities).orElse(emptyList()).stream()
 			.map(this::toPartsResponsive)
 			.filter(Objects::nonNull)
@@ -83,7 +83,7 @@ public class KivraMapper {
 	 * @return                  a PartsResponsive object containing the attachment's name, content (as a Base64 string), and
 	 *                          content type,
 	 */
-	public ContentUserV2.PartsResponsive toPartsResponsive(final AttachmentEntity attachmentEntity) {
+	ContentUserV2.PartsResponsive toPartsResponsive(final AttachmentEntity attachmentEntity) {
 		return Optional.ofNullable(attachmentEntity).map(attachment -> PartsResponsiveBuilder.create()
 			.withName(attachment.getFileName())
 			.withData(blobUtil.convertBlobToBase64String(attachment.getContent()))

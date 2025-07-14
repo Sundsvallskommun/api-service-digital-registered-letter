@@ -6,12 +6,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -37,48 +39,57 @@ import se.sundsvall.digitalregisteredletter.service.mapper.AttachmentMapper;
 class LetterServiceTest {
 
 	@Mock
-	private LetterRepository letterRepository;
+	private LetterRepository letterRepositoryMock;
 
 	@Mock
-	private AttachmentMapper attachmentMapper;
+	private AttachmentMapper attachmentMapperMock;
+
+	@Mock
+	private PartyIntegration partyIntegrationMock;
+
+	@Mock
+	private KivraIntegration kivraIntegrationMock;
 
 	@Captor
 	private ArgumentCaptor<LetterEntity> letterEntityArgumentCaptor;
 
-	@Mock
-	private PartyIntegration partyIntegration;
-
-	@Mock
-	private KivraIntegration kivraIntegration;
-
 	@InjectMocks
 	private LetterService letterService;
+
+	@AfterEach
+	void ensureNoInteractionsWereMissed() {
+		verifyNoMoreInteractions(attachmentMapperMock, letterRepositoryMock, partyIntegrationMock, kivraIntegrationMock);
+	}
 
 	@Test
 	void sendLetterTest() {
 		var multipartFile = mock(MultipartFile.class);
 		var municipalityId = "2281";
 		var letterRequest = createLetterRequest();
+		var legalId = "legalId";
 		var attachments = AttachmentsBuilder.create()
 			.withFiles(List.of(multipartFile))
 			.build();
 		var attachmentEntity = AttachmentEntity.create()
 			.withContentType("application/pdf")
 			.withFileName("attachment.pdf");
-		when(letterRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-		when(attachmentMapper.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntity));
+		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+		when(attachmentMapperMock.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntity));
+		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(legalId);
 
 		var response = letterService.sendLetter(municipalityId, letterRequest, attachments);
 
 		assertThat(response).isNull();
 
-		verify(letterRepository, times(2)).save(letterEntityArgumentCaptor.capture());
+		verify(letterRepositoryMock, times(2)).save(letterEntityArgumentCaptor.capture());
 		var capturedLetterEntity = letterEntityArgumentCaptor.getValue();
 		assertThat(capturedLetterEntity).isNotNull();
 		assertThat(capturedLetterEntity.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(capturedLetterEntity.getAttachments()).containsExactly(attachmentEntity);
-		// TODO: This test is only partially done, complete when service logic is implemented.
 
+		verify(attachmentMapperMock).toAttachmentEntities(attachments);
+		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
+		verify(kivraIntegrationMock).sendContent(capturedLetterEntity, legalId);
 	}
 
 	@Test
@@ -87,7 +98,7 @@ class LetterServiceTest {
 		var letterId = "12345";
 		var letterEntity = createLetterEntity();
 
-		when(letterRepository.findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false))
+		when(letterRepositoryMock.findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false))
 			.thenReturn(Optional.of(letterEntity));
 
 		var result = letterService.getLetter(municipalityId, letterId);
@@ -105,7 +116,7 @@ class LetterServiceTest {
 		assertThat(result.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInfo().getContactInformationEmail());
 		assertThat(result.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInfo().getContactInformationPhoneNumber());
 
-		verify(letterRepository).findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false);
+		verify(letterRepositoryMock).findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false);
 	}
 
 	@Test
@@ -113,14 +124,14 @@ class LetterServiceTest {
 		var municipalityId = "2281";
 		var letterId = "12345";
 
-		when(letterRepository.findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false))
+		when(letterRepositoryMock.findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false))
 			.thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> letterService.getLetter(municipalityId, letterId))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Not Found: Letter with id '%s' and municipalityId '%s' not found", letterId, municipalityId);
 
-		verify(letterRepository).findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false);
+		verify(letterRepositoryMock).findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false);
 	}
 
 	@Test
@@ -129,7 +140,7 @@ class LetterServiceTest {
 		var pageable = mock(Pageable.class);
 		var letterEntity = createLetterEntity();
 
-		when(letterRepository.findAllByMunicipalityIdAndDeleted(municipalityId, false, pageable))
+		when(letterRepositoryMock.findAllByMunicipalityIdAndDeleted(municipalityId, false, pageable))
 			.thenReturn(new PageImpl<>(List.of(letterEntity)));
 
 		var result = letterService.getLetters(municipalityId, pageable);
@@ -153,7 +164,7 @@ class LetterServiceTest {
 			assertThat(letter.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInfo().getContactInformationPhoneNumber());
 		});
 
-		verify(letterRepository).findAllByMunicipalityIdAndDeleted(municipalityId, false, pageable);
+		verify(letterRepositoryMock).findAllByMunicipalityIdAndDeleted(municipalityId, false, pageable);
 	}
 
 }

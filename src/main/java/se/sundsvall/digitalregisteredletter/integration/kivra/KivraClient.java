@@ -23,6 +23,7 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2S
 @FeignClient(
 	name = CLIENT_ID,
 	url = "${integration.kivra.api-url}",
+	dismiss404 = true,
 	configuration = KivraConfiguration.class)
 @CircuitBreaker(name = CLIENT_ID)
 public interface KivraClient {
