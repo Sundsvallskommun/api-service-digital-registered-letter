@@ -73,7 +73,6 @@ class BlobUtilTest {
 		assertThatThrownBy(() -> spy.createBlob(multipartFile))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Internal Server Error: Could not convert file with name [ TestFile.txt ] to database object");
-
 	}
 
 	@Test
@@ -103,9 +102,20 @@ class BlobUtilTest {
 
 		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
 
-		var result = BlobUtil.convertBlobToBase64String(blob);
+		var result = blobUtil.convertBlobToBase64String(blob);
 
 		assertThat(result).isEqualTo("dGVzdA==");
+	}
+
+	@Test
+	void convertToBlob_SQLException() throws SQLException {
+		var blob = Mockito.mock(Blob.class);
+		when(blob.length()).thenThrow(new SQLException("Test exception"));
+
+		assertThatThrownBy(() -> blobUtil.convertBlobToBase64String(blob))
+			.isInstanceOf(Problem.class)
+			.hasMessage("Internal Server Error: Could not convert Blob to Base64 string: Test exception");
+
 	}
 
 }

@@ -3,11 +3,6 @@ package se.sundsvall.digitalregisteredletter.integration.kivra;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.when;
-import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.createRegisteredLetterHidden;
-import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toCheckEligibilityRequest;
-import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toPartsResponsives;
-import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toRegisteredLetter;
-import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toSendContentRequest;
 
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -17,21 +12,30 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
+import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
 @ExtendWith(MockitoExtension.class)
 class KivraMapperTest {
+
+	@Mock
+	private BlobUtil blobUtil;
+
+	@InjectMocks
+	private KivraMapper kivraMapper;
 
 	@Test
 	void toCheckEligibilityRequestTest() {
 		var legalId = "1234567890";
 		var legalIds = List.of(legalId);
 
-		var result = toCheckEligibilityRequest(legalIds);
+		var result = kivraMapper.toCheckEligibilityRequest(legalIds);
 
 		assertThat(result).isNotNull().satisfies(userMatchV2SSN -> assertThat(userMatchV2SSN.legalIds()).hasSize(1).containsExactly(legalId));
 	}
@@ -52,8 +56,9 @@ class KivraMapperTest {
 			.withSubject(subject)
 			.withId(letterId)
 			.withAttachments(List.of(attachment));
+		when(kivraMapper.toSendContentRequest(letterEntity, legalId)).thenCallRealMethod();
 
-		var result = toSendContentRequest(letterEntity, legalId);
+		var result = kivraMapper.toSendContentRequest(letterEntity, legalId);
 
 		assertThat(result).isNotNull().satisfies(contentUserV2 -> {
 			assertThat(contentUserV2.subject()).isEqualTo(subject);
@@ -80,7 +85,7 @@ class KivraMapperTest {
 	void toRegisteredLetterTest() {
 		var reference = "letterId";
 
-		var result = toRegisteredLetter(reference);
+		var result = kivraMapper.toRegisteredLetter(reference);
 
 		assertThat(result).isNotNull().satisfies(registeredLetter -> {
 			assertThat(registeredLetter.expiresAt()).isCloseTo(OffsetDateTime.now().plusDays(30), within(1, ChronoUnit.SECONDS));
@@ -95,7 +100,7 @@ class KivraMapperTest {
 	@Test
 	void createRegisteredLetterHiddenTest() {
 
-		var result = createRegisteredLetterHidden();
+		var result = kivraMapper.createRegisteredLetterHidden();
 
 		assertThat(result).isNotNull().satisfies(hidden -> {
 			assertThat(hidden.sender()).isFalse();
@@ -116,7 +121,9 @@ class KivraMapperTest {
 			.withFileName("test2.txt")
 			.withContent(blob);
 
-		var result = toPartsResponsives(List.of(attachment1, attachment2));
+		when(kivraMapper.toPartsResponsives(List.of(attachment1, attachment2))).thenCallRealMethod();
+
+		var result = kivraMapper.toPartsResponsives(List.of(attachment1, attachment2));
 
 		assertThat(result).isNotNull().hasSize(2).satisfies(parts -> {
 			assertThat(parts.getFirst().contentType()).isEqualTo("text/plain");
@@ -138,7 +145,9 @@ class KivraMapperTest {
 			.withFileName("test.txt")
 			.withContent(blob);
 
-		var result = KivraMapper.toPartsResponsive(attachment);
+		when(kivraMapper.toPartsResponsive(attachment)).thenCallRealMethod();
+
+		var result = kivraMapper.toPartsResponsive(attachment);
 
 		assertThat(result).isNotNull().satisfies(part -> {
 			assertThat(part.contentType()).isEqualTo("text/plain");

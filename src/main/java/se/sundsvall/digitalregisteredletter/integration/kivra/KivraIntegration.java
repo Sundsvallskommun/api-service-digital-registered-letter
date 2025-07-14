@@ -2,8 +2,6 @@ package se.sundsvall.digitalregisteredletter.integration.kivra;
 
 import static java.util.Collections.emptyList;
 import static org.zalando.problem.Status.BAD_GATEWAY;
-import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toCheckEligibilityRequest;
-import static se.sundsvall.digitalregisteredletter.integration.kivra.KivraMapper.toSendContentRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +19,12 @@ public class KivraIntegration {
 
 	private static final Logger LOG = LoggerFactory.getLogger(KivraIntegration.class);
 	private final KivraClient kivraClient;
+	private final KivraMapper kivraMapper;
 
-	public KivraIntegration(final KivraClient kivraClient) {
+	public KivraIntegration(final KivraClient kivraClient,
+		final KivraMapper kivraMapper) {
 		this.kivraClient = kivraClient;
+		this.kivraMapper = kivraMapper;
 	}
 
 	/**
@@ -34,7 +35,7 @@ public class KivraIntegration {
 	 */
 	public List<String> checkEligibility(final List<String> legalIds) {
 		try {
-			var request = toCheckEligibilityRequest(legalIds);
+			var request = kivraMapper.toCheckEligibilityRequest(legalIds);
 			LOG.info("Checking Kivra eligibility for legal ids: {}", legalIds);
 			var response = kivraClient.checkEligibility(request);
 			LOG.info("Kivra eligibility check successful");
@@ -54,7 +55,7 @@ public class KivraIntegration {
 	 */
 	public String sendContent(final LetterEntity letterEntity, final String legalId) {
 		try {
-			var request = toSendContentRequest(letterEntity, legalId);
+			var request = kivraMapper.toSendContentRequest(letterEntity, legalId);
 			LOG.info("Sending content to Kivra for legal id: {}", legalId);
 			var response = kivraClient.sendContent(request);
 			LOG.info("Kivra content sent successfully for legal id: {}", legalId);

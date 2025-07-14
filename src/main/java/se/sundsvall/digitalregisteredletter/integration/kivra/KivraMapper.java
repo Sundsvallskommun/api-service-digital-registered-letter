@@ -1,12 +1,12 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra;
 
 import static java.util.Collections.emptyList;
-import static se.sundsvall.digitalregisteredletter.service.util.BlobUtil.convertBlobToBase64String;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
@@ -15,16 +15,22 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.PartsRespons
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterHiddenBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
+import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
-public final class KivraMapper {
+@Component
+public class KivraMapper {
 
-	private KivraMapper() {}
+	private final BlobUtil blobUtil;
 
-	public static UserMatchV2SSN toCheckEligibilityRequest(final List<String> legalIds) {
+	public KivraMapper(final BlobUtil blobUtil) {
+		this.blobUtil = blobUtil;
+	}
+
+	public UserMatchV2SSN toCheckEligibilityRequest(final List<String> legalIds) {
 		return new UserMatchV2SSN(legalIds);
 	}
 
-	public static ContentUserV2 toSendContentRequest(final LetterEntity letterEntity, final String legalId) {
+	public ContentUserV2 toSendContentRequest(final LetterEntity letterEntity, final String legalId) {
 		return ContentUserV2Builder.create()
 			.withLegalId(legalId)
 			.withSubject(letterEntity.getSubject())
@@ -40,7 +46,7 @@ public final class KivraMapper {
 	 *
 	 * @return RegisteredLetter with visibility settings, expiration date and a sender reference.
 	 */
-	public static ContentUserV2.RegisteredLetter toRegisteredLetter(final String reference) {
+	public ContentUserV2.RegisteredLetter toRegisteredLetter(final String reference) {
 		return RegisteredLetterBuilder.create()
 			.withExpiresAt(OffsetDateTime.now().plusDays(30))
 			.withSenderReference(new ContentUserV2.RegisteredLetter.SenderReference(reference))
@@ -54,7 +60,7 @@ public final class KivraMapper {
 	 *
 	 * @return RegisteredLetterHidden object that configures the visibility of the subject and sender in the Kivra inbox.
 	 */
-	public static ContentUserV2.RegisteredLetter.RegisteredLetterHidden createRegisteredLetterHidden() {
+	public ContentUserV2.RegisteredLetter.RegisteredLetterHidden createRegisteredLetterHidden() {
 		return RegisteredLetterHiddenBuilder.create()
 			// Setting sender to true means that the sender name and icon will be hidden in the Kivra Inbox.
 			.withSender(false)
@@ -63,9 +69,9 @@ public final class KivraMapper {
 			.build();
 	}
 
-	public static List<ContentUserV2.PartsResponsive> toPartsResponsives(final List<AttachmentEntity> entities) {
+	public List<ContentUserV2.PartsResponsive> toPartsResponsives(final List<AttachmentEntity> entities) {
 		return Optional.ofNullable(entities).orElse(emptyList()).stream()
-			.map(KivraMapper::toPartsResponsive)
+			.map(this::toPartsResponsive)
 			.filter(Objects::nonNull)
 			.toList();
 	}
@@ -77,10 +83,10 @@ public final class KivraMapper {
 	 * @return                  a PartsResponsive object containing the attachment's name, content (as a Base64 string), and
 	 *                          content type,
 	 */
-	public static ContentUserV2.PartsResponsive toPartsResponsive(final AttachmentEntity attachmentEntity) {
+	public ContentUserV2.PartsResponsive toPartsResponsive(final AttachmentEntity attachmentEntity) {
 		return Optional.ofNullable(attachmentEntity).map(attachment -> PartsResponsiveBuilder.create()
 			.withName(attachment.getFileName())
-			.withData(convertBlobToBase64String(attachment.getContent()))
+			.withData(blobUtil.convertBlobToBase64String(attachment.getContent()))
 			.withContentType(attachment.getContentType())
 			.build())
 			.orElse(null);

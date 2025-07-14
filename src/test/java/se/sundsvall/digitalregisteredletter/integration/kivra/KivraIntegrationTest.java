@@ -33,6 +33,9 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2S
 class KivraIntegrationTest {
 
 	@Mock
+	private KivraMapper kivraMapper;
+
+	@Mock
 	private KivraClient kivraClient;
 
 	@InjectMocks
@@ -40,18 +43,19 @@ class KivraIntegrationTest {
 
 	@Test
 	void checkEligibilityTest() {
-		var legalId = "1234567890";
-		var response = new UserMatchV2SSN(List.of(legalId));
+		var legalIds = List.of("1234567890");
+		var userMatchV2SSN = new UserMatchV2SSN(legalIds);
 		var requestCaptor = ArgumentCaptor.forClass(UserMatchV2SSN.class);
 
-		when(kivraClient.checkEligibility(requestCaptor.capture())).thenReturn(response);
+		when(kivraMapper.toCheckEligibilityRequest(legalIds)).thenReturn(userMatchV2SSN);
+		when(kivraClient.checkEligibility(requestCaptor.capture())).thenReturn(userMatchV2SSN);
 
-		var result = kivraIntegration.checkEligibility(List.of(legalId));
-		assertThat(result).isNotNull().hasSize(1).containsExactly(legalId);
+		var result = kivraIntegration.checkEligibility(legalIds);
+		assertThat(result).isNotNull().hasSize(1).containsExactly(legalIds.getFirst());
 
 		var capturedRequest = requestCaptor.getValue();
 		assertThat(capturedRequest).isNotNull();
-		assertThat(capturedRequest.legalIds()).hasSize(1).containsExactly(legalId);
+		assertThat(capturedRequest.legalIds()).hasSize(1).containsExactly(legalIds.getFirst());
 
 		verify(kivraClient).checkEligibility(capturedRequest);
 	}
@@ -60,13 +64,15 @@ class KivraIntegrationTest {
 	void checkEligibilityKivraThrows() {
 		var legalId = "1234567890";
 		var legalIds = List.of(legalId);
-		when(kivraClient.checkEligibility(new UserMatchV2SSN(legalIds))).thenThrow(new RuntimeException("Kivra service error"));
+		var request = new UserMatchV2SSN(legalIds);
+		when(kivraMapper.toCheckEligibilityRequest(legalIds)).thenReturn(request);
+		when(kivraClient.checkEligibility(request)).thenThrow(new RuntimeException("Kivra service error"));
 
 		assertThatThrownBy(() -> kivraIntegration.checkEligibility(legalIds))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Exception occurred while checking Kivra eligibility for legal ids: %s", legalIds);
 
-		verify(kivraClient).checkEligibility(new UserMatchV2SSN(legalIds));
+		verify(kivraClient).checkEligibility(request);
 	}
 
 	@ParameterizedTest
@@ -81,12 +87,12 @@ class KivraIntegrationTest {
 			.build());
 
 		var requestCaptor = ArgumentCaptor.forClass(ContentUserV2.class);
+		when(kivraMapper.toSendContentRequest(letterEntity, legalId)).thenCallRealMethod();
 		when(kivraClient.sendContent(requestCaptor.capture())).thenReturn(response);
 
 		var result = kivraIntegration.sendContent(letterEntity, legalId);
 
-		assertThat(result).isNotNull().isInstanceOf(String.class);
-		assertThat(result).isEqualTo(expectedStatus);
+		assertThat(result).isNotNull().isInstanceOf(String.class).isEqualTo(expectedStatus);
 
 		var capturedRequest = requestCaptor.getValue();
 		assertThat(capturedRequest).isNotNull().isInstanceOf(ContentUserV2.class);
