@@ -1,0 +1,14 @@
+{
+	"request": {
+		"headers": {
+			"Authorization": {
+				"equalTo": "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3"
+			}
+		},
+		"method": "DELETE",
+		"url": "/kivra/some-tenant-key/registered/responseKey1"
+	},
+	"response": {
+		"status": 200
+	}
+}
