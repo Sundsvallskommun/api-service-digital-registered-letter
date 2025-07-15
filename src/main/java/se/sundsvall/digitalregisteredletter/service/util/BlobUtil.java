@@ -4,6 +4,7 @@ import static org.zalando.fauxpas.FauxPas.throwingFunction;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import jakarta.persistence.EntityManager;
+import java.io.ByteArrayInputStream;
 import java.sql.Blob;
 import java.util.Base64;
 import java.util.Optional;
@@ -36,7 +37,9 @@ public class BlobUtil {
 
 	Blob createBlob(final MultipartFile multipartFile) {
 		try {
-			return getSession().getLobHelper().createBlob(multipartFile.getInputStream(), multipartFile.getSize());
+			var fileBytes = multipartFile.getBytes();
+			var inputStream = new ByteArrayInputStream(fileBytes);
+			return getSession().getLobHelper().createBlob(inputStream, fileBytes.length);
 		} catch (Exception e) {
 			LOG.warn("Failed to create Blob from MultipartFile: {}", e.getMessage(), e);
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert file with name [ %s ] to database object".formatted(multipartFile.getOriginalFilename()));
@@ -49,13 +52,13 @@ public class BlobUtil {
 	 * @param  blob the Blob to convert
 	 * @return      the Base64 encoded string representation of the Blob
 	 */
-	public static String convertBlobToBase64String(final Blob blob) {
+	public String convertBlobToBase64String(final Blob blob) {
 		try {
 			var bytes = blob.getBytes(1, (int) blob.length());
 			return Base64.getEncoder().encodeToString(bytes);
 		} catch (Exception e) {
+			LOG.warn("Failed to convert Blob to Base64 String: {}", e.getMessage(), e);
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert Blob to Base64 string: " + e.getMessage());
 		}
-
 	}
 }

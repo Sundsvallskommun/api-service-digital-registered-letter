@@ -42,6 +42,12 @@ integration:
     readTimeout: 30
     url: http://localhost:8080/party
   kivra:
-    connect-timeout: 5
-    read-timeout: 30
-    url: http://localhost:8080/kivra
+    api-url: http://kivra-url.com
+    tenant-key: some-tenant-key
+    oauth2:
+      token-url: http://token-url.com
+      client-id: some-client-id
+      client-secret: some-client-secret
+scheduler:
+  update-letter-statuses:
+    cron: "-"

@@ -1,5 +1,6 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import se.sundsvall.digitalregisteredletter.support.Builder;
 
@@ -9,6 +10,6 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Builder
 public record ContentUser(
 	String subject,
-	LocalDate generatedAt,
+	@JsonProperty("generated_at") LocalDate generatedAt,
 	String type) {
 }

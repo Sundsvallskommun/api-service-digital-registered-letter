@@ -1,10 +1,12 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.sql.Blob;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +25,11 @@ class AttachmentMapperTest {
 
 	@InjectMocks
 	private AttachmentMapper attachmentMapper;
+
+	@AfterEach
+	void ensureNoInteractionsWereMissed() {
+		verifyNoMoreInteractions(blobUtil);
+	}
 
 	@Test
 	void toAttachmentEntities() {

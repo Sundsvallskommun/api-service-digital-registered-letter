@@ -16,7 +16,7 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Schema(description = "Request to send a digital registered letter")
 public record LetterRequest(
 
-	@ValidUuid @Schema(description = "Party ID of the recipient", example = "123e4567-e89b-12d3-a456-426614174000", requiredMode = REQUIRED) String partyId,
+	@ValidUuid @Schema(description = "Party ID of the recipient", example = "7ca29702-a07f-4e13-a66a-4ebc27929cfd", requiredMode = REQUIRED) String partyId,
 
 	@NotBlank @Schema(description = "Subject of the letter", example = "Important Notification", requiredMode = REQUIRED) String subject,
 

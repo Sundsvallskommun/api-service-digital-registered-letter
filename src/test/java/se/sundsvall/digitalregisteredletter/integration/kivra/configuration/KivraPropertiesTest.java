@@ -1,7 +1,9 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra.configuration;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
+import java.time.Duration;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +19,14 @@ class KivraPropertiesTest {
 
 	@Test
 	void testProperties() {
-		assertThat(properties.connectTimeout()).isEqualTo(5);
-		assertThat(properties.readTimeout()).isEqualTo(30);
+		Assertions.assertThat(properties.apiUrl()).isEqualTo("http://kivra-url.com");
+		Assertions.assertThat(properties.connectTimeout()).isEqualTo(Duration.of(5, SECONDS));
+		Assertions.assertThat(properties.readTimeout()).isEqualTo(Duration.of(15, SECONDS));
+		Assertions.assertThat(properties.tenantKey()).isEqualTo("some-tenant-key");
+		Assertions.assertThat(properties.oauth2()).isNotNull().satisfies(oauth2 -> {
+			Assertions.assertThat(oauth2.clientId()).isEqualTo("some-client-id");
+			Assertions.assertThat(oauth2.clientSecret()).isEqualTo("some-client-secret");
+			Assertions.assertThat(oauth2.tokenUrl()).isEqualTo("http://token-url.com");
+		});
 	}
 }

@@ -2,6 +2,7 @@ package se.sundsvall.digitalregisteredletter.service.mapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.digitalregisteredletter.api.model.Attachments;
@@ -21,7 +22,7 @@ public final class AttachmentMapper {
 		return Optional.ofNullable(attachments).map(Attachments::files)
 			.map(files -> files.stream()
 				.map(this::toAttachmentEntity)
-				.toList())
+				.collect(Collectors.toList())) // Mutable list
 			.orElse(null);
 	}
 

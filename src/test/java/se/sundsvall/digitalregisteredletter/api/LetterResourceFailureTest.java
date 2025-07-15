@@ -122,7 +122,6 @@ class LetterResourceFailureTest {
 			.extracting(Violation::getField, Violation::getMessage)
 			.containsExactlyInAnyOrder(tuple("sendLetter.municipalityId", "not a valid municipality ID"));
 
-		verify(letterServiceMock, never()).parseLetterRequest(any());
 		verify(letterServiceMock, never()).getLetters(any(), any());
 	}
 
@@ -136,7 +135,6 @@ class LetterResourceFailureTest {
 		multipartBodyBuilder.part("letterAttachments", "file-content").filename("duplicate-name.txt").contentType(APPLICATION_PDF);
 		multipartBodyBuilder.part("letter", createLetterRequest);
 
-		when(letterServiceMock.parseLetterRequest(any())).thenReturn(createLetterRequest);
 		when(letterServiceMock.sendLetter(any(), any(), any())).thenReturn(letterId);
 
 		var response = webTestClient.post()
@@ -154,7 +152,6 @@ class LetterResourceFailureTest {
 			.extracting(Violation::getField, Violation::getMessage)
 			.containsExactlyInAnyOrder(tuple("files", "no duplicate file names allowed in the list of files"));
 
-		verify(letterServiceMock).parseLetterRequest(any());
 		verify(letterServiceMock, never()).sendLetter(any(), any(), any());
 	}
 
@@ -185,7 +182,6 @@ class LetterResourceFailureTest {
 			.extracting(Violation::getField, Violation::getMessage)
 			.containsExactlyInAnyOrder(tuple("sendLetter.files", "content type must be application/pdf"));
 
-		verify(letterServiceMock, never()).parseLetterRequest(any());
 		verify(letterServiceMock, never()).sendLetter(any(), any(), any());
 	}
 
