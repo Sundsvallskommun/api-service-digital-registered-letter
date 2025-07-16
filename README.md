@@ -34,7 +34,6 @@ cd api-service-digital-registered-letter
    - Purpose: Used for translating between party id and legal id.
    - Repository: https://github.com/Sundsvallskommun/api-service-party
    - Setup Instructions: See documentation in repository above for installation and configuration steps.
-
 4. **Build and run the application:**
 
 - Using Maven:
