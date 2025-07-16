@@ -1,6 +1,7 @@
 # Digital Registered Letter
 
-_The service provides functionality to send digital registered letters with Kivra and stores information about what letters have been sent, signed and expired._
+_The service provides functionality to send digital registered letters with Kivra and stores information about what
+letters have been sent, signed and expired._
 
 ## Getting Started
 
@@ -34,6 +35,12 @@ cd api-service-digital-registered-letter
    - Purpose: Used for translating between party id and legal id.
    - Repository: https://github.com/Sundsvallskommun/api-service-party
    - Setup Instructions: See documentation in repository above for installation and configuration steps.
+
+   *Kivra*
+
+   - Purpose: Used for sending digital registered letters.
+   - Setup Instructions: Ensure you have the necessary credentials and configuration for Kivra. Refer to
+     the [Kivra API documentation](https://developer.kivra.se/) for more details.
 4. **Build and run the application:**
 
 - Using Maven:
@@ -69,7 +76,8 @@ curl -X 'GET' 'https://localhost:8080/2281/letters?page=0&size=10'
 
 ## Configuration
 
-Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in `application.yml`.
+Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in
+`application.yml`.
 
 ### Key Configuration Parameters
 
@@ -98,39 +106,40 @@ spring:
   security:
     oauth2:
       client:
-         provider:
-            kivra:
-               token-uri: <token-uri-for-kivra>
-            party:
-               token-uri: <token-uri-for-party>
-         registration:
-            kivra:
-               client-id: <kivra-client-id>
-               client-secret: <kivra-client-secret>
-            party:
-               client-id: <party-client-id>
-               client-secret: <party-client-secret>
+        provider:
+          kivra:
+            token-uri: <token-uri-for-kivra>
+          party:
+            token-uri: <token-uri-for-party>
+        registration:
+          kivra:
+            client-id: <kivra-client-id>
+            client-secret: <kivra-client-secret>
+          party:
+            client-id: <party-client-id>
+            client-secret: <party-client-secret>
 integration:
-   party:
-      url: <party-url>
-   kivra:
-      api-url: <kivra-url>
-      tenant-key: <kivra-tenant-key>
-      oauth2:
-         token-url: <token-uri-for-kivra>
-         client-id: <kivra-client-id>
-         client-secret: <kivra-client-secret>
+  party:
+    url: <party-url>
+  kivra:
+    api-url: <kivra-url>
+    tenant-key: <kivra-tenant-key>
+    oauth2:
+      token-url: <token-uri-for-kivra>
+      client-id: <kivra-client-id>
+      client-secret: <kivra-client-secret>
 scheduler:
-   update-letter-statuses:
-      cron: <cron-expression>
-      name: <name-of-the-job>
-      shedlock-lock-at-most-for: <ISO-8601-duration>
-      maximum-execution-time: <ISO-8601-duration>
+  update-letter-statuses:
+    cron: <cron-expression>
+    name: <name-of-the-job>
+    shedlock-lock-at-most-for: <ISO-8601-duration>
+    maximum-execution-time: <ISO-8601-duration>
 ```
 
 ### Database Initialization
 
-The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by default so you will have to enable it to automatically populate the database schema upon application startup.
+The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by
+default so you will have to enable it to automatically populate the database schema upon application startup.
 
 ```yaml
 spring:
@@ -138,7 +147,8 @@ spring:
     enabled: true
 ```
 
-- **No additional setup is required** for database initialization, as long as the database connection settings are correctly configured.
+- **No additional setup is required** for database initialization, as long as the database connection settings are
+  correctly configured.
 
 ### Additional Notes
 
@@ -152,7 +162,8 @@ spring:
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please
+see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
 
 ## License
 
