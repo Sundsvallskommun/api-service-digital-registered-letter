@@ -1,0 +1,22 @@
+{
+	"id": "${json-unit.any-string}",
+	"municipalityId": "2281",
+	"status": "SENT",
+	"body": "body",
+	"contentType": "text/plain",
+	"created": "${json-unit.any-string}",
+	"updated": "${json-unit.any-string}",
+	"supportInfo": {
+		"supportText": "support text",
+		"contactInformationUrl": "https://example.com/support",
+		"contactInformationPhoneNumber": "+46123456789",
+		"contactInformationEmail": "support@email.com"
+	},
+	"attachments": [
+		{
+			"id": "${json-unit.any-string}",
+			"fileName": "test.pdf",
+			"contentType": "application/pdf"
+		}
+	]
+}

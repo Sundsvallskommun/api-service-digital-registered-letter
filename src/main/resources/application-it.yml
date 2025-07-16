@@ -25,21 +25,21 @@ spring:
             client-secret: the-client-secret
         provider:
           party:
-            token-uri: http://localhost:${wiremock.server.port:}/api-gateway/token
+            token-uri: http://localhost:${wiremock.server.port:}/token
           kivra:
-            token-uri: http://localhost:${wiremock.server.port:}/api-gateway/token
+            token-uri: http://localhost:${wiremock.server.port:}/token
 integration:
   party:
     connectTimeout: 5
     readTimeout: 30
-    url: http://localhost:8080/party
+    url: http://localhost:${wiremock.server.port}/party
   kivra:
-    api-url: http://kivra-url.com
     tenant-key: some-tenant-key
+    api-url: http://localhost:${wiremock.server.port}/kivra/${integration.kivra.tenant-key}
     connectTimeout: PT7S
     readTimeout: PT8S
     oauth2:
-      token-url: http://token-url.com
+      token-url: http://localhost:${wiremock.server.port:}/token
       client-id: some-client-id
       client-secret: some-client-secret
 scheduler:

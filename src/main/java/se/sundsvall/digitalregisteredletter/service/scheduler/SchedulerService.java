@@ -26,8 +26,8 @@ public class SchedulerService {
 	@Dept44Scheduled(
 		cron = "${scheduler.update-letter-statuses.cron}",
 		name = "${scheduler.update-letter-statuses.name}",
-		lockAtMostFor = "${scheduler.suspension.shedlock-lock-at-most-for}",
-		maximumExecutionTime = "${scheduler.suspension.maximum-execution-time}")
+		lockAtMostFor = "${scheduler.update-letter-statuses.shedlock-lock-at-most-for}",
+		maximumExecutionTime = "${scheduler.update-letter-statuses.maximum-execution-time}")
 	void updateLetterStatuses() {
 		schedulerWorker.updateLetterStatuses();
 	}

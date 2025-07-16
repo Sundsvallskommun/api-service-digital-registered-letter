@@ -1,0 +1,12 @@
+{
+	"partyId": "6a5c3d04-412d-11ec-973a-0242ac130003",
+	"subject": "subject",
+	"supportInfo": {
+		"supportText": "support text",
+		"contactInformationUrl": "https://example.com/support",
+		"contactInformationPhoneNumber": "+46123456789",
+		"contactInformationEmail": "support@email.com"
+	},
+	"contentType": "text/plain",
+	"body": "body"
+}

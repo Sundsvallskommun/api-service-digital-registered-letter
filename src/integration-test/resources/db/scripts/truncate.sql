@@ -1,0 +1,4 @@
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE table letter;
+TRUNCATE table attachment;
+SET FOREIGN_KEY_CHECKS = 1;

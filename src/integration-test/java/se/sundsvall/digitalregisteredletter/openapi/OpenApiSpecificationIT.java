@@ -1,4 +1,4 @@
-package se.sundsvall.digitalregisteredletter.apptest;
+package se.sundsvall.digitalregisteredletter.openapi;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 

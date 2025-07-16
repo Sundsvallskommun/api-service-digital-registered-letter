@@ -50,7 +50,7 @@ class KivraMapperTest {
 		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
 		var attachment = new AttachmentEntity()
 			.withContentType("text/plain")
-			.withFileName("test.txt")
+			.withFileName("test.pdf")
 			.withContent(blob);
 		var letterEntity = new LetterEntity()
 			.withSubject(subject)
@@ -142,7 +142,7 @@ class KivraMapperTest {
 		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
 		var attachment = new AttachmentEntity()
 			.withContentType("text/plain")
-			.withFileName("test.txt")
+			.withFileName("test.pdf")
 			.withContent(blob);
 
 		when(kivraMapper.toPartsResponsive(attachment)).thenCallRealMethod();
@@ -151,7 +151,7 @@ class KivraMapperTest {
 
 		assertThat(result).isNotNull().satisfies(part -> {
 			assertThat(part.contentType()).isEqualTo("text/plain");
-			assertThat(part.name()).isEqualTo("test.txt");
+			assertThat(part.name()).isEqualTo("test.pdf");
 			assertThat(part.data()).isEqualTo("dGVzdA=="); // Base64 encoded "test"
 		});
 
