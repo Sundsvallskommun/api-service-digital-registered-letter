@@ -1,0 +1,27 @@
+{
+	"id": "43a32404-28ee-480f-a095-00d48109afab",
+	"municipalityId": "2281",
+	"status": "NEW",
+	"body": "body",
+	"contentType": "text/plain",
+	"created": "2023-10-01T12:00:00Z",
+	"updated": "2023-10-01T12:00:00Z",
+	"supportInfo": {
+		"supportText": "support text",
+		"contactInformationUrl": "https://example.com/support",
+		"contactInformationPhoneNumber": "+46123456789",
+		"contactInformationEmail": "support@email.com"
+	},
+	"attachments": [
+		{
+			"id": "1",
+			"fileName": "attachment1.txt",
+			"contentType": "text/plain"
+		},
+		{
+			"id": "2",
+			"fileName": "attachment2.txt",
+			"contentType": "text/plain"
+		}
+	]
+}
