@@ -29,7 +29,7 @@ cd api-service-digital-registered-letter
 
 3. **Ensure dependent services are running:**
 
-   **Party** 
+   *Party*
 
    - Purpose: Used for translating between party id and legal id.
    - Repository: https://github.com/Sundsvallskommun/api-service-party
@@ -164,7 +164,7 @@ This project is licensed under the [MIT License](LICENSE).
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-digital-registered-letter&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-digital-registered-letter)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-digital-registered-letter&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-digital-registered-letter)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-digital-registered-letter&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-digital-registered-letter)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-digital-registered-lettermetric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-digital-registered-letter)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-digital-registered-letter&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-digital-registered-letter)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-digital-registered-letter&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-digital-registered-letter)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-digital-registered-letter&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-digital-registered-letter)
 
