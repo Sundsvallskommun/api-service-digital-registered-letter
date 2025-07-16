@@ -29,7 +29,11 @@ cd api-service-digital-registered-letter
 
 3. **Ensure dependent services are running:**
 
-   This microservice does not depend on any other services.
+   **Party** 
+
+   - Purpose: Used for translating between party id and legal id.
+   - Repository: https://github.com/Sundsvallskommun/api-service-party
+   - Setup Instructions: See documentation in repository above for installation and configuration steps.
 
 4. **Build and run the application:**
 
