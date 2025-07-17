@@ -22,7 +22,6 @@ class KivraPropertiesTest {
 		assertThat(properties.apiUrl()).isEqualTo("http://kivra-url.com");
 		assertThat(properties.connectTimeout()).isEqualTo(Duration.of(5, SECONDS));
 		assertThat(properties.readTimeout()).isEqualTo(Duration.of(15, SECONDS));
-		assertThat(properties.tenantKey()).isEqualTo("some-tenant-key");
 		assertThat(properties.oauth2()).isNotNull().satisfies(oauth2 -> {
 			assertThat(oauth2.clientId()).isEqualTo("some-client-id");
 			assertThat(oauth2.clientSecret()).isEqualTo("some-client-secret");
