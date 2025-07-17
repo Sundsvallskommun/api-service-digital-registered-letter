@@ -20,13 +20,8 @@ spring:
           party:
             client-id: the-client-id
             client-secret: the-client-secret
-          kivra:
-            client-id: the-client-id
-            client-secret: the-client-secret
         provider:
           party:
-            token-uri: http://localhost:${wiremock.server.port:}/token
-          kivra:
             token-uri: http://localhost:${wiremock.server.port:}/token
 integration:
   party:
@@ -36,12 +31,16 @@ integration:
   kivra:
     tenant-key: some-tenant-key
     api-url: http://localhost:${wiremock.server.port}/kivra/${integration.kivra.tenant-key}
-    connectTimeout: PT7S
-    readTimeout: PT8S
+    connectTimeout: PT5S
+    readTimeout: PT15S
     oauth2:
       token-url: http://localhost:${wiremock.server.port:}/token
       client-id: some-client-id
       client-secret: some-client-secret
+      authorization-grant-type: client_credentials
 scheduler:
   update-letter-statuses:
     cron: "-"
+    name: update-letter-statuses
+    shedlock-lock-at-most-for: PT1M
+    maximum-execution-time: PT1M

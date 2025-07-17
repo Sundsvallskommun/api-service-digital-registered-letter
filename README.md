@@ -107,14 +107,9 @@ spring:
     oauth2:
       client:
         provider:
-          kivra:
-            token-uri: <token-uri-for-kivra>
           party:
             token-uri: <token-uri-for-party>
         registration:
-          kivra:
-            client-id: <kivra-client-id>
-            client-secret: <kivra-client-secret>
           party:
             client-id: <party-client-id>
             client-secret: <party-client-secret>
@@ -124,16 +119,19 @@ integration:
   kivra:
     api-url: <kivra-url>
     tenant-key: <kivra-tenant-key>
+    connect-timeout: <maximum-connection-duration in ISO8601-duration format>
+    read-timeout: <maximum-read-duration in ISO8601-duration format>
     oauth2:
       token-url: <token-uri-for-kivra>
       client-id: <kivra-client-id>
       client-secret: <kivra-client-secret>
+      authorization-grant-type: <grant-type>
 scheduler:
   update-letter-statuses:
     cron: <cron-expression>
     name: <name-of-the-job>
-    shedlock-lock-at-most-for: <ISO-8601-duration>
-    maximum-execution-time: <ISO-8601-duration>
+    shedlock-lock-at-most-for: <ISO8601-duration format>
+    maximum-execution-time: <ISO8601-duration format>
 ```
 
 ### Database Initialization
