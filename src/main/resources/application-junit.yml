@@ -28,13 +28,8 @@ spring:
           party:
             client-id: the-client-id
             client-secret: the-client-secret
-          kivra:
-            client-id: the-client-id
-            client-secret: the-client-secret
         provider:
           party:
-            token-uri: http://token.url
-          kivra:
             token-uri: http://token.url
 integration:
   party:
@@ -44,10 +39,16 @@ integration:
   kivra:
     api-url: http://kivra-url.com
     tenant-key: some-tenant-key
+    connect-timeout: PT5S
+    read-timeout: PT15S
     oauth2:
       token-url: http://token-url.com
       client-id: some-client-id
       client-secret: some-client-secret
+      authorization-grant-type: client_credentials
 scheduler:
   update-letter-statuses:
     cron: "-"
+    name: update-letter-statuses
+    shedlock-lock-at-most-for: PT1M
+    maximum-execution-time: PT1M

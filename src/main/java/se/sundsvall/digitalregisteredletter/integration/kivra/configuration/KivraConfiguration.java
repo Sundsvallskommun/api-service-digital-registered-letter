@@ -4,7 +4,6 @@ import static java.util.Collections.emptySet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import feign.Request;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -16,7 +15,6 @@ import se.sundsvall.dept44.configuration.feign.interceptor.OAuth2RequestIntercep
 import se.sundsvall.dept44.configuration.feign.retryer.ActionRetryer;
 
 @Import(FeignConfiguration.class)
-@EnableConfigurationProperties(KivraProperties.class)
 public class KivraConfiguration {
 
 	public static final String CLIENT_ID = "kivra";
