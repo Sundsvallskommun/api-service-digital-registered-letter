@@ -38,7 +38,6 @@ integration:
     url: http://localhost:8080/party
   kivra:
     api-url: http://kivra-url.com
-    tenant-key: some-tenant-key
     connect-timeout: PT5S
     read-timeout: PT15S
     oauth2:

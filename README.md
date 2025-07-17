@@ -118,7 +118,6 @@ integration:
     url: <party-url>
   kivra:
     api-url: <kivra-url>
-    tenant-key: <kivra-tenant-key>
     connect-timeout: <maximum-connection-duration in ISO8601-duration format>
     read-timeout: <maximum-read-duration in ISO8601-duration format>
     oauth2:

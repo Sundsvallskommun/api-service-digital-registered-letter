@@ -29,8 +29,7 @@ integration:
     readTimeout: 30
     url: http://localhost:${wiremock.server.port}/party
   kivra:
-    tenant-key: some-tenant-key
-    api-url: http://localhost:${wiremock.server.port}/kivra/${integration.kivra.tenant-key}
+    api-url: http://localhost:${wiremock.server.port}/kivra/some-tenant-key
     connectTimeout: PT5S
     readTimeout: PT15S
     oauth2:
