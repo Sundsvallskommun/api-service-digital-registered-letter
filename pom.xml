@@ -15,7 +15,7 @@
 	<properties>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 		<generated-sources-java-path>src/main/java</generated-sources-java-path>
-		<jilt.version>1.8.2</jilt.version>
+		<jilt.version>1.8.3</jilt.version>
 	</properties>
 	<dependencies>
 		<dependency>
