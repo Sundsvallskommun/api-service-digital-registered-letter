@@ -129,4 +129,8 @@ public class KivraIntegration {
 		}
 	}
 
+	public void healthCheck() {
+		kivraClient.getTenantInformation();
+	}
+
 }
