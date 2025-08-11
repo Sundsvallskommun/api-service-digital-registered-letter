@@ -82,4 +82,12 @@ public interface KivraClient {
 	@DeleteMapping(value = "/registered/{responseKey}", produces = ALL_VALUE)
 	ResponseEntity<Void> deleteResponse(@PathVariable("responseKey") final String responseKey);
 
+	/**
+	 * Method is used to verify that the certificate to Kivra is valid
+	 *
+	 * @return basic tenant information
+	 */
+	@GetMapping(produces = APPLICATION_JSON_VALUE)
+	ResponseEntity<Void> getTenantInformation();
+
 }

@@ -28,9 +28,14 @@ spring:
           party:
             client-id: the-client-id
             client-secret: the-client-secret
+          messaging:
+            client-id: messaging-client-id
+            client-secret: messaging
         provider:
           party:
             token-uri: http://token.url
+          messaging:
+            token-uri: http://messaging.token.url
 integration:
   party:
     connectTimeout: 5
@@ -45,9 +50,29 @@ integration:
       client-id: some-client-id
       client-secret: some-client-secret
       authorization-grant-type: client_credentials
+  messaging:
+    connect-timeout: 5
+    read-timeout: 30
+    url: http://localhost:8080/messaging
 scheduler:
   update-letter-statuses:
     cron: "-"
     name: update-letter-statuses
     shedlock-lock-at-most-for: PT1M
     maximum-execution-time: PT1M
+  certificate-health:
+    name: certificate-health
+    lock-at-most-for: PT2M
+    maximum-execution-time: PT2M
+    notification:
+      mail:
+        subject: someMailSubject
+        sender:
+          name: someSender
+          email-address: some.sender@address.com
+        recipients:
+          - some.recipient@address.com
+      slack:
+        channel: someSlackChannel
+        message: someSlackMessage
+        token: someSlackToken

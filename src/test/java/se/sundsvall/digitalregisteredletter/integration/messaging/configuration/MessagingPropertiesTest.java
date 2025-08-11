@@ -1,4 +1,4 @@
-package se.sundsvall.digitalregisteredletter.integration.party.configuration;
+package se.sundsvall.digitalregisteredletter.integration.messaging.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,15 +10,14 @@ import se.sundsvall.digitalregisteredletter.Application;
 
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles("junit")
-class PartyPropertiesTest {
+class MessagingPropertiesTest {
 
 	@Autowired
-	private PartyProperties properties;
+	private MessagingProperties properties;
 
 	@Test
 	void testProperties() {
 		assertThat(properties.connectTimeout()).isEqualTo(5);
 		assertThat(properties.readTimeout()).isEqualTo(30);
 	}
-
 }

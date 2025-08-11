@@ -15,11 +15,11 @@ public class SchedulerService {
 	/**
 	 * When a digital registered letter is opened or expires, a response is created at Kivra. When we fetch all the
 	 * available responses for our tenantId, Kivra returns a list of key-value pairs. The key is a responseKey and the value
-	 * is the status of the
-	 * response. We need to fetch the complete response from Kivra using the responseKey, the complete response contains a
+	 * is the status of the response. We need to fetch the complete response from Kivra using the responseKey, the complete
+	 * response contains a
 	 * sender_reference object that has a sender_internal_id that corresponds to a letters primary key in our database. We
-	 * use the
-	 * sender_internal_id to fetch the letter from our database and update its status based on the response from Kivra.
+	 * use the sender_internal_id to fetch the letter from our database and update its status based on the response from
+	 * Kivra.
 	 * After updating the letter, we delete the response from Kivra to ensure that the same response is not processed
 	 * multiple times.
 	 */
