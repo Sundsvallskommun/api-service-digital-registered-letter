@@ -7,13 +7,15 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:64405
+  - url: http://localhost:54833
     description: Generated server url
 tags:
   - name: Scheduler Resource
     description: Manually trigger scheduled tasks
   - name: Letter Resource
     description: Send and manage digital registered letters
+  - name: Eligibility Resource
+    description: Check eligibility for sending digital registered letters
 paths:
   /{municipalityId}/scheduler:
     post:
@@ -199,6 +201,49 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /{municipalityId}/eligibility/kivra:
+    get:
+      tags:
+        - Eligibility Resource
+      summary: Check if the given partyIds are eligible for receiving digital registered
+        letters with Kivra
+      description: Returns a list of party IDs that are eligible for Kivra based on
+        the provided municipality ID and party IDs
+      operationId: checkKivraEligibility
+      parameters:
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: request
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/EligibilityRequest"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /api-docs:
     get:
       tags:
@@ -232,9 +277,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
         title:
+          type: string
+        detail:
           type: string
     StatusType:
       type: object
@@ -367,9 +412,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
         title:
+          type: string
+        detail:
           type: string
         suppressed:
           type: array
@@ -587,4 +632,11 @@ components:
           $ref: "#/components/schemas/Direction"
       description: PagingAndSortingMetaData model
       readOnly: true
+    EligibilityRequest:
+      type: object
+      properties:
+        partyIds:
+          type: array
+          items:
+            type: string
   securitySchemes: { }

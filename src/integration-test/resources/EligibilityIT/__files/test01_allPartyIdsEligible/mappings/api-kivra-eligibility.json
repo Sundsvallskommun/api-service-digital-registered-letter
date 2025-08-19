@@ -1,0 +1,24 @@
+{
+	"request": {
+		"headers": {
+			"Authorization": {
+				"equalTo": "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3"
+			}
+		},
+		"method": "POST",
+		"url": "/kivra/some-tenant-key/usermatch/ssn",
+		"bodyPatterns": [
+			{
+				"equalToJson": "{ \"_list\": [\"190101010000\", \"190101010001\", \"190101010002\"] }",
+				"ignoreArrayOrder": true
+			}
+		]
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"bodyFileName": "test01_allPartyIdsEligible/responses/api-kivra-eligibility.json"
+	}
+}
