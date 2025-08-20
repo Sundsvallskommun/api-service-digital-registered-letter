@@ -58,7 +58,7 @@ class LetterResource {
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Get all letters", description = "Retrieves all letters for a municipality", responses = @ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true))
-	ResponseEntity<Letters> getLetters(@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId, @ParameterObject final Pageable pageable) {
+	ResponseEntity<Letters> getLetters(@PathVariable @ValidMunicipalityId final String municipalityId, @ParameterObject final Pageable pageable) {
 		return ok(letterService.getLetters(municipalityId, pageable));
 	}
 
@@ -67,7 +67,7 @@ class LetterResource {
 		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 	})
-	ResponseEntity<Letter> getLetter(@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId, @PathVariable(name = "letterId") final String letterId) {
+	ResponseEntity<Letter> getLetter(@PathVariable @ValidMunicipalityId final String municipalityId, @PathVariable final String letterId) {
 		return ok(letterService.getLetter(municipalityId, letterId));
 	}
 
@@ -76,7 +76,7 @@ class LetterResource {
 		description = "Send a digital registered letter using Kivra",
 		responses = @ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
 	ResponseEntity<Void> sendLetter(
-		@PathVariable(name = "municipalityId") @ValidMunicipalityId final String municipalityId,
+		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@RequestPart(name = "letter") @Schema(description = "LetterRequest as a JSON string", implementation = LetterRequest.class) final String letterString,
 		@RequestPart(name = "letterAttachments") @ValidPdf final List<MultipartFile> files) {
 		// Parses the letter string to an actual LetterRequest object and validates it.
