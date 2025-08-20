@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
+import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.digitalregisteredletter.api.model.EligibilityRequest;
 import se.sundsvall.digitalregisteredletter.service.EligibilityService;
 
@@ -39,7 +40,7 @@ class EligibilityResource {
 
 	@GetMapping("/kivra")
 	@Operation(summary = "Check if the given partyIds are eligible for receiving digital registered letters with Kivra", description = "Returns a list of party IDs that are eligible for Kivra based on the provided municipality ID and party IDs")
-	ResponseEntity<List<String>> checkKivraEligibility(@PathVariable final String municipalityId, final EligibilityRequest request) {
+	ResponseEntity<List<String>> checkKivraEligibility(@ValidMunicipalityId @PathVariable final String municipalityId, final EligibilityRequest request) {
 		return ok(eligibilityService.checkEligibility(municipalityId, request));
 	}
 

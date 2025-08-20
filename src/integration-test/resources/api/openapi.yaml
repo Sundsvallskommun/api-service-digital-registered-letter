@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:54833
+  - url: http://localhost:53535
     description: Generated server url
 tags:
   - name: Scheduler Resource
