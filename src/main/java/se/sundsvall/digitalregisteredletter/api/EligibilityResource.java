@@ -39,7 +39,7 @@ class EligibilityResource {
 
 	@GetMapping("/kivra")
 	@Operation(summary = "Check if the given partyIds are eligible for receiving digital registered letters with Kivra", description = "Returns a list of party IDs that are eligible for Kivra based on the provided municipality ID and party IDs")
-	ResponseEntity<List<String>> checkKivraEligibility(@PathVariable("municipalityId") final String municipalityId, final EligibilityRequest request) {
+	ResponseEntity<List<String>> checkKivraEligibility(@PathVariable final String municipalityId, final EligibilityRequest request) {
 		return ok(eligibilityService.checkEligibility(municipalityId, request));
 	}
 
