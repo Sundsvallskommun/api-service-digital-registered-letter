@@ -9,7 +9,7 @@
 		"url": "/kivra/some-tenant-key/usermatch/ssn",
 		"bodyPatterns": [
 			{
-				"equalToJson": "{ \"_list\": [\"190101010000\", \"190101010001\", \"190101010002\"] }",
+				"equalToJson": "{ \"list\": [\"190101010000\", \"190101010001\", \"190101010002\"] }",
 				"ignoreArrayOrder": true
 			}
 		]
