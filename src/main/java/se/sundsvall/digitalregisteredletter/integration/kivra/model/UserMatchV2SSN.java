@@ -9,5 +9,5 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
  */
 @Builder
 public record UserMatchV2SSN(
-	@JsonProperty("_list") List<String> legalIds) {
+	@JsonProperty("list") List<String> legalIds) {
 }
