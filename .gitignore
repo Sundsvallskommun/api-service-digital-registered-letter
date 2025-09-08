@@ -55,3 +55,5 @@ docker-compose.yaml
 # Spring
 application-default.*
 
+/.apt_generated/
+/.apt_generated_tests/

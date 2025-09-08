@@ -56,7 +56,6 @@ integration:
     url: http://localhost:8080/messaging
 scheduler:
   update-letter-statuses:
-    cron: "-"
     name: update-letter-statuses
     shedlock-lock-at-most-for: PT1M
     maximum-execution-time: PT1M

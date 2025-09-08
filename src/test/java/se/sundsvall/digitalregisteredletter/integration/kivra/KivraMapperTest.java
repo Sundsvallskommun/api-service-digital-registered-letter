@@ -16,8 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
-import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 

@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.digitalregisteredletter.api.model.Attachments;
-import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
 @Component

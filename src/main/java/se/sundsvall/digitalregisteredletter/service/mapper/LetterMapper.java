@@ -9,9 +9,9 @@ import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
-import se.sundsvall.digitalregisteredletter.integration.db.AttachmentEntity;
-import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
-import se.sundsvall.digitalregisteredletter.integration.db.SupportInfo;
+import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInfo;
 
 public final class LetterMapper {
 

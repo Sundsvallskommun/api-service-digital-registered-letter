@@ -1,4 +1,4 @@
-package se.sundsvall.digitalregisteredletter.integration.db;
+package se.sundsvall.digitalregisteredletter.integration.db.model;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;

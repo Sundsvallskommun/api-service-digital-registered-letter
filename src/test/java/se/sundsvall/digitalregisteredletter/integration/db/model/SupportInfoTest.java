@@ -1,4 +1,4 @@
-package se.sundsvall.digitalregisteredletter.integration.db;
+package se.sundsvall.digitalregisteredletter.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;

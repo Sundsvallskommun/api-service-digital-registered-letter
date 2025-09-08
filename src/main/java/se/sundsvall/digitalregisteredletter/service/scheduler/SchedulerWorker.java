@@ -3,7 +3,7 @@ package se.sundsvall.digitalregisteredletter.service.scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import se.sundsvall.digitalregisteredletter.integration.db.dao.LetterRepository;
+import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 
 @Component

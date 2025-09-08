@@ -1,4 +1,4 @@
-package se.sundsvall.digitalregisteredletter.integration.db;
+package se.sundsvall.digitalregisteredletter.integration.db.model;
 
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
