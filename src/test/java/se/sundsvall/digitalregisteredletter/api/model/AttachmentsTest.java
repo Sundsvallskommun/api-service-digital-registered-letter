@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import org.springframework.web.multipart.MultipartFile;
 
 class AttachmentsTest {
-	private final static List<MultipartFile> MULTIPART_FILES = List.of(Mockito.mock(MultipartFile.class));
+	private static final List<MultipartFile> MULTIPART_FILES = List.of(Mockito.mock(MultipartFile.class));
 
 	@Test
 	void constructorTest() {

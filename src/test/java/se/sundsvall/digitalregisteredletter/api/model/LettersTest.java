@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import se.sundsvall.dept44.models.api.paging.PagingAndSortingMetaData;
 
 class LettersTest {
-	private final static List<Letter> LETTER_LIST = List.of(LetterBuilder.create().build());
-	private final static PagingAndSortingMetaData META_DATA = PagingAndSortingMetaData.create()
+	private static final List<Letter> LETTER_LIST = List.of(LetterBuilder.create().build());
+	private static final PagingAndSortingMetaData META_DATA = PagingAndSortingMetaData.create()
 		.withPage(1)
 		.withCount(1);
 

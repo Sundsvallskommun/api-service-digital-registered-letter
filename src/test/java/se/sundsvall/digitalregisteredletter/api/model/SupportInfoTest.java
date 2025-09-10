@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 class SupportInfoTest {
-	private final static String SUPPORT_TEXT = "supportText";
-	private final static String CONTACT_INFORMATION_URL = "contactInformationUrl";
-	private final static String CONTACT_INFORMATION_EMAIL = "contactInformationEmail";
-	private final static String CONTACT_INFORMATION_PHONE_NUMBER = "contactInformationPhoneNumber";
+	private static final String SUPPORT_TEXT = "supportText";
+	private static final String CONTACT_INFORMATION_URL = "contactInformationUrl";
+	private static final String CONTACT_INFORMATION_EMAIL = "contactInformationEmail";
+	private static final String CONTACT_INFORMATION_PHONE_NUMBER = "contactInformationPhoneNumber";
 
 	@Test
 	void supportInfoConstructorTest() {

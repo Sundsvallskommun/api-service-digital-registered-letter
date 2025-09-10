@@ -8,15 +8,15 @@ import org.junit.jupiter.api.Test;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 
 class LetterTest {
-	private final static OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(2025, 6, 18, 0, 0, 0, 0, OffsetDateTime.now().getOffset());
-	private final static String ID = "id";
-	private final static String MUNICIPALITY_ID = "municipalityId";
-	private final static String STATUS = "status";
-	private final static String BODY = "body";
-	private final static String CONTENT_TYPE = "contentType";
-	private final static OffsetDateTime CREATED = OFFSET_DATE_TIME.minusDays(1);
-	private final static OffsetDateTime UPDATED = OFFSET_DATE_TIME.minusHours(1);
-	private final static List<Attachment> ATTACHMENTS = List.of(AttachmentBuilder.create()
+	private static final OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(2025, 6, 18, 0, 0, 0, 0, OffsetDateTime.now().getOffset());
+	private static final String ID = "id";
+	private static final String MUNICIPALITY_ID = "municipalityId";
+	private static final String STATUS = "status";
+	private static final String BODY = "body";
+	private static final String CONTENT_TYPE = "contentType";
+	private static final OffsetDateTime CREATED = OFFSET_DATE_TIME.minusDays(1);
+	private static final OffsetDateTime UPDATED = OFFSET_DATE_TIME.minusHours(1);
+	private static final List<Attachment> ATTACHMENTS = List.of(AttachmentBuilder.create()
 		.withId("attachmentId")
 		.withFileName("fileName")
 		.withContentType("contentType")

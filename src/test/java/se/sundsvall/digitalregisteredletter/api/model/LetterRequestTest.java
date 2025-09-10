@@ -5,17 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 class LetterRequestTest {
-	private final static String PARTY_ID = "partyId";
-	private final static String SUBJECT = "subject";
-	private final static String CONTENT_TYPE = "contentType";
-	private final static String BODY = "body";
-	private final static SupportInfo SUPPORT_INFO = SupportInfoBuilder.create()
+	private static final String PARTY_ID = "partyId";
+	private static final String SUBJECT = "subject";
+	private static final String CONTENT_TYPE = "contentType";
+	private static final String BODY = "body";
+	private static final SupportInfo SUPPORT_INFO = SupportInfoBuilder.create()
 		.withSupportText("supportText")
 		.withContactInformationUrl("contactInformationUrl")
 		.withContactInformationEmail("contactInformationEmail")
 		.withContactInformationPhoneNumber("contactInformationPhoneNumber")
 		.build();
-	private final static Organization ORGANIZATION = OrganizationBuilder.create()
+	private static final Organization ORGANIZATION = OrganizationBuilder.create()
 		.withName("name")
 		.withNumber(12345)
 		.build();
