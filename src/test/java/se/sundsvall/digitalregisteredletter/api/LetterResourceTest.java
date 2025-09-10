@@ -9,6 +9,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
+import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.TestDataFactory.createLetter;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createLetters;
@@ -24,6 +25,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
@@ -48,14 +50,14 @@ class LetterResourceTest {
 
 	@Test
 	void getLetters_OK() {
-		var letterResponses = createLetters();
-		var pageNumber = 0;
-		var pageSize = 10;
-		var pageable = PageRequest.of(pageNumber, pageSize);
+		final var letterResponses = createLetters();
+		final var pageNumber = 0;
+		final var pageSize = 10;
+		final var pageable = PageRequest.of(pageNumber, pageSize);
 
 		when(letterServiceMock.getLetters(eq(MUNICIPALITY_ID), any(Pageable.class))).thenReturn(letterResponses);
 
-		var response = webTestClient.get()
+		final var response = webTestClient.get()
 			.uri(uriBuilder -> uriBuilder.path("/%s/letters".formatted(MUNICIPALITY_ID))
 				.queryParam("page", pageNumber)
 				.queryParam("size", pageSize)
@@ -72,12 +74,12 @@ class LetterResourceTest {
 
 	@Test
 	void getLetter_OK() {
-		var letterResponse = createLetter();
-		var letterId = "1234567890";
+		final var letterResponse = createLetter();
+		final var letterId = "1234567890";
 
 		when(letterServiceMock.getLetter(MUNICIPALITY_ID, letterId)).thenReturn(letterResponse);
 
-		var response = webTestClient.get()
+		final var response = webTestClient.get()
 			.uri("/%s/letters/%s".formatted(MUNICIPALITY_ID, letterId))
 			.exchange()
 			.expectStatus().isOk()
@@ -90,9 +92,23 @@ class LetterResourceTest {
 	}
 
 	@Test
+	void getLetter_notFound() {
+		final var letterId = "1234567890";
+
+		when(letterServiceMock.getLetter(MUNICIPALITY_ID, letterId)).thenThrow(Problem.valueOf(NOT_FOUND));
+
+		webTestClient.get()
+			.uri("/%s/letters/%s".formatted(MUNICIPALITY_ID, letterId))
+			.exchange()
+			.expectStatus().isNotFound();
+
+		verify(letterServiceMock).getLetter(MUNICIPALITY_ID, letterId);
+	}
+
+	@Test
 	void sendLetter_Created() {
-		var createLetterRequest = createLetterRequest();
-		var letterId = "1234567890";
+		final var createLetterRequest = createLetterRequest();
+		final var letterId = "1234567890";
 
 		final var multipartBodyBuilder = new MultipartBodyBuilder();
 		multipartBodyBuilder.part("letterAttachments", "file-content").filename("test1.txt").contentType(APPLICATION_PDF);

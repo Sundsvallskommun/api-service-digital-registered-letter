@@ -20,7 +20,9 @@ public record LetterRequest(
 
 	@NotBlank @Schema(description = "Subject of the letter", example = "Important Notification", requiredMode = REQUIRED) String subject,
 
-	@Valid @NotNull @Schema(implementation = SupportInfo.class, description = "Support information for the letter") SupportInfo supportInfo,
+	@Valid @NotNull @Schema(implementation = SupportInfo.class, description = "Support information for the letter", requiredMode = REQUIRED) SupportInfo supportInfo,
+
+	@Valid @NotNull @Schema(description = "Information regarding the organizational unit sending the letter", requiredMode = REQUIRED) Organization organization,
 
 	@OneOf( {
 		TEXT_PLAIN_VALUE, TEXT_HTML_VALUE
