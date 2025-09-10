@@ -1,4 +1,4 @@
-package se.sundsvall.digitalregisteredletter.integration.db.dao;
+package se.sundsvall.digitalregisteredletter.integration.db;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 
 @Repository
 public interface LetterRepository extends JpaRepository<LetterEntity, String> {

@@ -1,4 +1,4 @@
-package se.sundsvall.digitalregisteredletter.integration.db;
+package se.sundsvall.digitalregisteredletter.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
@@ -38,25 +38,27 @@ class LetterEntityTest {
 	@Test
 	void testBuilderMethods() {
 
-		var offsetDateTime = OffsetDateTime.of(2025, 6, 18, 0, 0, 0, 0, OffsetDateTime.now().getOffset());
-		var id = "id";
-		var municipalityId = "1234";
-		var created = offsetDateTime.minusDays(1);
-		var updated = offsetDateTime.minusHours(1);
-		var body = "body";
-		var subject = "subject";
-		var partyId = "partyId";
-		var contentType = "text/plain";
-		var status = "status";
-		var deleted = true;
-		var attachments = List.of(createAttachmentEntity());
-		var supportInfo = SupportInfo.create()
+		final var offsetDateTime = OffsetDateTime.of(2025, 6, 18, 0, 0, 0, 0, OffsetDateTime.now().getOffset());
+		final var id = "id";
+		final var municipalityId = "1234";
+		final var created = offsetDateTime.minusDays(1);
+		final var updated = offsetDateTime.minusHours(1);
+		final var body = "body";
+		final var subject = "subject";
+		final var partyId = "partyId";
+		final var user = UserEntity.create();
+		final var organization = OrganizationEntity.create();
+		final var contentType = "text/plain";
+		final var status = "status";
+		final var deleted = true;
+		final var attachments = List.of(createAttachmentEntity());
+		final var supportInfo = SupportInfo.create()
 			.withSupportText("support text")
 			.withContactInformationUrl("https://example.com/contact")
 			.withContactInformationEmail("support@email.com")
 			.withContactInformationPhoneNumber("+46123456789");
 
-		var letterEntity = LetterEntity.create()
+		final var letterEntity = LetterEntity.create()
 			.withId(id)
 			.withMunicipalityId(municipalityId)
 			.withCreated(created)
@@ -67,6 +69,8 @@ class LetterEntityTest {
 			.withDeleted(deleted)
 			.withAttachments(attachments)
 			.withPartyId(partyId)
+			.withUser(user)
+			.withOrganization(organization)
 			.withSubject(subject)
 			.withSupportInfo(supportInfo);
 
@@ -81,6 +85,8 @@ class LetterEntityTest {
 		assertThat(letterEntity.isDeleted()).isEqualTo(deleted);
 		assertThat(letterEntity.getSupportInfo()).isEqualTo(supportInfo);
 		assertThat(letterEntity.getPartyId()).isEqualTo(partyId);
+		assertThat(letterEntity.getUser()).isEqualTo(user);
+		assertThat(letterEntity.getOrganization()).isEqualTo(organization);
 		assertThat(letterEntity.getSubject()).isEqualTo(subject);
 
 		assertThat(letterEntity).hasNoNullFieldsOrProperties();

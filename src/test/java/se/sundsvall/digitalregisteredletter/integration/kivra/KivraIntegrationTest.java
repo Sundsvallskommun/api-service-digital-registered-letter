@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.zalando.problem.Problem;
-import se.sundsvall.digitalregisteredletter.integration.db.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValueBuilder;

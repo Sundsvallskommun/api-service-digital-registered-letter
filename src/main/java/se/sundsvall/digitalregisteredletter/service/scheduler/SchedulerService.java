@@ -24,7 +24,7 @@ public class SchedulerService {
 	 * multiple times.
 	 */
 	@Dept44Scheduled(
-		cron = "${scheduler.update-letter-statuses.cron}",
+		cron = "${scheduler.update-letter-statuses.cron:-}",
 		name = "${scheduler.update-letter-statuses.name}",
 		lockAtMostFor = "${scheduler.update-letter-statuses.shedlock-lock-at-most-for}",
 		maximumExecutionTime = "${scheduler.update-letter-statuses.maximum-execution-time}")

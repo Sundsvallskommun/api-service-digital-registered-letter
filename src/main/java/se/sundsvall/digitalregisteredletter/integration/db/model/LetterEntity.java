@@ -1,15 +1,16 @@
-package se.sundsvall.digitalregisteredletter.integration.db;
+package se.sundsvall.digitalregisteredletter.integration.db.model;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -56,17 +57,23 @@ public class LetterEntity {
 	private OffsetDateTime updated;
 
 	@Embedded
-	@AttributeOverrides({
-		@AttributeOverride(name = "supportText", column = @Column(name = "support_text")),
-		@AttributeOverride(name = "contactInformationUrl", column = @Column(name = "support_information_url")),
-		@AttributeOverride(name = "contactInformationEmail", column = @Column(name = "support_information_email")),
-		@AttributeOverride(name = "contactInformationPhoneNumber", column = @Column(name = "support_information_phone"))
-	})
+	@AttributeOverride(name = "supportText", column = @Column(name = "support_text"))
+	@AttributeOverride(name = "contactInformationUrl", column = @Column(name = "support_information_url"))
+	@AttributeOverride(name = "contactInformationEmail", column = @Column(name = "support_information_email"))
+	@AttributeOverride(name = "contactInformationPhoneNumber", column = @Column(name = "support_information_phone"))
 	private SupportInfo supportInfo;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "letter_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "letter_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "fk_attachment_letter"))
 	private List<AttachmentEntity> attachments = new ArrayList<>();
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_letter"))
+	private UserEntity user;
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name = "fk_organization_letter"))
+	private OrganizationEntity organization;
 
 	@PrePersist
 	void onPersist() {
@@ -77,6 +84,10 @@ public class LetterEntity {
 	@PreUpdate
 	void onUpdate() {
 		this.updated = OffsetDateTime.now();
+	}
+
+	public static LetterEntity create() {
+		return new LetterEntity();
 	}
 
 	public String getSubject() {
@@ -105,8 +116,30 @@ public class LetterEntity {
 		return this;
 	}
 
-	public static LetterEntity create() {
-		return new LetterEntity();
+	public UserEntity getUser() {
+		return user;
+	}
+
+	public void setUser(final UserEntity user) {
+		this.user = user;
+	}
+
+	public LetterEntity withUser(final UserEntity user) {
+		this.user = user;
+		return this;
+	}
+
+	public OrganizationEntity getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(final OrganizationEntity organization) {
+		this.organization = organization;
+	}
+
+	public LetterEntity withOrganization(final OrganizationEntity organization) {
+		this.organization = organization;
+		return this;
 	}
 
 	public boolean isDeleted() {
@@ -240,35 +273,26 @@ public class LetterEntity {
 	}
 
 	@Override
-	public String toString() {
-		return "LetterEntity{" +
-			"id='" + id + '\'' +
-			", municipalityId='" + municipalityId + '\'' +
-			", body='" + body + '\'' +
-			", contentType='" + contentType + '\'' +
-			", status='" + status + '\'' +
-			", subject='" + subject + '\'' +
-			", partyId='" + partyId + '\'' +
-			", deleted=" + deleted +
-			", created=" + created +
-			", updated=" + updated +
-			", supportInfo=" + supportInfo +
-			", attachments=" + attachments +
-			'}';
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o == null || getClass() != o.getClass())
-			return false;
-		LetterEntity that = (LetterEntity) o;
-		return deleted == that.deleted && Objects.equals(id, that.id) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(body, that.body) && Objects.equals(contentType, that.contentType)
-			&& Objects.equals(status, that.status) && Objects.equals(subject, that.subject) && Objects.equals(partyId, that.partyId) && Objects.equals(created, that.created) && Objects.equals(updated,
-				that.updated) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments, that.attachments);
-	}
-
-	@Override
 	public int hashCode() {
-		return Objects.hash(id, municipalityId, body, contentType, status, subject, partyId, deleted, created, updated, supportInfo, attachments);
+		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, status, subject, supportInfo, updated, user);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) { return true; }
+		if (!(obj instanceof final LetterEntity other)) { return false; }
+		return Objects.equals(attachments, other.attachments) && Objects.equals(body, other.body) && Objects.equals(contentType, other.contentType) && Objects.equals(created, other.created) && deleted == other.deleted && Objects.equals(id, other.id)
+			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(organization, other.organization) && Objects.equals(partyId, other.partyId) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject) && Objects
+				.equals(supportInfo, other.supportInfo) && Objects.equals(updated, other.updated) && Objects.equals(user, other.user);
+	}
+
+	@Override
+	public String toString() {
+		final var builder = new StringBuilder();
+		builder.append("LetterEntity [id=").append(id).append(", municipalityId=").append(municipalityId).append(", body=").append(body).append(", contentType=").append(contentType).append(", status=").append(status).append(", subject=").append(subject)
+			.append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInfo=").append(supportInfo).append(", attachments=").append(attachments)
+			.append(", user=").append(user).append(", organization=").append(organization).append("]");
+		return builder.toString();
+	}
+
 }

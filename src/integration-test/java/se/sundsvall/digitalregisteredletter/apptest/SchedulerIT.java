@@ -10,7 +10,7 @@ import org.springframework.test.context.jdbc.Sql;
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
-import se.sundsvall.digitalregisteredletter.integration.db.dao.LetterRepository;
+import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 
 @WireMockAppTestSuite(files = "classpath:/SchedulerIT/", classes = Application.class)
 @Sql({
