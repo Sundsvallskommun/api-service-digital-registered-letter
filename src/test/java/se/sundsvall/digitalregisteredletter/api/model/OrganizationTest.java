@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 class OrganizationTest {
-	private static final String ORGANIZATION_NAME = "organizationName";
-	private static final Integer ORGANIZATION_NUMBER = 112;
+	private final static String ORGANIZATION_NAME = "organizationName";
+	private final static Integer ORGANIZATION_NUMBER = 112;
 
 	@Test
 	void constructorTest() {

@@ -8,30 +8,32 @@ import org.mockito.Mockito;
 import org.springframework.web.multipart.MultipartFile;
 
 class AttachmentsTest {
+	private final static List<MultipartFile> MULTIPART_FILES = List.of(Mockito.mock(MultipartFile.class));
 
 	@Test
-	void attachmentsConstructorTest() {
-		var multiPartFile = Mockito.mock(MultipartFile.class);
+	void constructorTest() {
+		final var bean = new Attachments(MULTIPART_FILES);
 
-		var files = List.of(multiPartFile);
-
-		var attachments = new Attachments(files);
-
-		assertThat(attachments).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(attachments.files()).isEqualTo(files);
+		assertBean(bean);
 	}
 
 	@Test
-	void attachmentsBuilderTest() {
-		var multiPartFile = Mockito.mock(MultipartFile.class);
-
-		var files = List.of(multiPartFile);
-
-		var attachments = AttachmentsBuilder.create()
-			.withFiles(files)
+	void builderTest() {
+		final var bean = AttachmentsBuilder.create()
+			.withFiles(MULTIPART_FILES)
 			.build();
 
-		assertThat(attachments).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(attachments.files()).isEqualTo(files);
+		assertBean(bean);
+	}
+
+	@Test
+	void noDirtOnEmptyBean() {
+		assertThat(new Attachments(null)).hasAllNullFieldsOrProperties();
+		assertThat(AttachmentsBuilder.create().build()).hasAllNullFieldsOrProperties();
+	}
+
+	private static void assertBean(Attachments bean) {
+		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(bean.files()).isEqualTo(MULTIPART_FILES);
 	}
 }

@@ -7,27 +7,37 @@ import org.junit.jupiter.api.Test;
 import se.sundsvall.dept44.models.api.paging.PagingAndSortingMetaData;
 
 class LettersTest {
+	private final static List<Letter> LETTER_LIST = List.of(LetterBuilder.create().build());
+	private final static PagingAndSortingMetaData META_DATA = PagingAndSortingMetaData.create()
+		.withPage(1)
+		.withCount(1);
 
 	@Test
-	void lettersConstructorTest() {
-		var letterList = List.of(LetterBuilder.create().build());
-		var metaData = PagingAndSortingMetaData.create()
-			.withPage(1)
-			.withCount(1);
+	void constructorTest() {
+		final var bean = new Letters(META_DATA, LETTER_LIST);
 
-		var letters = new Letters(metaData, letterList);
-
-		assertThat(letters).isNotNull();
-		assertThat(letters.metaData()).isEqualTo(metaData);
-		assertThat(letters.letters()).isEqualTo(letterList);
+		assertBean(bean);
 	}
 
 	@Test
-	void lettersBuilderTest() {
-		var letterResponse = LettersBuilder.create()
+	void builderTest() {
+		final var bean = LettersBuilder.create()
+			.withLetters(LETTER_LIST)
+			.withMetaData(META_DATA)
 			.build();
 
-		assertThat(letterResponse).isNotNull().hasAllNullFieldsOrProperties();
+		assertBean(bean);
 	}
 
+	@Test
+	void noDirtOnEmptyBean() {
+		assertThat(new Letters(null, null)).hasAllNullFieldsOrProperties();
+		assertThat(LettersBuilder.create().build()).hasAllNullFieldsOrProperties();
+	}
+
+	private static void assertBean(Letters letters) {
+		assertThat(letters).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(letters.metaData()).isEqualTo(META_DATA);
+		assertThat(letters.letters()).isEqualTo(LETTER_LIST);
+	}
 }
