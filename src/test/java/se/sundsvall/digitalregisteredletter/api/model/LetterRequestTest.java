@@ -5,58 +5,55 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 class LetterRequestTest {
+	private static final String PARTY_ID = "partyId";
+	private static final String SUBJECT = "subject";
+	private static final String CONTENT_TYPE = "contentType";
+	private static final String BODY = "body";
+	private static final SupportInfo SUPPORT_INFO = SupportInfoBuilder.create()
+		.withSupportText("supportText")
+		.withContactInformationUrl("contactInformationUrl")
+		.withContactInformationEmail("contactInformationEmail")
+		.withContactInformationPhoneNumber("contactInformationPhoneNumber")
+		.build();
+	private static final Organization ORGANIZATION = OrganizationBuilder.create()
+		.withName("name")
+		.withNumber(12345)
+		.build();
 
 	@Test
-	void letterRequestConstructorTest() {
-		var partyId = "partyId";
-		var subject = "subject";
-		var contentType = "contentType";
-		var body = "body";
+	void constructorTest() {
+		final var bean = new LetterRequest(PARTY_ID, SUBJECT, SUPPORT_INFO, ORGANIZATION, CONTENT_TYPE, BODY);
 
-		var supportInfo = SupportInfoBuilder.create()
-			.withSupportText("supportText")
-			.withContactInformationUrl("contactInformationUrl")
-			.withContactInformationEmail("contactInformationEmail")
-			.withContactInformationPhoneNumber("contactInformationPhoneNumber")
-			.build();
-
-		var letterRequest = new LetterRequest(partyId, subject, supportInfo, contentType, body);
-
-		assertThat(letterRequest).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(letterRequest.partyId()).isEqualTo(partyId);
-		assertThat(letterRequest.subject()).isEqualTo(subject);
-		assertThat(letterRequest.contentType()).isEqualTo(contentType);
-		assertThat(letterRequest.body()).isEqualTo(body);
-		assertThat(letterRequest.supportInfo()).isNotNull();
+		assertBean(bean);
 	}
 
 	@Test
-	void letterRequestBuilderTest() {
-		var partyId = "partyId";
-		var subject = "subject";
-		var contentType = "contentType";
-		var body = "body";
-
-		var supportInfo = SupportInfoBuilder.create()
-			.withSupportText("supportText")
-			.withContactInformationUrl("contactInformationUrl")
-			.withContactInformationEmail("contactInformationEmail")
-			.withContactInformationPhoneNumber("contactInformationPhoneNumber")
+	void builderTest() {
+		final var bean = LetterRequestBuilder.create()
+			.withBody(BODY)
+			.withContentType(CONTENT_TYPE)
+			.withOrganization(ORGANIZATION)
+			.withPartyId(PARTY_ID)
+			.withSubject(SUBJECT)
+			.withSupportInfo(SUPPORT_INFO)
 			.build();
 
-		var letterRequest = LetterRequestBuilder.create()
-			.withPartyId(partyId)
-			.withSubject(subject)
-			.withSupportInfo(supportInfo)
-			.withContentType(contentType)
-			.withBody(body)
-			.build();
+		assertBean(bean);
+	}
 
-		assertThat(letterRequest).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(letterRequest.partyId()).isEqualTo(partyId);
-		assertThat(letterRequest.subject()).isEqualTo(subject);
-		assertThat(letterRequest.contentType()).isEqualTo(contentType);
-		assertThat(letterRequest.body()).isEqualTo(body);
-		assertThat(letterRequest.supportInfo()).isNotNull();
+	@Test
+	void noDirtOnEmptyBean() {
+		assertThat(new LetterRequest(null, null, null, null, null, null)).hasAllNullFieldsOrProperties();
+		assertThat(LetterRequestBuilder.create().build()).hasAllNullFieldsOrProperties();
+	}
+
+	private static void assertBean(LetterRequest bean) {
+		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(bean.partyId()).isEqualTo(PARTY_ID);
+		assertThat(bean.subject()).isEqualTo(SUBJECT);
+		assertThat(bean.contentType()).isEqualTo(CONTENT_TYPE);
+		assertThat(bean.body()).isEqualTo(BODY);
+		assertThat(bean.supportInfo()).usingRecursiveComparison().isEqualTo(SUPPORT_INFO);
+		assertThat(bean.organization()).usingRecursiveComparison().isEqualTo(ORGANIZATION);
 	}
 }

@@ -10,10 +10,13 @@ import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequestBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.LettersBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.Organization;
+import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfo;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.PartsResponsiveBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterBuilder;
@@ -24,7 +27,7 @@ public class TestDataFactory {
 	public static final OffsetDateTime NOW = OffsetDateTime.now();
 
 	public static LetterEntity createLetterEntity() {
-		return LetterEntity.create()
+		final var letter = LetterEntity.create()
 			.withId("letter-id")
 			.withMunicipalityId("municipality-id")
 			.withBody("This is the body of the letter")
@@ -34,15 +37,22 @@ public class TestDataFactory {
 			.withSupportInfo(createLetterEntitySupportInfo())
 			.withCreated(NOW)
 			.withUpdated(NOW);
+
+		return letter.withOrganization(createOrganizationEntity(letter));
 	}
 
 	public static LetterRequest createLetterRequest() {
+		return createLetterRequest(createOrganization());
+	}
+
+	public static LetterRequest createLetterRequest(Organization organization) {
 		return LetterRequestBuilder.create()
 			.withBody("This is the body of the letter")
 			.withSubject("This is the subject")
 			.withContentType("text/plain")
 			.withPartyId("ce408061-9e38-4fca-a3e1-220b06f7bd23")
 			.withSupportInfo(createSupportInfo())
+			.withOrganization(organization)
 			.build();
 	}
 
@@ -95,6 +105,14 @@ public class TestDataFactory {
 			.build();
 	}
 
+	public static OrganizationEntity createOrganizationEntity(LetterEntity letterEntity) {
+		return OrganizationEntity.create()
+			.withId("uuid")
+			.withLetters(List.of(letterEntity))
+			.withName("organization name")
+			.withNumber(234);
+	}
+
 	public static ContentUserV2.RegisteredLetter createRegisteredLetter() {
 		return RegisteredLetterBuilder.create()
 			.withSenderReference(new ContentUserV2.RegisteredLetter.SenderReference("senderReference"))
@@ -107,6 +125,13 @@ public class TestDataFactory {
 		return RegisteredLetterHiddenBuilder.create()
 			.withSender(false)
 			.withSubject(false)
+			.build();
+	}
+
+	public static Organization createOrganization() {
+		return OrganizationBuilder.create()
+			.withName("organization-name")
+			.withNumber(234)
 			.build();
 	}
 }

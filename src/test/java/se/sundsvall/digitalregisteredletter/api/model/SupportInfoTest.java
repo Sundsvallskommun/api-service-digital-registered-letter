@@ -5,42 +5,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 class SupportInfoTest {
+	private static final String SUPPORT_TEXT = "supportText";
+	private static final String CONTACT_INFORMATION_URL = "contactInformationUrl";
+	private static final String CONTACT_INFORMATION_EMAIL = "contactInformationEmail";
+	private static final String CONTACT_INFORMATION_PHONE_NUMBER = "contactInformationPhoneNumber";
 
 	@Test
 	void supportInfoConstructorTest() {
-		var supportText = "supportText";
-		var contactInformationUrl = "contactInformationUrl";
-		var contactInformationEmail = "contactInformationEmail";
-		var contactInformationPhoneNumber = "contactInformationPhoneNumber";
+		final var bean = new SupportInfo(SUPPORT_TEXT, CONTACT_INFORMATION_URL, CONTACT_INFORMATION_PHONE_NUMBER, CONTACT_INFORMATION_EMAIL);
 
-		var supportInfo = new SupportInfo(supportText, contactInformationUrl, contactInformationPhoneNumber, contactInformationEmail);
-
-		assertThat(supportInfo).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(supportInfo.supportText()).isEqualTo(supportText);
-		assertThat(supportInfo.contactInformationUrl()).isEqualTo(contactInformationUrl);
-		assertThat(supportInfo.contactInformationEmail()).isEqualTo(contactInformationEmail);
-		assertThat(supportInfo.contactInformationPhoneNumber()).isEqualTo(contactInformationPhoneNumber);
+		assertBean(bean);
 	}
 
 	@Test
 	void supportInfoBuilderTest() {
-		var supportText = "supportText";
-		var contactInformationUrl = "contactInformationUrl";
-		var contactInformationEmail = "contactInformationEmail";
-		var contactInformationPhoneNumber = "contactInformationPhoneNumber";
-
-		var supportInfo = SupportInfoBuilder.create()
-			.withSupportText(supportText)
-			.withContactInformationUrl(contactInformationUrl)
-			.withContactInformationEmail(contactInformationEmail)
-			.withContactInformationPhoneNumber(contactInformationPhoneNumber)
+		final var bean = SupportInfoBuilder.create()
+			.withSupportText(SUPPORT_TEXT)
+			.withContactInformationUrl(CONTACT_INFORMATION_URL)
+			.withContactInformationEmail(CONTACT_INFORMATION_EMAIL)
+			.withContactInformationPhoneNumber(CONTACT_INFORMATION_PHONE_NUMBER)
 			.build();
 
-		assertThat(supportInfo).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(supportInfo.supportText()).isEqualTo(supportText);
-		assertThat(supportInfo.contactInformationUrl()).isEqualTo(contactInformationUrl);
-		assertThat(supportInfo.contactInformationEmail()).isEqualTo(contactInformationEmail);
-		assertThat(supportInfo.contactInformationPhoneNumber()).isEqualTo(contactInformationPhoneNumber);
+		assertBean(bean);
 	}
 
+	@Test
+	void noDirtOnEmptyBean() {
+		assertThat(new SupportInfo(null, null, null, null)).hasAllNullFieldsOrProperties();
+		assertThat(SupportInfoBuilder.create().build()).hasAllNullFieldsOrProperties();
+	}
+
+	private static void assertBean(SupportInfo bean) {
+		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(bean.supportText()).isEqualTo(SUPPORT_TEXT);
+		assertThat(bean.contactInformationUrl()).isEqualTo(CONTACT_INFORMATION_URL);
+		assertThat(bean.contactInformationEmail()).isEqualTo(CONTACT_INFORMATION_EMAIL);
+		assertThat(bean.contactInformationPhoneNumber()).isEqualTo(CONTACT_INFORMATION_PHONE_NUMBER);
+	}
 }

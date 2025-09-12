@@ -79,22 +79,22 @@ class LetterResource {
 		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@RequestPart(name = "letter") @Schema(description = "LetterRequest as a JSON string", implementation = LetterRequest.class) final String letterString,
 		@RequestPart(name = "letterAttachments") @ValidPdf final List<MultipartFile> files) {
+
 		// Parses the letter string to an actual LetterRequest object and validates it.
-		var letterRequest = parseLetterRequest(letterString);
+		final var letterRequest = parseLetterRequest(letterString);
 		validate(letterRequest);
 
 		// Places the multipart files into an Attachments object and validates it.
-		var attachments = AttachmentsBuilder.create()
+		final var attachments = AttachmentsBuilder.create()
 			.withFiles(files)
 			.build();
 		validate(attachments);
 
-		var id = letterService.sendLetter(municipalityId, letterRequest, attachments);
+		final var id = letterService.sendLetter(municipalityId, letterRequest, attachments);
 
 		return created(fromPath("/{municipalityId}/letters/{letterId}")
 			.buildAndExpand(municipalityId, id).toUri())
 			.header(CONTENT_TYPE, ALL_VALUE)
 			.build();
 	}
-
 }
