@@ -10,9 +10,11 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
@@ -21,10 +23,11 @@ import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 @WireMockAppTestSuite(files = "classpath:/LetterIT/", classes = Application.class)
 @Sql({
 	"/db/scripts/truncate.sql",
-	"/db/scripts/test-data.sql"
+	"/db/scripts/testdata-it.sql"
 })
 class LetterIT extends AbstractAppTest {
 
+	public static final String HEADER_X_SENT_BY = "X-Sent-By";
 	private static final String RESPONSE = "response.json";
 	private static final String REQUEST = "request.json";
 
@@ -53,12 +56,13 @@ class LetterIT extends AbstractAppTest {
 
 	@Test
 	void test03_sendLetter() throws FileNotFoundException {
-		var lettersBefore = letterRepository.findAll();
+		final var lettersBefore = letterRepository.findAll();
 		assertThat(lettersBefore).hasSize(2);
 
-		var headers = setupCall()
+		final var headers = setupCall()
 			.withServicePath("/2281/letters")
 			.withHttpMethod(POST)
+			.withHeader(HEADER_X_SENT_BY, "joe01doe; type=adAccount")
 			.withContentType(MULTIPART_FORM_DATA)
 			.withRequestFile("letter", REQUEST)
 			.withRequestFile("letterAttachments", "test.pdf")
@@ -76,7 +80,7 @@ class LetterIT extends AbstractAppTest {
 			.withExpectedResponse(RESPONSE)
 			.sendRequestAndVerifyResponse();
 
-		var lettersAfter = letterRepository.findAll();
+		final var lettersAfter = letterRepository.findAll();
 		assertThat(lettersAfter).hasSize(3);
 	}
 

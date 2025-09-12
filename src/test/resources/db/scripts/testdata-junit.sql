@@ -1,0 +1,30 @@
+INSERT INTO organization(id, number, name)
+VALUES ('a95aa330-7cad-4ce1-8bef-1e742fcac6e4', 44, 'Department 44'),
+       ('fe85fe5e-7de1-4a48-bda7-8df8556b0265', 45, 'Department 45');
+
+INSERT INTO `user`(id, username)
+VALUES ('3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', 'joe01doe'),
+       ('36c85960-0b77-4228-a8b3-da86ca8078e7', 'sue02doe');
+
+INSERT INTO letter(id, municipality_id, body, content_type, status, subject, party_id, deleted, created, updated,
+                   support_text, support_information_url, support_information_email, support_information_phone,
+                   organization_id, user_id)
+VALUES ('43a32404-28ee-480f-a095-00d48109afab', '2281', 'body', 'text/plain', 'NEW', 'subject',
+        'a51fc859-b867-4a02-b574-ec1040035b4a',
+        0, '2023-10-01 12:00:00', '2023-10-01 12:00:00', 'support text', 'https://example.com/support',
+        'support@email.com', '+46123456789', 'a95aa330-7cad-4ce1-8bef-1e742fcac6e4', '3bb3dc98-c674-448a-aa1c-bc4bdf3258bc'),
+       
+        ('f8853893-46a9-4249-a0e5-35d5595efd91', '2281', 'body', 'text/plain', 'SENT', 'subject',
+        '3f4ac4dd-48fe-4303-b48c-93c929a31ee1',
+        0, '2023-10-01 12:00:00', '2023-10-01 12:00:00', 'support text', 'https://example.com/support',
+        'support@email.com', '+46123456789', 'a95aa330-7cad-4ce1-8bef-1e742fcac6e4', '3bb3dc98-c674-448a-aa1c-bc4bdf3258bc'),
+       
+        ('9bb97fd2-4410-4a4b-9019-fdd98f01bd7c', '2281', 'body', 'text/plain', 'NEW', 'subject',
+        '491ca409-94ee-4f21-b32b-9304be3c6077',
+        0, '2023-10-01 12:00:00', '2023-10-01 12:00:00', 'support text', 'https://example.com/support',
+        'support@email.com', '+46123456789', 'fe85fe5e-7de1-4a48-bda7-8df8556b0265', '36c85960-0b77-4228-a8b3-da86ca8078e7');
+
+INSERT INTO attachment(id, file_name, content, content_type, letter_id)
+VALUES (1, 'attachment1.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
+       (2, 'attachment2.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
+       (3, 'attachment3.txt', 'dGVzdA==', 'text/plain', '9bb97fd2-4410-4a4b-9019-fdd98f01bd7c');

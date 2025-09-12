@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.OK;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
@@ -15,7 +16,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 @WireMockAppTestSuite(files = "classpath:/SchedulerIT/", classes = Application.class)
 @Sql({
 	"/db/scripts/truncate.sql",
-	"/db/scripts/test-data.sql"
+	"/db/scripts/testdata-it.sql"
 })
 class SchedulerIT extends AbstractAppTest {
 
@@ -28,7 +29,7 @@ class SchedulerIT extends AbstractAppTest {
 	@Test
 	void test01_updateLetterStatuses() {
 		// Assert that the letter status is "NEW" before the update
-		var letterBeforeUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
+		final var letterBeforeUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
 		assertThat(letterBeforeUpdate.getStatus()).isEqualTo("NEW");
 
 		setupCall()
@@ -38,7 +39,7 @@ class SchedulerIT extends AbstractAppTest {
 			.sendRequestAndVerifyResponse();
 
 		// Assert that the letter status is "SIGNED" after the update
-		var letterAfterUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
+		final var letterAfterUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
 		assertThat(letterAfterUpdate.getStatus()).isEqualTo("SIGNED");
 	}
 }
