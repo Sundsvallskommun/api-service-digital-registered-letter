@@ -4,7 +4,7 @@ spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
   flyway:
-    enabled: true
+    enabled: false
   jpa:
     properties:
       jakarta:
