@@ -1,5 +1,7 @@
 package se.sundsvall.digitalregisteredletter.integration.db.model;
 
+import static java.util.Optional.ofNullable;
+
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -282,8 +284,9 @@ public class LetterEntity {
 		if (this == obj) { return true; }
 		if (!(obj instanceof final LetterEntity other)) { return false; }
 		return Objects.equals(attachments, other.attachments) && Objects.equals(body, other.body) && Objects.equals(contentType, other.contentType) && Objects.equals(created, other.created) && deleted == other.deleted && Objects.equals(id, other.id)
-			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(organization, other.organization) && Objects.equals(partyId, other.partyId) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject) && Objects
-				.equals(supportInfo, other.supportInfo) && Objects.equals(updated, other.updated) && Objects.equals(user, other.user);
+			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(ofNullable(organization).map(OrganizationEntity::getId).orElse(null), ofNullable(other.organization).map(OrganizationEntity::getId).orElse(null)) && Objects.equals(
+				partyId, other.partyId) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject) && Objects.equals(supportInfo, other.supportInfo) && Objects.equals(updated, other.updated) && Objects.equals(ofNullable(user).map(
+					UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
 	}
 
 	@Override
@@ -291,7 +294,7 @@ public class LetterEntity {
 		final var builder = new StringBuilder();
 		builder.append("LetterEntity [id=").append(id).append(", municipalityId=").append(municipalityId).append(", body=").append(body).append(", contentType=").append(contentType).append(", status=").append(status).append(", subject=").append(subject)
 			.append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInfo=").append(supportInfo).append(", attachments=").append(attachments)
-			.append(", user=").append(user).append(", organization=").append(organization).append("]");
+			.append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId).orElse(null)).append("]");
 		return builder.toString();
 	}
 

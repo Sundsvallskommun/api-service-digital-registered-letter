@@ -32,13 +32,15 @@ class UserRepositoryTest {
 	void findByUsernameIgnoreCase(String username) {
 		final var result = userRepository.findByUsernameIgnoreCase(username);
 
-		assertThat(result).isPresent().hasValueSatisfying(ue -> {
-			assertThat(ue.getId()).isEqualTo("3bb3dc98-c674-448a-aa1c-bc4bdf3258bc");
-			assertThat(ue.getUsername()).isEqualTo("joe01doe");
-			assertThat(ue.getLetters()).hasSize(2).satisfies(letters -> {
+		assertThat(result).isPresent().hasValueSatisfying(assertedUserEntity -> {
+			assertThat(assertedUserEntity.getId()).isEqualTo("3bb3dc98-c674-448a-aa1c-bc4bdf3258bc");
+			assertThat(assertedUserEntity.getUsername()).isEqualTo("joe01doe");
+			assertThat(assertedUserEntity.getLetters()).hasSize(4).satisfies(letters -> {
 				assertThat(letters.stream().map(LetterEntity::getId).toList()).containsExactlyInAnyOrder(
 					"43a32404-28ee-480f-a095-00d48109afab",
-					"f8853893-46a9-4249-a0e5-35d5595efd91");
+					"f8853893-46a9-4249-a0e5-35d5595efd91",
+					"59eeec4c-81f3-4a96-918e-43a5e08a8ef0",
+					"450970bb-118c-43a8-8813-6b67c2d33a3b");
 			});
 		});
 	}

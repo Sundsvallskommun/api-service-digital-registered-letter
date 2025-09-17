@@ -27,14 +27,15 @@ class OrganizationRepositoryTest {
 	void findByNumber() {
 		final var result = organizationRepository.findByNumber(44);
 
-		assertThat(result).isPresent().hasValueSatisfying(oe -> {
-			assertThat(oe.getId()).isEqualTo("a95aa330-7cad-4ce1-8bef-1e742fcac6e4");
-			assertThat(oe.getName()).isEqualTo("Department 44");
-			assertThat(oe.getNumber()).isEqualTo(44);
-			assertThat(oe.getLetters()).hasSize(2).satisfies(letters -> {
+		assertThat(result).isPresent().hasValueSatisfying(assertedOrganizationEntity -> {
+			assertThat(assertedOrganizationEntity.getId()).isEqualTo("a95aa330-7cad-4ce1-8bef-1e742fcac6e4");
+			assertThat(assertedOrganizationEntity.getName()).isEqualTo("Department 44");
+			assertThat(assertedOrganizationEntity.getNumber()).isEqualTo(44);
+			assertThat(assertedOrganizationEntity.getLetters()).hasSize(3).satisfies(letters -> {
 				assertThat(letters.stream().map(LetterEntity::getId).toList()).containsExactlyInAnyOrder(
-					"43a32404-28ee-480f-a095-00d48109afab",
-					"f8853893-46a9-4249-a0e5-35d5595efd91");
+					"59eeec4c-81f3-4a96-918e-43a5e08a8ef0",
+					"f8853893-46a9-4249-a0e5-35d5595efd91",
+					"43a32404-28ee-480f-a095-00d48109afab");
 			});
 		});
 	}

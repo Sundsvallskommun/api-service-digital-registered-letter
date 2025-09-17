@@ -7,10 +7,14 @@ import static java.util.Optional.ofNullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.data.domain.Page;
+import se.sundsvall.dept44.models.api.paging.PagingAndSortingMetaData;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
+import se.sundsvall.digitalregisteredletter.api.model.Letters;
+import se.sundsvall.digitalregisteredletter.api.model.LettersBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
@@ -27,59 +31,59 @@ public final class LetterMapper {
 	 * Methods for mapping API objects to their entity counterparts
 	 */
 
-	public static LetterEntity toLetterEntity(final LetterRequest letterRequest) {
-		return ofNullable(letterRequest)
-			.map(lr -> LetterEntity.create()
-				.withBody(lr.body())
-				.withContentType(lr.contentType())
-				.withPartyId(lr.partyId())
-				.withSubject(lr.subject())
-				.withSupportInfo(toSupportInfo(lr.supportInfo())))
+	public static LetterEntity toLetterEntity(final LetterRequest nullableLetterRequest) {
+		return ofNullable(nullableLetterRequest)
+			.map(letterRequest -> LetterEntity.create()
+				.withBody(letterRequest.body())
+				.withContentType(letterRequest.contentType())
+				.withPartyId(letterRequest.partyId())
+				.withSubject(letterRequest.subject())
+				.withSupportInfo(toSupportInfo(letterRequest.supportInfo())))
 			.orElse(null);
 	}
 
-	public static OrganizationEntity toOrganizationEntity(Organization organization, LetterEntity letterEntity) {
-		return ofNullable(organization)
-			.map(o -> OrganizationEntity.create()
-				.withLetters(ofNullable(letterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
-				.withName(o.name())
-				.withNumber(o.number()))
+	public static OrganizationEntity toOrganizationEntity(Organization nullableOrganization, LetterEntity nullableLetterEntity) {
+		return ofNullable(nullableOrganization)
+			.map(organization -> OrganizationEntity.create()
+				.withLetters(ofNullable(nullableLetterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
+				.withName(organization.name())
+				.withNumber(organization.number()))
 			.orElse(null);
 	}
 
-	public static UserEntity toUserEntity(String username, LetterEntity letterEntity) {
-		return ofNullable(username)
-			.map(u -> UserEntity.create()
-				.withLetters(ofNullable(letterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
-				.withUsername(u))
+	public static UserEntity toUserEntity(String nullableUsername, LetterEntity nullableLetterEntity) {
+		return ofNullable(nullableUsername)
+			.map(username -> UserEntity.create()
+				.withLetters(ofNullable(nullableLetterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
+				.withUsername(username))
 			.orElse(null);
 	}
 
-	public static OrganizationEntity addLetter(OrganizationEntity organizationEntity, LetterEntity letterEntity) {
+	public static OrganizationEntity addLetter(OrganizationEntity organizationEntity, LetterEntity nullableLetterEntity) {
 		if (isNull(organizationEntity.getLetters())) {
 			organizationEntity.setLetters(new ArrayList<>());
 		}
 
-		ofNullable(letterEntity).ifPresent(le -> organizationEntity.getLetters().add(le));
+		ofNullable(nullableLetterEntity).ifPresent(letterEntity -> organizationEntity.getLetters().add(letterEntity));
 		return organizationEntity;
 	}
 
-	public static UserEntity addLetter(UserEntity userEntity, LetterEntity letterEntity) {
+	public static UserEntity addLetter(UserEntity userEntity, LetterEntity nullableLetterEntity) {
 		if (isNull(userEntity.getLetters())) {
 			userEntity.setLetters(new ArrayList<>());
 		}
 
-		ofNullable(letterEntity).ifPresent(le -> userEntity.getLetters().add(le));
+		ofNullable(nullableLetterEntity).ifPresent(letterEntity -> userEntity.getLetters().add(letterEntity));
 		return userEntity;
 	}
 
-	public static SupportInfo toSupportInfo(final se.sundsvall.digitalregisteredletter.api.model.SupportInfo supportInfo) {
-		return ofNullable(supportInfo)
-			.map(si -> SupportInfo.create()
-				.withSupportText(si.supportText())
-				.withContactInformationUrl(si.contactInformationUrl())
-				.withContactInformationEmail(si.contactInformationEmail())
-				.withContactInformationPhoneNumber(si.contactInformationPhoneNumber()))
+	public static SupportInfo toSupportInfo(final se.sundsvall.digitalregisteredletter.api.model.SupportInfo nullableSupportInfo) {
+		return ofNullable(nullableSupportInfo)
+			.map(supportInfo -> SupportInfo.create()
+				.withSupportText(supportInfo.supportText())
+				.withContactInformationUrl(supportInfo.contactInformationUrl())
+				.withContactInformationEmail(supportInfo.contactInformationEmail())
+				.withContactInformationPhoneNumber(supportInfo.contactInformationPhoneNumber()))
 			.orElse(null);
 	}
 
@@ -87,53 +91,62 @@ public final class LetterMapper {
 	 * Methods for mapping database entities to their API counterparts
 	 */
 
-	public static List<Letter> toLetters(final List<LetterEntity> letterEntities) {
-		return ofNullable(letterEntities).orElse(emptyList()).stream()
+	public static Letters toLetters(final Page<LetterEntity> nullablePage) {
+		return ofNullable(nullablePage)
+			.map(page -> LettersBuilder.create()
+				.withMetaData(PagingAndSortingMetaData.create().withPageData(page))
+				.withLetters(toLetterList(page.getContent()))
+				.build())
+			.orElse(null);
+	}
+
+	private static List<Letter> toLetterList(final List<LetterEntity> nullableLetterEntities) {
+		return ofNullable(nullableLetterEntities).orElse(emptyList()).stream()
 			.map(LetterMapper::toLetter)
 			.filter(Objects::nonNull)
 			.toList();
 	}
 
-	public static Letter toLetter(final LetterEntity letterEntity) {
-		return ofNullable(letterEntity)
-			.map(le -> LetterBuilder.create()
-				.withId(le.getId())
-				.withMunicipalityId(le.getMunicipalityId())
-				.withBody(le.getBody())
-				.withContentType(le.getContentType())
-				.withStatus(le.getStatus())
-				.withAttachments(toLetterAttachments(le.getAttachments()))
-				.withSupportInfo(toSupportInfo(le.getSupportInfo()))
-				.withCreated(le.getCreated())
-				.withUpdated(le.getUpdated())
+	public static Letter toLetter(final LetterEntity nullableLetterEntity) {
+		return ofNullable(nullableLetterEntity)
+			.map(etterEntity -> LetterBuilder.create()
+				.withId(etterEntity.getId())
+				.withMunicipalityId(etterEntity.getMunicipalityId())
+				.withBody(etterEntity.getBody())
+				.withContentType(etterEntity.getContentType())
+				.withStatus(etterEntity.getStatus())
+				.withAttachments(toLetterAttachments(etterEntity.getAttachments()))
+				.withSupportInfo(toSupportInfo(etterEntity.getSupportInfo()))
+				.withCreated(etterEntity.getCreated())
+				.withUpdated(etterEntity.getUpdated())
 				.build())
 			.orElse(null);
 	}
 
-	public static se.sundsvall.digitalregisteredletter.api.model.SupportInfo toSupportInfo(final SupportInfo supportInfo) {
-		return ofNullable(supportInfo)
-			.map(si -> SupportInfoBuilder.create()
-				.withContactInformationUrl(si.getContactInformationUrl())
-				.withContactInformationEmail(si.getContactInformationEmail())
-				.withContactInformationPhoneNumber(si.getContactInformationPhoneNumber())
-				.withSupportText(si.getSupportText())
+	public static se.sundsvall.digitalregisteredletter.api.model.SupportInfo toSupportInfo(final SupportInfo nullableSupportInfo) {
+		return ofNullable(nullableSupportInfo)
+			.map(supportInfo -> SupportInfoBuilder.create()
+				.withContactInformationUrl(supportInfo.getContactInformationUrl())
+				.withContactInformationEmail(supportInfo.getContactInformationEmail())
+				.withContactInformationPhoneNumber(supportInfo.getContactInformationPhoneNumber())
+				.withSupportText(supportInfo.getSupportText())
 				.build())
 			.orElse(null);
 	}
 
-	public static List<Letter.Attachment> toLetterAttachments(final List<AttachmentEntity> attachmentEntities) {
-		return ofNullable(attachmentEntities).orElse(emptyList()).stream()
+	public static List<Letter.Attachment> toLetterAttachments(final List<AttachmentEntity> nullableAttachmentEntities) {
+		return ofNullable(nullableAttachmentEntities).orElse(emptyList()).stream()
 			.map(LetterMapper::toLetterAttachment)
 			.filter(Objects::nonNull)
 			.toList();
 	}
 
-	public static Letter.Attachment toLetterAttachment(final AttachmentEntity attachmentEntity) {
-		return ofNullable(attachmentEntity)
-			.map(ae -> AttachmentBuilder.create()
-				.withId(ae.getId())
-				.withFileName(ae.getFileName())
-				.withContentType(ae.getContentType())
+	public static Letter.Attachment toLetterAttachment(final AttachmentEntity nullableAttachmentEntity) {
+		return ofNullable(nullableAttachmentEntity)
+			.map(attachmentEntity -> AttachmentBuilder.create()
+				.withId(attachmentEntity.getId())
+				.withFileName(attachmentEntity.getFileName())
+				.withContentType(attachmentEntity.getContentType())
 				.build())
 			.orElse(null);
 	}

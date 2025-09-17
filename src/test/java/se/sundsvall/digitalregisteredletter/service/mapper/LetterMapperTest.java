@@ -10,6 +10,7 @@ import static se.sundsvall.TestDataFactory.createSupportInfoEmbeddable;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
@@ -28,11 +29,11 @@ class LetterMapperTest {
 
 		assertThat(result.getBody()).isEqualTo(letterRequest.body());
 		assertThat(result.getContentType()).isEqualTo(letterRequest.contentType());
-		assertThat(result.getSupportInfo()).satisfies(supportInfo -> {
-			assertThat(supportInfo.getSupportText()).isEqualTo(letterRequest.supportInfo().supportText());
-			assertThat(supportInfo.getContactInformationEmail()).isEqualTo(letterRequest.supportInfo().contactInformationEmail());
-			assertThat(supportInfo.getContactInformationUrl()).isEqualTo(letterRequest.supportInfo().contactInformationUrl());
-			assertThat(supportInfo.getContactInformationPhoneNumber()).isEqualTo(letterRequest.supportInfo().contactInformationPhoneNumber());
+		assertThat(result.getSupportInfo()).satisfies(assertedSupportInfo -> {
+			assertThat(assertedSupportInfo.getSupportText()).isEqualTo(letterRequest.supportInfo().supportText());
+			assertThat(assertedSupportInfo.getContactInformationEmail()).isEqualTo(letterRequest.supportInfo().contactInformationEmail());
+			assertThat(assertedSupportInfo.getContactInformationUrl()).isEqualTo(letterRequest.supportInfo().contactInformationUrl());
+			assertThat(assertedSupportInfo.getContactInformationPhoneNumber()).isEqualTo(letterRequest.supportInfo().contactInformationPhoneNumber());
 		});
 
 	}
@@ -252,10 +253,11 @@ class LetterMapperTest {
 		final var entity = createLetterEntity();
 		final var letter = LetterMapper.toLetter(entity);
 
-		final var list = LetterMapper.toLetters(List.of(entity));
+		final var pagedResponse = LetterMapper.toLetters(new PageImpl<>(List.of(entity)));
 
-		assertThat(list).hasSize(1).satisfiesExactly(l -> {
-			assertThat(l).usingRecursiveAssertion().isEqualTo(letter);
+		assertThat(pagedResponse).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(pagedResponse.letters()).hasSize(1).satisfiesExactly(assertedLetter -> {
+			assertThat(assertedLetter).usingRecursiveAssertion().isEqualTo(letter);
 		});
 	}
 
@@ -265,12 +267,15 @@ class LetterMapperTest {
 		final var listWithNull = new ArrayList<>(List.of(entity));
 		listWithNull.addFirst(null);
 
-		assertThat(LetterMapper.toLetters(listWithNull)).hasSize(1);
+		final var pagedResponse = LetterMapper.toLetters(new PageImpl<>(listWithNull));
+
+		assertThat(pagedResponse).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(pagedResponse.letters()).hasSize(1);
 	}
 
 	@Test
 	void toLettersFromNull() {
-		assertThat(LetterMapper.toLetters(null)).isEmpty();
+		assertThat(LetterMapper.toLetters(null)).isNull();
 	}
 
 	@Test
@@ -297,8 +302,8 @@ class LetterMapperTest {
 
 		final var list = LetterMapper.toLetterAttachments(List.of(entity));
 
-		assertThat(list).hasSize(1).satisfiesExactly(l -> {
-			assertThat(l).usingRecursiveAssertion().isEqualTo(attachment);
+		assertThat(list).hasSize(1).satisfiesExactly(assertedAttachment -> {
+			assertThat(assertedAttachment).usingRecursiveAssertion().isEqualTo(attachment);
 		});
 	}
 

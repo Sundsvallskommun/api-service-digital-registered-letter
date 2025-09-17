@@ -56,8 +56,7 @@ class LetterIT extends AbstractAppTest {
 
 	@Test
 	void test03_sendLetter() throws FileNotFoundException {
-		final var lettersBefore = letterRepository.findAll();
-		assertThat(lettersBefore).hasSize(2);
+		final var initialLetterSize = letterRepository.count();
 
 		final var headers = setupCall()
 			.withServicePath("/2281/letters")
@@ -80,8 +79,62 @@ class LetterIT extends AbstractAppTest {
 			.withExpectedResponse(RESPONSE)
 			.sendRequestAndVerifyResponse();
 
-		final var lettersAfter = letterRepository.findAll();
-		assertThat(lettersAfter).hasSize(3);
+		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly successfully sent letter)
 	}
 
+	@Test
+	void test04_sendLetterKivraReturnClientError() throws FileNotFoundException {
+		final var initialLetterSize = letterRepository.count();
+
+		final var headers = setupCall()
+			.withServicePath("/2281/letters")
+			.withHttpMethod(POST)
+			.withHeader(HEADER_X_SENT_BY, "joe01doe; type=adAccount")
+			.withContentType(MULTIPART_FORM_DATA)
+			.withRequestFile("letter", REQUEST)
+			.withRequestFile("letterAttachments", "test.pdf")
+			.withExpectedResponseStatus(CREATED)
+			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+			.sendRequest()
+			.getResponseHeaders();
+
+		assertThat(headers.get(LOCATION)).isNotNull();
+
+		setupCall()
+			.withServicePath(headers.get(LOCATION).getFirst())
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+
+		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly failed sent letter)
+	}
+
+	@Test
+	void test05_sendLetterKivraReturnServerError() throws FileNotFoundException {
+		final var initialLetterSize = letterRepository.count();
+
+		final var headers = setupCall()
+			.withServicePath("/2281/letters")
+			.withHttpMethod(POST)
+			.withHeader(HEADER_X_SENT_BY, "joe01doe; type=adAccount")
+			.withContentType(MULTIPART_FORM_DATA)
+			.withRequestFile("letter", REQUEST)
+			.withRequestFile("letterAttachments", "test.pdf")
+			.withExpectedResponseStatus(CREATED)
+			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+			.sendRequest()
+			.getResponseHeaders();
+
+		assertThat(headers.get(LOCATION)).isNotNull();
+
+		setupCall()
+			.withServicePath(headers.get(LOCATION).getFirst())
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+
+		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly failed sent letter)
+	}
 }

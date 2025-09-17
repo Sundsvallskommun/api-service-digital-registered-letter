@@ -7,7 +7,6 @@ import static se.sundsvall.digitalregisteredletter.integration.kivra.configurati
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +36,7 @@ public interface KivraClient {
 	 *                 of the content sent by Kivra to the end user.
 	 */
 	@PostMapping(value = "/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-	ResponseEntity<ContentUser> sendContent(@RequestBody final ContentUserV2 content);
+	ContentUser sendContent(@RequestBody final ContentUserV2 content);
 
 	/**
 	 * This resource is used to match a list of users to check that they are eligible for receiving Content from the
@@ -80,7 +79,7 @@ public interface KivraClient {
 	 * @return             a ResponseEntity with no content, indicating that the deletion was successful
 	 */
 	@DeleteMapping(value = "/registered/{responseKey}", produces = ALL_VALUE)
-	ResponseEntity<Void> deleteResponse(@PathVariable("responseKey") final String responseKey);
+	void deleteResponse(@PathVariable("responseKey") final String responseKey);
 
 	/**
 	 * Method is used to verify that the certificate to Kivra is valid
@@ -88,6 +87,6 @@ public interface KivraClient {
 	 * @return basic tenant information
 	 */
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	ResponseEntity<Void> getTenantInformation();
+	void getTenantInformation();
 
 }
