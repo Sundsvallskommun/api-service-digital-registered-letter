@@ -1,14 +1,23 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.zalando.problem.Status.BAD_GATEWAY;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_CLIENT_ERROR;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SERVER_ERROR;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_UNKNOWN_ERROR;
 
 import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
+import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.dept44.exception.ClientProblem;
+import se.sundsvall.dept44.exception.ServerProblem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
@@ -35,14 +44,18 @@ public class KivraIntegration {
 	 */
 	public List<String> checkEligibility(final List<String> legalIds) {
 		try {
-			var request = kivraMapper.toCheckEligibilityRequest(legalIds);
+			final var request = kivraMapper.toCheckEligibilityRequest(legalIds);
 			LOG.info("Checking Kivra eligibility for legal ids: {}", legalIds);
-			var response = kivraClient.checkEligibility(request);
+			final var response = kivraClient.checkEligibility(request);
 			LOG.info("Kivra eligibility check successful");
-			return Optional.ofNullable(response).map(UserMatchV2SSN::legalIds).orElse(emptyList());
-		} catch (Exception e) {
+			return ofNullable(response).map(UserMatchV2SSN::legalIds).orElse(emptyList());
+
+		} catch (final ServerProblem e) {
+			LOG.error("Server exception occurred when checking Kivra eligibility for legal ids: {}, exception message: {}", legalIds, e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while checking Kivra eligibility for legal ids: " + legalIds);
+		} catch (final Exception e) {
 			LOG.error("Exception occurred when checking Kivra eligibility for legal ids: {}, exception message: {}", legalIds, e.getMessage(), e);
-			throw Problem.valueOf(BAD_GATEWAY, "Exception occurred while checking Kivra eligibility for legal ids: " + legalIds);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while checking Kivra eligibility for legal ids: " + legalIds);
 		}
 	}
 
@@ -55,23 +68,25 @@ public class KivraIntegration {
 	 */
 	public String sendContent(final LetterEntity letterEntity, final String legalId) {
 		try {
-			var request = kivraMapper.toSendContentRequest(letterEntity, legalId);
+			final var request = kivraMapper.toSendContentRequest(letterEntity, legalId);
 			LOG.info("Sending content to Kivra for legal id: {}", legalId);
-			var response = kivraClient.sendContent(request);
-			LOG.info("Kivra content sent successfully for legal id: {}", legalId);
+			kivraClient.sendContent(request);
+			LOG.info("Content sent successfully for legal id: {}", legalId);
 
-			if (response.getStatusCode().is2xxSuccessful()) {
-				return "SENT";
-			} else if (response.getStatusCode().is4xxClientError()) {
-				return "FAILED - Client Error";
-			} else if (response.getStatusCode().is5xxServerError()) {
-				return "FAILED - Server Error";
-			} else {
-				return "FAILED - Unknown Error";
-			}
-		} catch (Exception e) {
-			LOG.error("Exception occurred when sending content to Kivra for legal id: {}, exception message: {}", legalId, e.getMessage(), e);
-			throw Problem.valueOf(BAD_GATEWAY, "Exception occurred while sending content to Kivra for legal id: " + legalId);
+			return STATUS_SENT;
+
+		} catch (final ClientProblem e) {
+			LOG.error("Response indicates client error", e);
+			return STATUS_CLIENT_ERROR;
+		} catch (final ServerProblem e) {
+			LOG.error("Response indicates server error", e);
+			return STATUS_SERVER_ERROR;
+		} catch (final ThrowableProblem e) {
+			LOG.error("Response indicates unknown error", e);
+			return STATUS_UNKNOWN_ERROR;
+		} catch (final Exception e) {
+			LOG.error("{} occurred when sending content to Kivra for legal id: {}, exception message: {}", e.getClass().getSimpleName(), legalId, e.getMessage(), e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while sending content to Kivra for legal id: " + legalId);
 		}
 	}
 
@@ -84,16 +99,21 @@ public class KivraIntegration {
 		try {
 			LOG.info("Retrieving all Kivra responses");
 
-			var keyValues = kivraClient.getAllResponses();
-			if (keyValues == null || keyValues.isEmpty()) {
+			final var keyValues = kivraClient.getAllResponses();
+			if (isEmpty(keyValues)) {
 				LOG.info("No Kivra responses found");
-				return emptyList();
+			} else {
+				LOG.info("Successfully retrieved {} Kivra responses", keyValues.size());
 			}
-			LOG.info("Successfully retrieved {} Kivra responses", keyValues.size());
+
 			return keyValues;
-		} catch (Exception e) {
+
+		} catch (final ServerProblem e) {
+			LOG.error("Server exception occurred when retrieving Kivra responses, exception message: {}", e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while retrieving Kivra responses");
+		} catch (final Exception e) {
 			LOG.error("Exception occurred when retrieving Kivra responses, exception message: {}", e.getMessage(), e);
-			throw Problem.valueOf(BAD_GATEWAY, "Exception occurred while retrieving Kivra responses");
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while retrieving Kivra responses");
 		}
 	}
 
@@ -107,9 +127,13 @@ public class KivraIntegration {
 		try {
 			LOG.info("Retrieving Kivra registered letter response for responseKey: {}", responseKey);
 			return kivraClient.getResponseDetails(responseKey);
-		} catch (Exception e) {
-			LOG.error("Exception occurred when retrieving Kivra registered letter response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
+
+		} catch (final ServerProblem e) {
+			LOG.error("Server exception occurred when retrieving Kivra registered letter response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
 			throw Problem.valueOf(BAD_GATEWAY, "Exception occurred while retrieving Kivra registered letter response for responseKey: " + responseKey);
+		} catch (final Exception e) {
+			LOG.error("Exception occurred when retrieving Kivra registered letter response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while retrieving Kivra registered letter response for responseKey: " + responseKey);
 		}
 	}
 
@@ -123,9 +147,13 @@ public class KivraIntegration {
 			LOG.info("Deleting Kivra response with key: {}", responseKey);
 			kivraClient.deleteResponse(responseKey);
 			LOG.info("Kivra response with key {} deleted successfully", responseKey);
-		} catch (Exception e) {
+
+		} catch (final ServerProblem e) {
+			LOG.error("Server exception occurred when deleting Kivra response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while deleting Kivra response for responseKey: " + responseKey);
+		} catch (final Exception e) {
 			LOG.error("Exception occurred when deleting Kivra response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
-			throw Problem.valueOf(BAD_GATEWAY, "Exception occurred while deleting Kivra response for responseKey: " + responseKey);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while deleting Kivra response for responseKey: " + responseKey);
 		}
 	}
 

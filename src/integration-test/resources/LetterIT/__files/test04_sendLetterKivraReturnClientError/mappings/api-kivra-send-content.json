@@ -1,0 +1,43 @@
+{
+	"request": {
+		"headers": {
+			"Authorization": {
+				"equalTo": "Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3"
+			}
+		},
+		"method": "POST",
+		"bodyPatterns": [
+			{
+				"equalToJson": {
+					"ssn": "190101010159",
+					"subject": "subject",
+					"type": "registered.letter",
+					"registered": {
+						"hidden": {
+							"sender": false,
+							"subject": false
+						}
+					},
+					"parts": [
+						{
+							"name": "test.pdf",
+							"data": "VGVzdGluZyEgOik=",
+							"content_type": "application/pdf"
+						}
+					]
+				},
+				"ignoreExtraElements": true
+			},
+			{
+				"matchesJsonPath": "$[?(@.registered.expires_at =~ /^.+$/)]"
+			},
+			{
+				"matchesJsonPath": "$[?(@.registered.sender_reference.sender_internal_id =~ /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)]"
+			}
+		],
+		"url": "/kivra/some-tenant-key/content"
+	},
+	"response": {
+		"status": 400
+	}
+}
