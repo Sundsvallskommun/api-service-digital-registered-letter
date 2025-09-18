@@ -5,7 +5,7 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.0"
+  version: "2.1"
 servers:
 - url: http://localhost:8080
   description: Generated server url
@@ -52,7 +52,9 @@ paths:
       tags:
       - Letter Resource
       summary: Get all letters
-      description: Retrieves all letters for a municipality
+      description: "Retrieves all letters for a municipality. Response is possible\
+        \ to filter by any combination of department id, username, earliest and\
+        \ latest created date."
       operationId: getLetters
       parameters:
       - name: municipalityId
@@ -60,6 +62,43 @@ paths:
         required: true
         schema:
           type: string
+      - name: orgId
+        in: query
+        description: Optional filter on organization id
+        required: false
+        schema:
+          type: integer
+          description: Optional filter on organization id
+          format: int32
+          example: 44
+        example: 44
+      - name: username
+        in: query
+        description: Optional filter on username
+        required: false
+        schema:
+          type: string
+          description: Optional filter on username
+          example: joe01doe
+        example: joe01doe
+      - name: createdEarliest
+        in: query
+        description: Optional filter on earliest date when letter was sent
+        required: false
+        schema:
+          type: string
+          description: Optional filter on earliest date when letter was sent
+          format: date-time
+        example: 2025-08-18
+      - name: createdLatest
+        in: query
+        description: Optional filter on latest date when letter was sent
+        required: false
+        schema:
+          type: string
+          description: Optional filter on latest date when letter was sent
+          format: date-time
+        example: 2025-09-18
       - name: page
         in: query
         description: Zero-based page index (0..N)

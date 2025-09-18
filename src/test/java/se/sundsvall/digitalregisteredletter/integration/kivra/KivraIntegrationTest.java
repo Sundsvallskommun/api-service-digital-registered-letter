@@ -210,6 +210,15 @@ class KivraIntegrationTest {
 	}
 
 	@Test
+	void getAllResponsesWhenKivraRespondsWithNull() {
+		when(kivraClientMock.getAllResponses()).thenReturn(null);
+
+		assertThat(kivraIntegration.getAllResponses()).isNotNull().isEmpty();
+
+		verify(kivraClientMock).getAllResponses();
+	}
+
+	@Test
 	void getAllResponsesKivraThrowsServerProblem() {
 		when(kivraClientMock.getAllResponses()).thenThrow(new ServerProblem(NOT_IMPLEMENTED, "Damn you Salazar"));
 

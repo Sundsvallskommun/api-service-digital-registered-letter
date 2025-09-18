@@ -99,7 +99,7 @@ public class KivraIntegration {
 		try {
 			LOG.info("Retrieving all Kivra responses");
 
-			final var keyValues = kivraClient.getAllResponses();
+			final var keyValues = ofNullable(kivraClient.getAllResponses()).orElse(emptyList());
 			if (isEmpty(keyValues)) {
 				LOG.info("No Kivra responses found");
 			} else {
