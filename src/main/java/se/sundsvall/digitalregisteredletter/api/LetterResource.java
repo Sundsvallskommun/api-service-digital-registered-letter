@@ -35,6 +35,7 @@ import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.validation.ValidPdf;
@@ -57,8 +58,13 @@ class LetterResource {
 	}
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	@Operation(summary = "Get all letters", description = "Retrieves all letters for a municipality", responses = @ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true))
-	ResponseEntity<Letters> getLetters(@PathVariable @ValidMunicipalityId final String municipalityId, @ParameterObject final Pageable pageable) {
+	@Operation(summary = "Get all letters",
+		description = "Retrieves all letters for a municipality. Response is possible to filter by any combination of department id, username, earliest and latest created date.",
+		responses = @ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true))
+	ResponseEntity<Letters> getLetters(
+		@PathVariable @ValidMunicipalityId final String municipalityId,
+		@ParameterObject final LetterFilter filter,
+		@ParameterObject final Pageable pageable) {
 		return ok(letterService.getLetters(municipalityId, pageable));
 	}
 
