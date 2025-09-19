@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 
 @DataJpaTest
@@ -45,8 +46,8 @@ class LetterRepositoryTest {
 	}
 
 	@Test
-	void findAllByMunicipalityIdAndDeletedFalse() {
-		assertThat(letterRepository.findAllByMunicipalityIdAndDeleted("2281", false, PageRequest.of(0, 100)).getContent())
+	void findAllByMunicipalityIdAndDeleted() {
+		assertThat(letterRepository.findAllByFilter("2281", LetterFilterBuilder.create().build(), false, PageRequest.of(0, 100)).getContent())
 			.hasSize(3)
 			.extracting(LetterEntity::getId).containsExactlyInAnyOrder(
 				"43a32404-28ee-480f-a095-00d48109afab",
@@ -56,7 +57,7 @@ class LetterRepositoryTest {
 
 	@Test
 	void findAllByMunicipalityIdAndDeletedTrue() {
-		assertThat(letterRepository.findAllByMunicipalityIdAndDeleted("2281", true, PageRequest.of(0, 100)).getContent())
+		assertThat(letterRepository.findAllByFilter("2281", LetterFilterBuilder.create().build(), true, PageRequest.of(0, 100)).getContent())
 			.hasSize(1)
 			.extracting(LetterEntity::getId).containsExactly(
 				"59eeec4c-81f3-4a96-918e-43a5e08a8ef0");

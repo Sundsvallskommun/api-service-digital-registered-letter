@@ -28,6 +28,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.service.LetterService;
 
@@ -54,8 +55,9 @@ class LetterResourceTest {
 		final var pageNumber = 0;
 		final var pageSize = 10;
 		final var pageable = PageRequest.of(pageNumber, pageSize);
+		final var letterFilter = LetterFilterBuilder.create().build();
 
-		when(letterServiceMock.getLetters(eq(MUNICIPALITY_ID), any(Pageable.class))).thenReturn(letterResponses);
+		when(letterServiceMock.getLetters(eq(MUNICIPALITY_ID), eq(letterFilter), any(Pageable.class))).thenReturn(letterResponses);
 
 		final var response = webTestClient.get()
 			.uri(uriBuilder -> uriBuilder.path("/%s/letters".formatted(MUNICIPALITY_ID))
@@ -69,7 +71,7 @@ class LetterResourceTest {
 			.getResponseBody();
 
 		assertThat(response).usingRecursiveComparison().isEqualTo(letterResponses);
-		verify(letterServiceMock).getLetters(MUNICIPALITY_ID, pageable);
+		verify(letterServiceMock).getLetters(MUNICIPALITY_ID, letterFilter, pageable);
 	}
 
 	@Test

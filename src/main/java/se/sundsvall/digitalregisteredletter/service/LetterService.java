@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.api.model.Attachments;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
@@ -51,8 +52,8 @@ public class LetterService {
 		return toLetter(letter);
 	}
 
-	public Letters getLetters(final String municipalityId, final Pageable pageable) {
-		final var page = repositoryIntegration.getPagedLetterEntities(municipalityId, pageable);
+	public Letters getLetters(final String municipalityId, final LetterFilter filter, final Pageable pageable) {
+		final var page = repositoryIntegration.getPagedLetterEntities(municipalityId, filter, pageable);
 
 		return toLetters(page);
 	}
