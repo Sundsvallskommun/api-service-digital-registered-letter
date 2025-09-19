@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.digitalregisteredletter.api.model.Attachments;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
@@ -114,14 +115,16 @@ public class RepositoryIntegration {
 	}
 
 	/**
-	 * Method returns a page based result of letter entities matching provided municipality id
+	 * Method returns a page based result of letter entities matching provided municipality id and optionally provided
+	 * filters
 	 *
 	 * @param  municipalityId municipality id to match against
+	 * @param  filter         filter object containing optional filters to use when retriving result
 	 * @param  pageable       pageable object providing data regarding the page and size to retrieve
 	 * @return                a paged result matching provided parameters
 	 */
-	public Page<LetterEntity> getPagedLetterEntities(final String municipalityId, final Pageable pageable) {
-		return letterRepository.findAllByMunicipalityIdAndDeleted(municipalityId, false, pageable);
+	public Page<LetterEntity> getPagedLetterEntities(final String municipalityId, final LetterFilter filter, final Pageable pageable) {
+		return letterRepository.findAllByFilter(municipalityId, filter, false, pageable);
 	}
 
 	/**

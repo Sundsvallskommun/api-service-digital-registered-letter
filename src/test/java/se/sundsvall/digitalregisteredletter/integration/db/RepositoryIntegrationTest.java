@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
@@ -178,13 +179,14 @@ class RepositoryIntegrationTest {
 	@Test
 	void getPagedLetterEntities() {
 		final var municipalityId = "municipalityId";
+		final var letterFilter = LetterFilterBuilder.create().build();
 		final var pageable = PageRequest.of(1, 100);
 
-		when(letterRepositoryMock.findAllByMunicipalityIdAndDeleted(municipalityId, false, pageable)).thenReturn(new PageImpl<>(List.of(letterEntityMock)));
+		when(letterRepositoryMock.findAllByFilter(municipalityId, letterFilter, false, pageable)).thenReturn(new PageImpl<>(List.of(letterEntityMock)));
 
-		assertThat(repositoryIntegration.getPagedLetterEntities(municipalityId, pageable)).hasSize(1).contains(letterEntityMock);
+		assertThat(repositoryIntegration.getPagedLetterEntities(municipalityId, letterFilter, pageable)).hasSize(1).contains(letterEntityMock);
 
-		verify(letterRepositoryMock).findAllByMunicipalityIdAndDeleted(municipalityId, false, pageable);
+		verify(letterRepositoryMock).findAllByFilter(municipalityId, letterFilter, false, pageable);
 	}
 
 	@Test
