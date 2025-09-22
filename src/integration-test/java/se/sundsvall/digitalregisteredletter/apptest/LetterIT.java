@@ -45,9 +45,9 @@ class LetterIT extends AbstractAppTest {
 	}
 
 	@Test
-	void test02_getLetters() {
+	void test02_getLettersPaged() {
 		setupCall()
-			.withServicePath("/2281/letters?page=0&size=10")
+			.withServicePath("/2281/letters?page=1&size=3")
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(OK)
 			.withExpectedResponse(RESPONSE)
@@ -136,5 +136,25 @@ class LetterIT extends AbstractAppTest {
 			.sendRequestAndVerifyResponse();
 
 		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly failed sent letter)
+	}
+
+	@Test
+	void test06_getLettersFilteredOnUsername() {
+		setupCall()
+			.withServicePath("/2281/letters?username=joe01doe&page=0&size=10")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test07_getLettersFilteredOnDepartmentIdAndDate() {
+		setupCall()
+			.withServicePath("/2281/letters?orgId=45&createdEarliest=2023-10-01&createdLatest=2023-10-01&page=0&size=10")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
 	}
 }

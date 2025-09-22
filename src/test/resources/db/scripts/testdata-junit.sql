@@ -37,4 +37,7 @@ VALUES ('43a32404-28ee-480f-a095-00d48109afab', '2281', 'body for municipality 2
 INSERT INTO attachment(id, file_name, content, content_type, letter_id)
 VALUES (1, 'attachment1.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
        (2, 'attachment2.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
-       (3, 'attachment3.txt', 'dGVzdA==', 'text/plain', '9bb97fd2-4410-4a4b-9019-fdd98f01bd7c');
+       (3, 'attachment3.txt', 'dGVzdA==', 'text/plain', '9bb97fd2-4410-4a4b-9019-fdd98f01bd7c'),
+       (4, 'attachment4.txt', 'dGVzdA==', 'text/plain', 'f8853893-46a9-4249-a0e5-35d5595efd91'),
+       (5, 'attachment5.txt', 'dGVzdA==', 'text/plain', '450970bb-118c-43a8-8813-6b67c2d33a3b'),
+       (6, 'attachment6.txt', 'dGVzdA==', 'text/plain', '59eeec4c-81f3-4a96-918e-43a5e08a8ef0');

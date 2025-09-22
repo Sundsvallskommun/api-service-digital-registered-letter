@@ -1,6 +1,10 @@
 package se.sundsvall.digitalregisteredletter.integration.db.model;
 
+import static java.time.OffsetDateTime.now;
+import static java.time.ZoneId.systemDefault;
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.Optional.ofNullable;
+import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
@@ -21,6 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.hibernate.annotations.TimeZoneStorage;
 
 @Entity
 @Table(name = "letter")
@@ -53,9 +58,11 @@ public class LetterEntity {
 	private boolean deleted = Boolean.FALSE;
 
 	@Column(name = "created")
+	@TimeZoneStorage(NORMALIZE)
 	private OffsetDateTime created;
 
 	@Column(name = "updated")
+	@TimeZoneStorage(NORMALIZE)
 	private OffsetDateTime updated;
 
 	@Embedded
@@ -79,13 +86,13 @@ public class LetterEntity {
 
 	@PrePersist
 	void onPersist() {
-		this.created = OffsetDateTime.now();
+		this.created = now(systemDefault()).truncatedTo(MILLIS);
 		this.updated = this.created;
 	}
 
 	@PreUpdate
 	void onUpdate() {
-		this.updated = OffsetDateTime.now();
+		this.updated = now(systemDefault()).truncatedTo(MILLIS);
 	}
 
 	public static LetterEntity create() {

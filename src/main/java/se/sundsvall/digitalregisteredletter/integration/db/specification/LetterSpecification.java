@@ -69,7 +69,6 @@ public class LetterSpecification {
 	 *               provided)
 	 */
 	public static Specification<LetterEntity> withCreatedEqualOrAfter(final OffsetDateTime value) {
-
 		return BUILDER.buildDateIsEqualOrAfterFilter(LetterEntity_.CREATED,
 			ofNullable(value)
 				.map(odt -> odt.truncatedTo(DAYS))
@@ -84,7 +83,6 @@ public class LetterSpecification {
 	 *               provided)
 	 */
 	public static Specification<LetterEntity> withCreatedEqualOrBefore(final OffsetDateTime value) {
-
 		return BUILDER.buildDateIsEqualOrBeforeFilter(LetterEntity_.CREATED,
 			ofNullable(value)
 				.map(odt -> odt.truncatedTo(DAYS))
