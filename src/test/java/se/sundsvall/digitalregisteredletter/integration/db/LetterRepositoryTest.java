@@ -1,8 +1,12 @@
 package se.sundsvall.digitalregisteredletter.integration.db;
 
+import static java.time.OffsetDateTime.now;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -10,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import se.sundsvall.dept44.requestid.RequestId;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 
@@ -24,6 +29,35 @@ class LetterRepositoryTest {
 
 	@Autowired
 	private LetterRepository letterRepository;
+
+	@BeforeAll
+	static void setup() {
+		RequestId.init();
+	}
+
+	@Test
+	void persistLetter() {
+		final var letterEntity = letterRepository.save(LetterEntity.create()
+			.withMunicipalityId("2262"));
+
+		assertThat(letterEntity.getRequestId()).isEqualTo(RequestId.get());
+		assertThat(letterEntity.getCreated()).isCloseTo(now(), within(2, SECONDS));
+		assertThat(letterEntity.getUpdated()).isEqualTo(letterEntity.getCreated());
+	}
+
+	@Test
+	void updateLetter() throws InterruptedException {
+		final var letterEntity = letterRepository.getReferenceById("1a7b65d7-bafd-49be-9e97-6406b1bf5886");
+		final var initialRequestId = "03ae04dc-ed22-4958-a1af-70e496e02fa8";
+
+		assertThat(letterEntity.getCreated()).isEqualTo(letterEntity.getUpdated());
+		assertThat(letterEntity.getRequestId()).isEqualTo(initialRequestId);
+
+		letterRepository.saveAndFlush(letterEntity.withStatus("modified"));
+
+		assertThat(letterEntity.getUpdated()).isAfter(letterEntity.getCreated());
+		assertThat(letterEntity.getRequestId()).isEqualTo(RequestId.get());
+	}
 
 	@Test
 	void findByIdAndMunicipalityIdAndDeleted() {

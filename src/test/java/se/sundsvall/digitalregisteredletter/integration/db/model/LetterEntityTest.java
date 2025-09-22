@@ -4,23 +4,30 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSettersExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.registerValueGenerator;
 import static java.time.OffsetDateTime.now;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.junit.Assert.assertTrue;
 import static se.sundsvall.TestDataFactory.createAttachmentEntity;
+import static se.sundsvall.TestUtil.isValidUUID;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import se.sundsvall.dept44.requestid.RequestId;
 
 class LetterEntityTest {
 
 	@BeforeAll
 	static void setup() {
+		RequestId.init();
+
 		final var random = new Random();
 		registerValueGenerator(() -> now().plusDays(random.nextInt()), OffsetDateTime.class);
 	}
@@ -29,10 +36,10 @@ class LetterEntityTest {
 	void testBean() {
 		org.hamcrest.MatcherAssert.assertThat(LetterEntity.class, allOf(
 			hasValidBeanConstructor(),
-			hasValidGettersAndSetters(),
-			hasValidBeanHashCodeExcluding("organization", "user"),
-			hasValidBeanEqualsExcluding("organization", "user"),
-			hasValidBeanToStringExcluding("organization", "user")));
+			hasValidGettersAndSettersExcluding("requestId"),
+			hasValidBeanHashCodeExcluding("organization", "user", "requestId"),
+			hasValidBeanEqualsExcluding("organization", "user", "requestId"),
+			hasValidBeanToStringExcluding("organization", "user", "requestId")));
 	}
 
 	@Test
@@ -89,7 +96,7 @@ class LetterEntityTest {
 		assertThat(letterEntity.getOrganization()).isEqualTo(organization);
 		assertThat(letterEntity.getSubject()).isEqualTo(subject);
 
-		assertThat(letterEntity).hasNoNullFieldsOrProperties();
+		assertThat(letterEntity).hasNoNullFieldsOrPropertiesExcept("requestId");
 	}
 
 	@Test
@@ -98,4 +105,33 @@ class LetterEntityTest {
 		assertThat(new LetterEntity()).hasAllNullFieldsOrPropertiesExcept("attachments", "deleted");
 	}
 
+	@Test
+	void testOnPersist() {
+		final var letterEntity = LetterEntity.create();
+
+		assertThat(letterEntity).hasAllNullFieldsOrPropertiesExcept("deleted", "attachments");
+		assertThat(letterEntity.isDeleted()).isFalse();
+		assertThat(letterEntity.getAttachments()).isEmpty();
+
+		letterEntity.onPersist();
+
+		assertThat(letterEntity.getCreated()).isCloseTo(now(), within(2, SECONDS));
+		assertThat(letterEntity.getUpdated()).isEqualTo(letterEntity.getCreated());
+		assertTrue(isValidUUID(letterEntity.getRequestId()));
+	}
+
+	@Test
+	void testOnUpdate() {
+		final var letterEntity = LetterEntity.create();
+
+		assertThat(letterEntity).hasAllNullFieldsOrPropertiesExcept("deleted", "attachments");
+		assertThat(letterEntity.isDeleted()).isFalse();
+		assertThat(letterEntity.getAttachments()).isEmpty();
+
+		letterEntity.onUpdate();
+
+		assertThat(letterEntity.getCreated()).isNull();
+		assertThat(letterEntity.getUpdated()).isCloseTo(now(), within(2, SECONDS));
+		assertTrue(isValidUUID(letterEntity.getRequestId()));
+	}
 }
