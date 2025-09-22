@@ -61,6 +61,11 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Test -->
 		<dependency>
 			<groupId>org.testcontainers</groupId>
@@ -135,9 +140,32 @@
 				<configuration>
 					<excludes>
 						<exclude>**/se/sundsvall/digitalregisteredletter/Application*</exclude>
+						<!-- API model classes -->
 						<exclude>**/generated/se/sundsvall/**/*</exclude>
+						<!-- JPAModelGen classes -->
+						<exclude>**/db/model/*_*</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>${build-helper-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>add-generated-source</id>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sources>
+								<!-- JPAModelGen classes -->
+								<source>${generated-sources-path}/annotations</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

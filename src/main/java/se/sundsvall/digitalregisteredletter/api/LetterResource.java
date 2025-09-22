@@ -65,7 +65,7 @@ class LetterResource {
 		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@ParameterObject final LetterFilter filter,
 		@ParameterObject final Pageable pageable) {
-		return ok(letterService.getLetters(municipalityId, pageable));
+		return ok(letterService.getLetters(municipalityId, filter, pageable));
 	}
 
 	@GetMapping(value = "/{letterId}", produces = APPLICATION_JSON_VALUE)

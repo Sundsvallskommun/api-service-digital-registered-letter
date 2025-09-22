@@ -29,6 +29,7 @@ import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
@@ -158,10 +159,11 @@ class LetterServiceTest {
 		final var municipalityId = "2281";
 		final var pageable = mock(Pageable.class);
 		final var letterEntity = createLetterEntity();
+		final var letterFilter = LetterFilterBuilder.create().build();
 
-		when(repositoryIntegrationMock.getPagedLetterEntities(municipalityId, pageable)).thenReturn(new PageImpl<>(List.of(letterEntity)));
+		when(repositoryIntegrationMock.getPagedLetterEntities(municipalityId, letterFilter, pageable)).thenReturn(new PageImpl<>(List.of(letterEntity)));
 
-		final var result = letterService.getLetters(municipalityId, pageable);
+		final var result = letterService.getLetters(municipalityId, letterFilter, pageable);
 
 		assertThat(result).isNotNull().isInstanceOf(Letters.class);
 		assertThat(result.metaData()).satisfies(metaData -> {
@@ -182,7 +184,7 @@ class LetterServiceTest {
 			assertThat(assertedLetter.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInfo().getContactInformationPhoneNumber());
 		});
 
-		verify(repositoryIntegrationMock).getPagedLetterEntities(municipalityId, pageable);
+		verify(repositoryIntegrationMock).getPagedLetterEntities(municipalityId, letterFilter, pageable);
 	}
 
 }
