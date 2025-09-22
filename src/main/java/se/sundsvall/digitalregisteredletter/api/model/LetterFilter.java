@@ -15,7 +15,7 @@ public record LetterFilter(
 
 	@Schema(description = "Optional filter for matching username", example = "joe01doe", requiredMode = NOT_REQUIRED) String username,
 
-	@Schema(description = "Optional filter with format YYYY-M-DD for matching earliest date when letter was sent", example = "2025-08-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdEarliest,
+	@Schema(description = "Optional filter with format YYYY-MM-DD for matching earliest date when letter was sent", example = "2025-08-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdEarliest,
 
-	@Schema(description = "Optional filter with format YYYY-M-DD for matching latest date when letter was sent", example = "2025-09-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdLatest) {
+	@Schema(description = "Optional filter with format YYYY-MM-DD for matching latest date when letter was sent", example = "2025-09-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdLatest) {
 }

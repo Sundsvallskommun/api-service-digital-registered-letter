@@ -83,23 +83,23 @@ paths:
         example: joe01doe
       - name: createdEarliest
         in: query
-        description: Optional filter with format YYYY-M-DD for matching earliest date
+        description: Optional filter with format YYYY-MM-DD for matching earliest date
           when letter was sent
         required: false
         schema:
           type: string
-          description: Optional filter with format YYYY-M-DD for matching earliest
+          description: Optional filter with format YYYY-MM-DD for matching earliest
             date when letter was sent
           format: date-time
         example: 2025-08-18
       - name: createdLatest
         in: query
-        description: Optional filter with format YYYY-M-DD for matching latest date
+        description: Optional filter with format YYYY-MM-DD for matching latest date
           when letter was sent
         required: false
         schema:
           type: string
-          description: Optional filter with format YYYY-M-DD for matching latest date
+          description: Optional filter with format YYYY-MM-DD for matching latest date
             when letter was sent
           format: date-time
         example: 2025-09-18

@@ -12,7 +12,7 @@ public class SpecificationBuilder<T> {
 	 * predicate (meaning no filtering will be applied for sent in attribute)
 	 *
 	 * @param  nestedAttribute name of the nested attribute that will be used in filter
-	 * @param  attribute       name in the nested attribute that will be used in filter
+	 * @param  attribute       name that will be used in filter
 	 * @param  value           value (or null) to compare against
 	 * @return                 Specification<T> matching sent in comparison
 	 */
@@ -68,5 +68,4 @@ public class SpecificationBuilder<T> {
 	public Specification<T> buildDateIsEqualOrBeforeFilter(final String attribute, final OffsetDateTime value) {
 		return (entity, cq, cb) -> nonNull(value) ? cb.lessThanOrEqualTo(entity.get(attribute), value) : cb.and();
 	}
-
 }

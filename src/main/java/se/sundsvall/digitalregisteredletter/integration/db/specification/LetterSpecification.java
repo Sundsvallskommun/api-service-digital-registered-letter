@@ -15,7 +15,7 @@ public class LetterSpecification {
 	private static final SpecificationBuilder<LetterEntity> BUILDER = new SpecificationBuilder<>();
 
 	private LetterSpecification() {
-		// To prevent instansiation
+		// To prevent instantiation
 	}
 
 	/**
@@ -42,8 +42,8 @@ public class LetterSpecification {
 	/**
 	 * Creates filter for matching org id of connected department if provided, else match all
 	 *
-	 * @param  value the value to compare against the conneced departments org id
-	 * @return       a specification that compares the conneced departments org id to the provided value (or match all if
+	 * @param  value the value to compare against the connected departments org id
+	 * @return       a specification that compares the connected departments org id to the provided value (or match all if
 	 *               value is not provided)
 	 */
 	public static Specification<LetterEntity> withDepartmentOrgId(final Integer value) {
