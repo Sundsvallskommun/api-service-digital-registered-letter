@@ -1,0 +1,77 @@
+{
+	"_meta": {
+		"page": 2,
+		"limit": 3,
+		"count": 3,
+		"totalRecords": 6,
+		"totalPages": 2
+	},
+	"letters": [
+		{
+			"id": "9bb97fd2-4410-4a4b-9019-fdd98f01bd7c",
+			"municipalityId": "2281",
+			"status": "NEW",
+			"body": "body of message for muncipality 2281 and Dept 45 issued by user sue02doe",
+			"contentType": "text/plain",
+			"created": "2023-10-01T12:00:00+02:00",
+			"updated": "2023-10-01T12:00:00+02:00",
+			"supportInfo": {
+				"supportText": "support text",
+				"contactInformationUrl": "https://example.com/support",
+				"contactInformationPhoneNumber": "+46123456789",
+				"contactInformationEmail": "support@email.com"
+			},
+			"attachments": [
+				{
+					"id": "3",
+					"fileName": "attachment3.txt",
+					"contentType": "text/plain"
+				}
+			]
+		},
+		{
+			"id": "bd3d2128-0d5a-457c-8629-0da4ffea85d9",
+			"municipalityId": "2281",
+			"status": "SENT",
+			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
+			"contentType": "text/plain",
+			"created": "2023-10-02T00:00:00+02:00",
+			"updated": "2023-10-02T00:00:00+02:00",
+			"supportInfo": {
+				"supportText": "support text",
+				"contactInformationUrl": "https://example.com/support",
+				"contactInformationPhoneNumber": "+46123456789",
+				"contactInformationEmail": "support@email.com"
+			},
+			"attachments": [
+				{
+					"id": "8",
+					"fileName": "attachment8.txt",
+					"contentType": "text/plain"
+				}
+			]
+		},
+		{
+			"id": "f8853893-46a9-4249-a0e5-35d5595efd91",
+			"municipalityId": "2281",
+			"status": "SENT",
+			"body": "body for municipality 2281 and Dept 44 issued by user joe01doe",
+			"contentType": "text/plain",
+			"created": "2023-10-01T12:00:00+02:00",
+			"updated": "2023-10-01T12:00:00+02:00",
+			"supportInfo": {
+				"supportText": "support text",
+				"contactInformationUrl": "https://example.com/support",
+				"contactInformationPhoneNumber": "+46123456789",
+				"contactInformationEmail": "support@email.com"
+			},
+			"attachments": [
+				{
+					"id": "4",
+					"fileName": "attachment4.txt",
+					"contentType": "text/plain"
+				}
+			]
+		}
+	]
+}
