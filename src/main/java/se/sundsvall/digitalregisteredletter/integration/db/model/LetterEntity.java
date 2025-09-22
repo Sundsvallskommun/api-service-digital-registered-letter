@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.hibernate.annotations.TimeZoneStorage;
+import se.sundsvall.dept44.requestid.RequestId;
 
 @Entity
 @Table(name = "letter")
@@ -47,6 +48,9 @@ public class LetterEntity {
 
 	@Column(name = "status", length = 40)
 	private String status;
+
+	@Column(name = "request_id", length = 36)
+	private String requestId;
 
 	@Column(name = "subject")
 	private String subject;
@@ -88,11 +92,13 @@ public class LetterEntity {
 	void onPersist() {
 		this.created = now(systemDefault()).truncatedTo(MILLIS);
 		this.updated = this.created;
+		this.requestId = RequestId.get();
 	}
 
 	@PreUpdate
 	void onUpdate() {
 		this.updated = now(systemDefault()).truncatedTo(MILLIS);
+		this.requestId = RequestId.get();
 	}
 
 	public static LetterEntity create() {
@@ -216,6 +222,10 @@ public class LetterEntity {
 		return this;
 	}
 
+	public String getRequestId() {
+		return requestId;
+	}
+
 	public String getMunicipalityId() {
 		return municipalityId;
 	}
@@ -283,7 +293,7 @@ public class LetterEntity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, status, subject, supportInfo, updated, user);
+		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, requestId, status, subject, supportInfo, updated, user);
 	}
 
 	@Override
@@ -292,16 +302,16 @@ public class LetterEntity {
 		if (!(obj instanceof final LetterEntity other)) { return false; }
 		return Objects.equals(attachments, other.attachments) && Objects.equals(body, other.body) && Objects.equals(contentType, other.contentType) && Objects.equals(created, other.created) && deleted == other.deleted && Objects.equals(id, other.id)
 			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(ofNullable(organization).map(OrganizationEntity::getId).orElse(null), ofNullable(other.organization).map(OrganizationEntity::getId).orElse(null)) && Objects.equals(
-				partyId, other.partyId) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject) && Objects.equals(supportInfo, other.supportInfo) && Objects.equals(updated, other.updated) && Objects.equals(ofNullable(user).map(
-					UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
+				partyId, other.partyId) && Objects.equals(requestId, other.requestId) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject) && Objects.equals(supportInfo, other.supportInfo) && Objects.equals(updated,
+					other.updated) && Objects.equals(ofNullable(user).map(UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
 	}
 
 	@Override
 	public String toString() {
 		final var builder = new StringBuilder();
-		builder.append("LetterEntity [id=").append(id).append(", municipalityId=").append(municipalityId).append(", body=").append(body).append(", contentType=").append(contentType).append(", status=").append(status).append(", subject=").append(subject)
-			.append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInfo=").append(supportInfo).append(", attachments=").append(attachments)
-			.append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId).orElse(null)).append("]");
+		builder.append("LetterEntity [id=").append(id).append(", municipalityId=").append(municipalityId).append(", body=").append(body).append(", contentType=").append(contentType).append(", status=").append(status).append(", requestId=").append(
+			requestId).append(", subject=").append(subject).append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInfo=").append(supportInfo)
+			.append(", attachments=").append(attachments).append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId).orElse(null)).append("]");
 		return builder.toString();
 	}
 

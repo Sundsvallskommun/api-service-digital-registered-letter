@@ -15,6 +15,7 @@
         id varchar(36) not null,
         organization_id varchar(36),
         party_id varchar(36),
+        request_id varchar(36),
         user_id varchar(36),
         status varchar(40),
         content_type varchar(50),
