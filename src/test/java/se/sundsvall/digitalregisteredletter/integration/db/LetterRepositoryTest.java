@@ -46,7 +46,7 @@ class LetterRepositoryTest {
 	}
 
 	@Test
-	void updateLetter() throws InterruptedException {
+	void updateLetter() {
 		final var letterEntity = letterRepository.getReferenceById("1a7b65d7-bafd-49be-9e97-6406b1bf5886");
 		final var initialRequestId = "03ae04dc-ed22-4958-a1af-70e496e02fa8";
 
