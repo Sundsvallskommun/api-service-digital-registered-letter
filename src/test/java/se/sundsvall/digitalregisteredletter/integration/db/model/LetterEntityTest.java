@@ -55,6 +55,7 @@ class LetterEntityTest {
 		final var partyId = "partyId";
 		final var user = UserEntity.create();
 		final var organization = OrganizationEntity.create();
+		final var signingInfo = SigningInfoEntity.create();
 		final var contentType = "text/plain";
 		final var status = "status";
 		final var deleted = true;
@@ -78,6 +79,7 @@ class LetterEntityTest {
 			.withPartyId(partyId)
 			.withUser(user)
 			.withOrganization(organization)
+			.withSigningInfo(signingInfo)
 			.withSubject(subject)
 			.withSupportInfo(supportInfo);
 
@@ -94,6 +96,7 @@ class LetterEntityTest {
 		assertThat(letterEntity.getPartyId()).isEqualTo(partyId);
 		assertThat(letterEntity.getUser()).isEqualTo(user);
 		assertThat(letterEntity.getOrganization()).isEqualTo(organization);
+		assertThat(letterEntity.getSigningInfo()).isEqualTo(signingInfo);
 		assertThat(letterEntity.getSubject()).isEqualTo(subject);
 
 		assertThat(letterEntity).hasNoNullFieldsOrPropertiesExcept("requestId");

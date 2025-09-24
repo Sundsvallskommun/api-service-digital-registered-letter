@@ -1,5 +1,8 @@
 package se.sundsvall.digitalregisteredletter.integration.db.model;
 
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.UUID;
 import static java.time.OffsetDateTime.now;
 import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.MILLIS;
@@ -7,20 +10,20 @@ import static java.util.Optional.ofNullable;
 import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +32,15 @@ import org.hibernate.annotations.TimeZoneStorage;
 import se.sundsvall.dept44.requestid.RequestId;
 
 @Entity
-@Table(name = "letter")
+@Table(name = "letter", uniqueConstraints = {
+	@UniqueConstraint(name = "uk_signing_id", columnNames = {
+		"signing_id"
+	})
+})
 public class LetterEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+	@GeneratedValue(strategy = UUID)
 	@Column(name = "id", nullable = false, updatable = false, length = 36)
 	private String id;
 
@@ -76,17 +83,21 @@ public class LetterEntity {
 	@AttributeOverride(name = "contactInformationPhoneNumber", column = @Column(name = "support_information_phone"))
 	private SupportInfo supportInfo;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = ALL, orphanRemoval = true)
 	@JoinColumn(name = "letter_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "fk_attachment_letter"))
 	private List<AttachmentEntity> attachments = new ArrayList<>();
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_letter"))
 	private UserEntity user;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name = "fk_organization_letter"))
 	private OrganizationEntity organization;
+
+	@OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
+	@JoinColumn(name = "signing_id", foreignKey = @ForeignKey(name = "fk_signing_info_letter"))
+	private SigningInfoEntity signingInfo;
 
 	@PrePersist
 	void onPersist() {
@@ -291,9 +302,22 @@ public class LetterEntity {
 		return this;
 	}
 
+	public SigningInfoEntity getSigningInfo() {
+		return signingInfo;
+	}
+
+	public void setSigningInfo(final SigningInfoEntity signingInfo) {
+		this.signingInfo = signingInfo;
+	}
+
+	public LetterEntity withSigningInfo(final SigningInfoEntity signingInfo) {
+		this.signingInfo = signingInfo;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, requestId, status, subject, supportInfo, updated, user);
+		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, requestId, signingInfo, status, subject, supportInfo, updated, user);
 	}
 
 	@Override
@@ -301,9 +325,9 @@ public class LetterEntity {
 		if (this == obj) { return true; }
 		if (!(obj instanceof final LetterEntity other)) { return false; }
 		return Objects.equals(attachments, other.attachments) && Objects.equals(body, other.body) && Objects.equals(contentType, other.contentType) && Objects.equals(created, other.created) && deleted == other.deleted && Objects.equals(id, other.id)
-			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(ofNullable(organization).map(OrganizationEntity::getId).orElse(null), ofNullable(other.organization).map(OrganizationEntity::getId).orElse(null)) && Objects.equals(
-				partyId, other.partyId) && Objects.equals(requestId, other.requestId) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject) && Objects.equals(supportInfo, other.supportInfo) && Objects.equals(updated,
-					other.updated) && Objects.equals(ofNullable(user).map(UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
+			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(ofNullable(organization).map(OrganizationEntity::getId).orElse(null), ofNullable(other.organization).map(OrganizationEntity::getId).orElse(null))
+			&& Objects.equals(partyId, other.partyId) && Objects.equals(requestId, other.requestId) && Objects.equals(signingInfo, other.signingInfo) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject)
+			&& Objects.equals(supportInfo, other.supportInfo) && Objects.equals(updated, other.updated) && Objects.equals(ofNullable(user).map(UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
 	}
 
 	@Override
@@ -311,7 +335,8 @@ public class LetterEntity {
 		final var builder = new StringBuilder();
 		builder.append("LetterEntity [id=").append(id).append(", municipalityId=").append(municipalityId).append(", body=").append(body).append(", contentType=").append(contentType).append(", status=").append(status).append(", requestId=").append(
 			requestId).append(", subject=").append(subject).append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInfo=").append(supportInfo)
-			.append(", attachments=").append(attachments).append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId).orElse(null)).append("]");
+			.append(", attachments=").append(attachments).append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId).orElse(null))
+			.append(", signingInfo=").append(signingInfo).append("]");
 		return builder.toString();
 	}
 
