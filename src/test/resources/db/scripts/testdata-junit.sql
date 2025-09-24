@@ -13,7 +13,7 @@ VALUES (0, '2023-10-15 10:20:00', '6b33fee5-6380-4cf5-9f53-fe992b57fa49', '0d458
 	 
 INSERT INTO letter(id, municipality_id, body, content_type, status, subject, party_id, deleted, created, updated,
                    support_text, support_information_url, support_information_email, support_information_phone,
-                   organization_id, user_id, request_id, signing_id)
+                   organization_id, user_id, request_id, signing_information_id)
 VALUES ('43a32404-28ee-480f-a095-00d48109afab', '2281', 'body for municipality 2281 and Dept 44 issued by user joe01doe', 'text/plain', 'NEW', 'subject',
         'a51fc859-b867-4a02-b574-ec1040035b4a', 0, '2023-10-01 12:00:00', '2023-10-01 12:00:00', 'support text', 'https://example.com/support',
         'support@email.com', '+46123456789', 'a95aa330-7cad-4ce1-8bef-1e742fcac6e4', '3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', '997a5dfc-ec57-4d41-b4c3-b4990adff734', 

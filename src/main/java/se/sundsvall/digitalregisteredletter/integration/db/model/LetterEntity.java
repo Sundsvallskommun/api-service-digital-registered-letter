@@ -33,8 +33,8 @@ import se.sundsvall.dept44.requestid.RequestId;
 
 @Entity
 @Table(name = "letter", uniqueConstraints = {
-	@UniqueConstraint(name = "uk_signing_id", columnNames = {
-		"signing_id"
+	@UniqueConstraint(name = "uk_signing_information_id", columnNames = {
+		"signing_information_id"
 	})
 })
 public class LetterEntity {
@@ -81,23 +81,23 @@ public class LetterEntity {
 	@AttributeOverride(name = "contactInformationUrl", column = @Column(name = "support_information_url"))
 	@AttributeOverride(name = "contactInformationEmail", column = @Column(name = "support_information_email"))
 	@AttributeOverride(name = "contactInformationPhoneNumber", column = @Column(name = "support_information_phone"))
-	private SupportInfo supportInfo;
+	private SupportInformation supportInformation;
 
 	@OneToMany(cascade = ALL, orphanRemoval = true)
 	@JoinColumn(name = "letter_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "fk_attachment_letter"))
 	private List<AttachmentEntity> attachments = new ArrayList<>();
 
 	@ManyToOne(cascade = ALL)
-	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_letter"))
+	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_letter_user"))
 	private UserEntity user;
 
 	@ManyToOne(cascade = ALL)
-	@JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name = "fk_organization_letter"))
+	@JoinColumn(name = "organization_id", foreignKey = @ForeignKey(name = "fk_letter_organization"))
 	private OrganizationEntity organization;
 
 	@OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
-	@JoinColumn(name = "signing_id", foreignKey = @ForeignKey(name = "fk_signing_info_letter"))
-	private SigningInfoEntity signingInfo;
+	@JoinColumn(name = "signing_information_id", foreignKey = @ForeignKey(name = "fk_letter_signing_information"))
+	private SigningInformationEntity signingInformation;
 
 	@PrePersist
 	void onPersist() {
@@ -276,16 +276,16 @@ public class LetterEntity {
 		return this;
 	}
 
-	public SupportInfo getSupportInfo() {
-		return supportInfo;
+	public SupportInformation getSupportInformation() {
+		return supportInformation;
 	}
 
-	public void setSupportInfo(final SupportInfo supportInfo) {
-		this.supportInfo = supportInfo;
+	public void setSupportInformation(final SupportInformation supportInformation) {
+		this.supportInformation = supportInformation;
 	}
 
-	public LetterEntity withSupportInfo(final SupportInfo supportInfo) {
-		this.supportInfo = supportInfo;
+	public LetterEntity withSupportInformation(final SupportInformation supportInformation) {
+		this.supportInformation = supportInformation;
 		return this;
 	}
 
@@ -302,22 +302,22 @@ public class LetterEntity {
 		return this;
 	}
 
-	public SigningInfoEntity getSigningInfo() {
-		return signingInfo;
+	public SigningInformationEntity getSigningInformation() {
+		return signingInformation;
 	}
 
-	public void setSigningInfo(final SigningInfoEntity signingInfo) {
-		this.signingInfo = signingInfo;
+	public void setSigningInformation(final SigningInformationEntity signingInformation) {
+		this.signingInformation = signingInformation;
 	}
 
-	public LetterEntity withSigningInfo(final SigningInfoEntity signingInfo) {
-		this.signingInfo = signingInfo;
+	public LetterEntity withSigningInformation(final SigningInformationEntity signingInformation) {
+		this.signingInformation = signingInformation;
 		return this;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, requestId, signingInfo, status, subject, supportInfo, updated, user);
+		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, requestId, signingInformation, status, subject, supportInformation, updated, user);
 	}
 
 	@Override
@@ -326,17 +326,17 @@ public class LetterEntity {
 		if (!(obj instanceof final LetterEntity other)) { return false; }
 		return Objects.equals(attachments, other.attachments) && Objects.equals(body, other.body) && Objects.equals(contentType, other.contentType) && Objects.equals(created, other.created) && deleted == other.deleted && Objects.equals(id, other.id)
 			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(ofNullable(organization).map(OrganizationEntity::getId).orElse(null), ofNullable(other.organization).map(OrganizationEntity::getId).orElse(null))
-			&& Objects.equals(partyId, other.partyId) && Objects.equals(requestId, other.requestId) && Objects.equals(signingInfo, other.signingInfo) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject)
-			&& Objects.equals(supportInfo, other.supportInfo) && Objects.equals(updated, other.updated) && Objects.equals(ofNullable(user).map(UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
+			&& Objects.equals(partyId, other.partyId) && Objects.equals(requestId, other.requestId) && Objects.equals(signingInformation, other.signingInformation) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject)
+			&& Objects.equals(supportInformation, other.supportInformation) && Objects.equals(updated, other.updated) && Objects.equals(ofNullable(user).map(UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
 	}
 
 	@Override
 	public String toString() {
 		final var builder = new StringBuilder();
 		builder.append("LetterEntity [id=").append(id).append(", municipalityId=").append(municipalityId).append(", body=").append(body).append(", contentType=").append(contentType).append(", status=").append(status).append(", requestId=").append(
-			requestId).append(", subject=").append(subject).append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInfo=").append(supportInfo)
-			.append(", attachments=").append(attachments).append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId).orElse(null))
-			.append(", signingInfo=").append(signingInfo).append("]");
+			requestId).append(", subject=").append(subject).append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInformation=").append(
+				supportInformation).append(", attachments=").append(attachments).append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId)
+					.orElse(null)).append(", signingInformation=").append(signingInformation).append("]");
 		return builder.toString();
 	}
 

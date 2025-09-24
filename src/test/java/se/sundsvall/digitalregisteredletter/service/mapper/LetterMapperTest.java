@@ -5,7 +5,7 @@ import static org.assertj.core.groups.Tuple.tuple;
 import static se.sundsvall.TestDataFactory.createAttachmentEntity;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
-import static se.sundsvall.TestDataFactory.createSupportInfoEmbeddable;
+import static se.sundsvall.TestDataFactory.createSupportInformationEmbeddable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
-import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInfo;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 
 class LetterMapperTest {
@@ -29,7 +29,7 @@ class LetterMapperTest {
 
 		assertThat(result.getBody()).isEqualTo(letterRequest.body());
 		assertThat(result.getContentType()).isEqualTo(letterRequest.contentType());
-		assertThat(result.getSupportInfo()).satisfies(assertedSupportInfo -> {
+		assertThat(result.getSupportInformation()).satisfies(assertedSupportInfo -> {
 			assertThat(assertedSupportInfo.getSupportText()).isEqualTo(letterRequest.supportInfo().supportText());
 			assertThat(assertedSupportInfo.getContactInformationEmail()).isEqualTo(letterRequest.supportInfo().contactInformationEmail());
 			assertThat(assertedSupportInfo.getContactInformationUrl()).isEqualTo(letterRequest.supportInfo().contactInformationUrl());
@@ -44,7 +44,7 @@ class LetterMapperTest {
 	}
 
 	@Test
-	void toSupportInfoEmbeddable() {
+	void toSupportInformationEmbeddable() {
 		final var supportInfo = SupportInfoBuilder.create()
 			.withSupportText("supportText")
 			.withContactInformationEmail("supportEmail")
@@ -52,7 +52,7 @@ class LetterMapperTest {
 			.withContactInformationPhoneNumber("supportPhone")
 			.build();
 
-		final var result = LetterMapper.toSupportInfo(supportInfo);
+		final var result = LetterMapper.toSupportInformation(supportInfo);
 
 		assertThat(result.getSupportText()).isEqualTo(supportInfo.supportText());
 		assertThat(result.getContactInformationEmail()).isEqualTo(supportInfo.contactInformationEmail());
@@ -61,8 +61,8 @@ class LetterMapperTest {
 	}
 
 	@Test
-	void toSupportInfoEmbeddableFromNull() {
-		assertThat(LetterMapper.toSupportInfo((se.sundsvall.digitalregisteredletter.api.model.SupportInfo) null)).isNull();
+	void toSupportInformationEmbeddableFromNull() {
+		assertThat(LetterMapper.toSupportInformation((se.sundsvall.digitalregisteredletter.api.model.SupportInfo) null)).isNull();
 	}
 
 	@Test
@@ -280,7 +280,7 @@ class LetterMapperTest {
 
 	@Test
 	void toSupportInfo() {
-		final var embeddable = createSupportInfoEmbeddable();
+		final var embeddable = createSupportInformationEmbeddable();
 
 		final var bean = LetterMapper.toSupportInfo(embeddable);
 
@@ -292,7 +292,7 @@ class LetterMapperTest {
 
 	@Test
 	void toSupportInfoFromNull() {
-		assertThat(LetterMapper.toSupportInfo((SupportInfo) null)).isNull();
+		assertThat(LetterMapper.toSupportInfo((SupportInformation) null)).isNull();
 	}
 
 	@Test

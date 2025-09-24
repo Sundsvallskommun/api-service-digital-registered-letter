@@ -14,7 +14,7 @@ import org.hibernate.annotations.TimeZoneStorage;
 
 @Entity
 @Table(name = "signing_information")
-public class SigningInfoEntity {
+public class SigningInformationEntity {
 
 	@Id
 	@GeneratedValue(strategy = UUID)
@@ -61,8 +61,8 @@ public class SigningInfoEntity {
 	@Column(name = "ocsp_response", columnDefinition = "longtext")
 	private String ocspResponse;
 
-	public static SigningInfoEntity create() {
-		return new SigningInfoEntity();
+	public static SigningInformationEntity create() {
+		return new SigningInformationEntity();
 	}
 
 	public String getId() {
@@ -73,7 +73,7 @@ public class SigningInfoEntity {
 		this.id = id;
 	}
 
-	public SigningInfoEntity withId(String id) {
+	public SigningInformationEntity withId(String id) {
 		this.id = id;
 		return this;
 	}
@@ -86,7 +86,7 @@ public class SigningInfoEntity {
 		this.signed = signed;
 	}
 
-	public SigningInfoEntity withSigned(OffsetDateTime signed) {
+	public SigningInformationEntity withSigned(OffsetDateTime signed) {
 		this.signed = signed;
 		return this;
 	}
@@ -99,7 +99,7 @@ public class SigningInfoEntity {
 		this.internalId = internalId;
 	}
 
-	public SigningInfoEntity withInternalId(String internalId) {
+	public SigningInformationEntity withInternalId(String internalId) {
 		this.internalId = internalId;
 		return this;
 	}
@@ -112,7 +112,7 @@ public class SigningInfoEntity {
 		this.contentKey = contentKey;
 	}
 
-	public SigningInfoEntity withContentKey(String contentKey) {
+	public SigningInformationEntity withContentKey(String contentKey) {
 		this.contentKey = contentKey;
 		return this;
 	}
@@ -125,7 +125,7 @@ public class SigningInfoEntity {
 		this.orderRef = orderRef;
 	}
 
-	public SigningInfoEntity withOrderRef(String orderRef) {
+	public SigningInformationEntity withOrderRef(String orderRef) {
 		this.orderRef = orderRef;
 		return this;
 	}
@@ -134,7 +134,7 @@ public class SigningInfoEntity {
 		return status;
 	}
 
-	public SigningInfoEntity withStatus(String status) {
+	public SigningInformationEntity withStatus(String status) {
 		this.status = status;
 		return this;
 	}
@@ -151,7 +151,7 @@ public class SigningInfoEntity {
 		this.personalNumber = personalNumber;
 	}
 
-	public SigningInfoEntity withPersonalNumber(String personalNumber) {
+	public SigningInformationEntity withPersonalNumber(String personalNumber) {
 		this.personalNumber = personalNumber;
 		return this;
 	}
@@ -164,7 +164,7 @@ public class SigningInfoEntity {
 		this.name = name;
 	}
 
-	public SigningInfoEntity withName(String name) {
+	public SigningInformationEntity withName(String name) {
 		this.name = name;
 		return this;
 	}
@@ -177,7 +177,7 @@ public class SigningInfoEntity {
 		this.givenName = givenName;
 	}
 
-	public SigningInfoEntity withGivenName(String givenName) {
+	public SigningInformationEntity withGivenName(String givenName) {
 		this.givenName = givenName;
 		return this;
 	}
@@ -190,7 +190,7 @@ public class SigningInfoEntity {
 		this.surname = surname;
 	}
 
-	public SigningInfoEntity withSurname(String surname) {
+	public SigningInformationEntity withSurname(String surname) {
 		this.surname = surname;
 		return this;
 	}
@@ -203,7 +203,7 @@ public class SigningInfoEntity {
 		this.ipAddress = ipAddress;
 	}
 
-	public SigningInfoEntity withIpAddress(String ipAddress) {
+	public SigningInformationEntity withIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
 		return this;
 	}
@@ -216,7 +216,7 @@ public class SigningInfoEntity {
 		this.mrtd = mrtd;
 	}
 
-	public SigningInfoEntity withMrtd(Boolean mrtd) {
+	public SigningInformationEntity withMrtd(Boolean mrtd) {
 		this.mrtd = mrtd;
 		return this;
 	}
@@ -229,7 +229,7 @@ public class SigningInfoEntity {
 		this.signature = signature;
 	}
 
-	public SigningInfoEntity withSignature(String signature) {
+	public SigningInformationEntity withSignature(String signature) {
 		this.signature = signature;
 		return this;
 	}
@@ -242,7 +242,7 @@ public class SigningInfoEntity {
 		this.ocspResponse = ocspResponse;
 	}
 
-	public SigningInfoEntity withOcspResponse(String ocspResponse) {
+	public SigningInformationEntity withOcspResponse(String ocspResponse) {
 		this.ocspResponse = ocspResponse;
 		return this;
 	}
@@ -255,7 +255,7 @@ public class SigningInfoEntity {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) { return true; }
-		if (!(obj instanceof final SigningInfoEntity other)) { return false; }
+		if (!(obj instanceof final SigningInformationEntity other)) { return false; }
 		return Objects.equals(contentKey, other.contentKey) && Objects.equals(givenName, other.givenName) && Objects.equals(id, other.id) && Objects.equals(ipAddress, other.ipAddress) && Objects.equals(mrtd, other.mrtd) && Objects.equals(name, other.name)
 			&& Objects.equals(ocspResponse, other.ocspResponse) && Objects.equals(orderRef, other.orderRef) && Objects.equals(personalNumber, other.personalNumber) && Objects.equals(internalId, other.internalId) && Objects
 				.equals(signature, other.signature) && Objects.equals(signed, other.signed) && Objects.equals(status, other.status) && Objects.equals(surname, other.surname);
@@ -264,9 +264,9 @@ public class SigningInfoEntity {
 	@Override
 	public String toString() {
 		final var builder = new StringBuilder();
-		builder.append("SigningInfoEntity [id=").append(id).append(", signed=").append(signed).append(", internalId=").append(internalId).append(", contentKey=").append(contentKey).append(", orderRef=").append(orderRef)
-			.append(", status=").append(status).append(", personalNumber=").append(personalNumber).append(", name=").append(name).append(", givenName=").append(givenName).append(", surname=").append(surname).append(", ipAddress=").append(ipAddress).append(
-				", mrtd=").append(mrtd).append(", signature=").append(signature).append(", ocspResponse=").append(ocspResponse).append("]");
+		builder.append("SigningInformationEntity [id=").append(id).append(", signed=").append(signed).append(", internalId=").append(internalId).append(", contentKey=").append(contentKey).append(", orderRef=").append(orderRef).append(", status=")
+			.append(status).append(", personalNumber=").append(personalNumber).append(", name=").append(name).append(", givenName=").append(givenName).append(", surname=").append(surname).append(", ipAddress=").append(ipAddress).append(", mrtd=")
+			.append(mrtd).append(", signature=").append(signature).append(", ocspResponse=").append(ocspResponse).append("]");
 		return builder.toString();
 	}
 }

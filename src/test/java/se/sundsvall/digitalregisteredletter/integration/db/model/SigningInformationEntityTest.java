@@ -15,21 +15,18 @@ import java.util.Random;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import se.sundsvall.dept44.requestid.RequestId;
 
-class SigningInfoEntityTest {
+class SigningInformationEntityTest {
 
 	@BeforeAll
 	static void setup() {
-		RequestId.init();
-
 		final var random = new Random();
 		registerValueGenerator(() -> now().plusDays(random.nextInt()), OffsetDateTime.class);
 	}
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(SigningInfoEntity.class, allOf(
+		MatcherAssert.assertThat(SigningInformationEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -54,7 +51,7 @@ class SigningInfoEntityTest {
 		final var status = "status";
 		final var surname = "surname";
 
-		final var bean = SigningInfoEntity.create()
+		final var bean = SigningInformationEntity.create()
 			.withContentKey(contentKey)
 			.withGivenName(givenName)
 			.withId(id)
@@ -89,7 +86,7 @@ class SigningInfoEntityTest {
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(SigningInfoEntity.create()).hasAllNullFieldsOrProperties();
-		assertThat(new SigningInfoEntity()).hasAllNullFieldsOrProperties();
+		assertThat(SigningInformationEntity.create()).hasAllNullFieldsOrProperties();
+		assertThat(new SigningInformationEntity()).hasAllNullFieldsOrProperties();
 	}
 }

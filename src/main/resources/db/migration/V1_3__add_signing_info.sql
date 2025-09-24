@@ -16,13 +16,29 @@
         primary key (id)
     ) engine=InnoDB;
 
+    alter table if exists letter
+       drop foreign key fk_organization_letter;
+
+    alter table if exists letter
+       drop foreign key fk_user_letter;
+       
     alter table if exists letter 
-       add column signing_id varchar(36) after request_id;
+       add constraint fk_letter_organization 
+       foreign key (organization_id) 
+       references organization (id);
+
+    alter table if exists letter 
+       add constraint fk_letter_user 
+       foreign key (user_id) 
+       references user (id);
+
+    alter table if exists letter 
+       add column signing_information_id varchar(36) after request_id;
         
-   alter table if exists letter 
-       add constraint uk_signing_id unique (signing_id);
+    alter table if exists letter 
+       add constraint uk_signing_information_id unique (signing_information_id);
       
     alter table if exists letter 
-       add constraint fk_signing_info_letter 
-       foreign key (signing_id) 
+       add constraint fk_letter_signing_information 
+       foreign key (signing_information_id) 
        references signing_information (id);

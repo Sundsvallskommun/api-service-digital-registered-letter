@@ -16,7 +16,7 @@
         organization_id varchar(36),
         party_id varchar(36),
         request_id varchar(36),
-        signing_id varchar(36),
+        signing_information_id varchar(36),
         user_id varchar(36),
         status varchar(40),
         content_type varchar(50),
@@ -53,7 +53,7 @@
         surname varchar(255),
         primary key (id)
     ) engine=InnoDB;
-    
+
     create table user (
         id varchar(36) not null,
         username varchar(255) not null,
@@ -61,8 +61,8 @@
     ) engine=InnoDB;
 
     alter table if exists letter 
-       add constraint uk_signing_id unique (signing_id);
-       
+       add constraint uk_signing_information_id unique (signing_information_id);
+
     create index idx_number 
        on organization (number);
 
@@ -81,16 +81,16 @@
        references letter (id);
 
     alter table if exists letter 
-       add constraint fk_organization_letter 
+       add constraint fk_letter_organization 
        foreign key (organization_id) 
        references organization (id);
 
     alter table if exists letter 
-       add constraint fk_signing_info_letter 
-       foreign key (signing_id) 
+       add constraint fk_letter_signing_information 
+       foreign key (signing_information_id) 
        references signing_information (id);
-       
+
     alter table if exists letter 
-       add constraint fk_user_letter 
+       add constraint fk_letter_user 
        foreign key (user_id) 
        references user (id);
