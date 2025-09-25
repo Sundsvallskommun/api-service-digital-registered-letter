@@ -55,11 +55,12 @@ class LetterEntityTest {
 		final var partyId = "partyId";
 		final var user = UserEntity.create();
 		final var organization = OrganizationEntity.create();
+		final var signingInformation = SigningInformationEntity.create();
 		final var contentType = "text/plain";
 		final var status = "status";
 		final var deleted = true;
 		final var attachments = List.of(createAttachmentEntity());
-		final var supportInfo = SupportInfo.create()
+		final var supportInformation = SupportInformation.create()
 			.withSupportText("support text")
 			.withContactInformationUrl("https://example.com/contact")
 			.withContactInformationEmail("support@email.com")
@@ -78,8 +79,9 @@ class LetterEntityTest {
 			.withPartyId(partyId)
 			.withUser(user)
 			.withOrganization(organization)
+			.withSigningInformation(signingInformation)
 			.withSubject(subject)
-			.withSupportInfo(supportInfo);
+			.withSupportInformation(supportInformation);
 
 		assertThat(letterEntity.getAttachments()).isEqualTo(attachments);
 		assertThat(letterEntity.getId()).isEqualTo(id);
@@ -90,10 +92,11 @@ class LetterEntityTest {
 		assertThat(letterEntity.getContentType()).isEqualTo(contentType);
 		assertThat(letterEntity.getStatus()).isEqualTo(status);
 		assertThat(letterEntity.isDeleted()).isEqualTo(deleted);
-		assertThat(letterEntity.getSupportInfo()).isEqualTo(supportInfo);
+		assertThat(letterEntity.getSupportInformation()).isEqualTo(supportInformation);
 		assertThat(letterEntity.getPartyId()).isEqualTo(partyId);
 		assertThat(letterEntity.getUser()).isEqualTo(user);
 		assertThat(letterEntity.getOrganization()).isEqualTo(organization);
+		assertThat(letterEntity.getSigningInformation()).isEqualTo(signingInformation);
 		assertThat(letterEntity.getSubject()).isEqualTo(subject);
 
 		assertThat(letterEntity).hasNoNullFieldsOrPropertiesExcept("requestId");

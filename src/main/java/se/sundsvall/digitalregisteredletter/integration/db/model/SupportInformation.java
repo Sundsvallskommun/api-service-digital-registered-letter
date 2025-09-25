@@ -4,7 +4,7 @@ import jakarta.persistence.Embeddable;
 import java.util.Objects;
 
 @Embeddable
-public class SupportInfo {
+public class SupportInformation {
 
 	private String supportText;
 
@@ -14,8 +14,8 @@ public class SupportInfo {
 
 	private String contactInformationPhoneNumber;
 
-	public static SupportInfo create() {
-		return new SupportInfo();
+	public static SupportInformation create() {
+		return new SupportInformation();
 	}
 
 	public String getSupportText() {
@@ -26,7 +26,7 @@ public class SupportInfo {
 		this.supportText = supportText;
 	}
 
-	public SupportInfo withSupportText(final String supportText) {
+	public SupportInformation withSupportText(final String supportText) {
 		this.supportText = supportText;
 		return this;
 	}
@@ -39,7 +39,7 @@ public class SupportInfo {
 		this.contactInformationUrl = contactInformationUrl;
 	}
 
-	public SupportInfo withContactInformationUrl(final String contactInformationUrl) {
+	public SupportInformation withContactInformationUrl(final String contactInformationUrl) {
 		this.contactInformationUrl = contactInformationUrl;
 		return this;
 	}
@@ -52,7 +52,7 @@ public class SupportInfo {
 		this.contactInformationPhoneNumber = contactInformationPhoneNumber;
 	}
 
-	public SupportInfo withContactInformationPhoneNumber(final String contactInformationPhoneNumber) {
+	public SupportInformation withContactInformationPhoneNumber(final String contactInformationPhoneNumber) {
 		this.contactInformationPhoneNumber = contactInformationPhoneNumber;
 		return this;
 	}
@@ -65,14 +65,14 @@ public class SupportInfo {
 		this.contactInformationEmail = contactInformationEmail;
 	}
 
-	public SupportInfo withContactInformationEmail(final String contactInformationEmail) {
+	public SupportInformation withContactInformationEmail(final String contactInformationEmail) {
 		this.contactInformationEmail = contactInformationEmail;
 		return this;
 	}
 
 	@Override
 	public String toString() {
-		return "SupportInfo{" +
+		return "SupportInformation{" +
 			"supportText='" + supportText + '\'' +
 			", contactInformationUrl='" + contactInformationUrl + '\'' +
 			", contactInformationEmail='" + contactInformationEmail + '\'' +
@@ -82,9 +82,10 @@ public class SupportInfo {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
-		SupportInfo that = (SupportInfo) o;
+		}
+		final var that = (SupportInformation) o;
 		return Objects.equals(supportText, that.supportText) && Objects.equals(contactInformationUrl, that.contactInformationUrl) && Objects.equals(contactInformationEmail, that.contactInformationEmail)
 			&& Objects.equals(contactInformationPhoneNumber, that.contactInformationPhoneNumber);
 	}

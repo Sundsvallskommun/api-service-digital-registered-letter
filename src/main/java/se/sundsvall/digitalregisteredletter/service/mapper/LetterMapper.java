@@ -20,7 +20,7 @@ import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
-import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInfo;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 
 public final class LetterMapper {
@@ -38,7 +38,7 @@ public final class LetterMapper {
 				.withContentType(letterRequest.contentType())
 				.withPartyId(letterRequest.partyId())
 				.withSubject(letterRequest.subject())
-				.withSupportInfo(toSupportInfo(letterRequest.supportInfo())))
+				.withSupportInformation(toSupportInformation(letterRequest.supportInfo())))
 			.orElse(null);
 	}
 
@@ -77,9 +77,9 @@ public final class LetterMapper {
 		return userEntity;
 	}
 
-	public static SupportInfo toSupportInfo(final se.sundsvall.digitalregisteredletter.api.model.SupportInfo nullableSupportInfo) {
+	public static SupportInformation toSupportInformation(final se.sundsvall.digitalregisteredletter.api.model.SupportInfo nullableSupportInfo) {
 		return ofNullable(nullableSupportInfo)
-			.map(supportInfo -> SupportInfo.create()
+			.map(supportInfo -> SupportInformation.create()
 				.withSupportText(supportInfo.supportText())
 				.withContactInformationUrl(supportInfo.contactInformationUrl())
 				.withContactInformationEmail(supportInfo.contactInformationEmail())
@@ -116,20 +116,20 @@ public final class LetterMapper {
 				.withContentType(etterEntity.getContentType())
 				.withStatus(etterEntity.getStatus())
 				.withAttachments(toLetterAttachments(etterEntity.getAttachments()))
-				.withSupportInfo(toSupportInfo(etterEntity.getSupportInfo()))
+				.withSupportInfo(toSupportInfo(etterEntity.getSupportInformation()))
 				.withCreated(etterEntity.getCreated())
 				.withUpdated(etterEntity.getUpdated())
 				.build())
 			.orElse(null);
 	}
 
-	public static se.sundsvall.digitalregisteredletter.api.model.SupportInfo toSupportInfo(final SupportInfo nullableSupportInfo) {
-		return ofNullable(nullableSupportInfo)
-			.map(supportInfo -> SupportInfoBuilder.create()
-				.withContactInformationUrl(supportInfo.getContactInformationUrl())
-				.withContactInformationEmail(supportInfo.getContactInformationEmail())
-				.withContactInformationPhoneNumber(supportInfo.getContactInformationPhoneNumber())
-				.withSupportText(supportInfo.getSupportText())
+	public static se.sundsvall.digitalregisteredletter.api.model.SupportInfo toSupportInfo(final SupportInformation nullableSupportInformation) {
+		return ofNullable(nullableSupportInformation)
+			.map(supportInformation -> SupportInfoBuilder.create()
+				.withContactInformationUrl(supportInformation.getContactInformationUrl())
+				.withContactInformationEmail(supportInformation.getContactInformationEmail())
+				.withContactInformationPhoneNumber(supportInformation.getContactInformationPhoneNumber())
+				.withSupportText(supportInformation.getSupportText())
 				.build())
 			.orElse(null);
 	}

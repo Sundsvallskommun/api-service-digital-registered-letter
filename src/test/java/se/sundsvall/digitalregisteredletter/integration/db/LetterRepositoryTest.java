@@ -103,4 +103,18 @@ class LetterRepositoryTest {
 		assertThat(letterRepository.findByIdAndDeleted("43a32404-28ee-480f-a095-00d48109afab", true)).isEmpty(); // Not deleted message (same as above)
 		assertThat(letterRepository.findByIdAndDeleted("59eeec4c-81f3-4a96-918e-43a5e08a8ef0", true)).isPresent(); // Deleted message
 	}
+
+	@Test
+	void findByIdAndVerifySigningInfo() {
+		assertThat(letterRepository.findById("1a7b65d7-bafd-49be-9e97-6406b1bf5886")).isPresent().hasValueSatisfying(entity -> {
+			assertThat(entity.getStatus()).isEqualTo("SENT");
+			assertThat(entity.getSigningInformation()).isNull();
+		});
+		assertThat(letterRepository.findById("f8853893-46a9-4249-a0e5-35d5595efd91")).isPresent().hasValueSatisfying(entity -> {
+			assertThat(entity.getStatus()).isEqualTo("SIGNED");
+			assertThat(entity.getSigningInformation()).isNotNull().satisfies(signingInfo -> {
+				assertThat(signingInfo.getStatus()).isEqualTo("COMPLETED");
+			});
+		});
+	}
 }

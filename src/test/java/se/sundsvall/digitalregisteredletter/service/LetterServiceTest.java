@@ -132,10 +132,10 @@ class LetterServiceTest {
 		assertThat(result.status()).isEqualTo(letterEntity.getStatus());
 		assertThat(result.attachments()).isNotNull().hasSize(letterEntity.getAttachments().size());
 		assertThat(result.supportInfo()).isNotNull();
-		assertThat(result.supportInfo().supportText()).isEqualTo(letterEntity.getSupportInfo().getSupportText());
-		assertThat(result.supportInfo().contactInformationUrl()).isEqualTo(letterEntity.getSupportInfo().getContactInformationUrl());
-		assertThat(result.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInfo().getContactInformationEmail());
-		assertThat(result.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInfo().getContactInformationPhoneNumber());
+		assertThat(result.supportInfo().supportText()).isEqualTo(letterEntity.getSupportInformation().getSupportText());
+		assertThat(result.supportInfo().contactInformationUrl()).isEqualTo(letterEntity.getSupportInformation().getContactInformationUrl());
+		assertThat(result.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInformation().getContactInformationEmail());
+		assertThat(result.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInformation().getContactInformationPhoneNumber());
 
 		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
 	}
@@ -178,10 +178,10 @@ class LetterServiceTest {
 			assertThat(assertedLetter.status()).isEqualTo(letterEntity.getStatus());
 			assertThat(assertedLetter.attachments()).isNotNull().hasSize(letterEntity.getAttachments().size());
 			assertThat(assertedLetter.supportInfo()).isNotNull();
-			assertThat(assertedLetter.supportInfo().supportText()).isEqualTo(letterEntity.getSupportInfo().getSupportText());
-			assertThat(assertedLetter.supportInfo().contactInformationUrl()).isEqualTo(letterEntity.getSupportInfo().getContactInformationUrl());
-			assertThat(assertedLetter.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInfo().getContactInformationEmail());
-			assertThat(assertedLetter.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInfo().getContactInformationPhoneNumber());
+			assertThat(assertedLetter.supportInfo().supportText()).isEqualTo(letterEntity.getSupportInformation().getSupportText());
+			assertThat(assertedLetter.supportInfo().contactInformationUrl()).isEqualTo(letterEntity.getSupportInformation().getContactInformationUrl());
+			assertThat(assertedLetter.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInformation().getContactInformationEmail());
+			assertThat(assertedLetter.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInformation().getContactInformationPhoneNumber());
 		});
 
 		verify(repositoryIntegrationMock).getPagedLetterEntities(municipalityId, letterFilter, pageable);

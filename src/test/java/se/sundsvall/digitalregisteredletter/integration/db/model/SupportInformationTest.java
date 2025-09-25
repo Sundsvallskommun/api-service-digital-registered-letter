@@ -10,11 +10,11 @@ import static org.hamcrest.core.AllOf.allOf;
 
 import org.junit.jupiter.api.Test;
 
-class SupportInfoTest {
+class SupportInformationTest {
 
 	@Test
 	void testBean() {
-		org.hamcrest.MatcherAssert.assertThat(SupportInfo.class, allOf(
+		org.hamcrest.MatcherAssert.assertThat(SupportInformation.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -29,23 +29,23 @@ class SupportInfoTest {
 		var supportInformationEmail = "support@email.com";
 		var supportInformationPhoneNumber = "123456789";
 
-		var supportInfo = SupportInfo.create()
+		var supportInformation = SupportInformation.create()
 			.withSupportText(supportText)
 			.withContactInformationUrl(supportInformationUrl)
 			.withContactInformationEmail(supportInformationEmail)
 			.withContactInformationPhoneNumber(supportInformationPhoneNumber);
 
-		assertThat(supportInfo.getSupportText()).isEqualTo(supportText);
-		assertThat(supportInfo.getContactInformationUrl()).isEqualTo(supportInformationUrl);
-		assertThat(supportInfo.getContactInformationEmail()).isEqualTo(supportInformationEmail);
-		assertThat(supportInfo.getContactInformationPhoneNumber()).isEqualTo(supportInformationPhoneNumber);
+		assertThat(supportInformation.getSupportText()).isEqualTo(supportText);
+		assertThat(supportInformation.getContactInformationUrl()).isEqualTo(supportInformationUrl);
+		assertThat(supportInformation.getContactInformationEmail()).isEqualTo(supportInformationEmail);
+		assertThat(supportInformation.getContactInformationPhoneNumber()).isEqualTo(supportInformationPhoneNumber);
 
-		assertThat(supportInfo).hasNoNullFieldsOrProperties();
+		assertThat(supportInformation).hasNoNullFieldsOrProperties();
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(SupportInfo.create()).hasAllNullFieldsOrPropertiesExcept();
-		assertThat(new SupportInfo()).hasAllNullFieldsOrPropertiesExcept();
+		assertThat(SupportInformation.create()).hasAllNullFieldsOrPropertiesExcept();
+		assertThat(new SupportInformation()).hasAllNullFieldsOrPropertiesExcept();
 	}
 }

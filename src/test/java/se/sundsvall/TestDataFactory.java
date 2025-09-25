@@ -34,7 +34,7 @@ public class TestDataFactory {
 			.withContentType("text/plain")
 			.withStatus("NEW")
 			.withAttachments(List.of(createAttachmentEntity()))
-			.withSupportInfo(createSupportInfoEmbeddable())
+			.withSupportInformation(createSupportInformationEmbeddable())
 			.withCreated(NOW.minusSeconds(30))
 			.withUpdated(NOW);
 
@@ -72,8 +72,8 @@ public class TestDataFactory {
 			.build();
 	}
 
-	public static se.sundsvall.digitalregisteredletter.integration.db.model.SupportInfo createSupportInfoEmbeddable() {
-		return se.sundsvall.digitalregisteredletter.integration.db.model.SupportInfo.create()
+	public static se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation createSupportInformationEmbeddable() {
+		return se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation.create()
 			.withSupportText("Support text")
 			.withContactInformationUrl("https://example.com/support")
 			.withContactInformationEmail("support@email.com")
