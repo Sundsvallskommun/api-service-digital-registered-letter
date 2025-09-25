@@ -63,7 +63,12 @@ public class TestDataFactory {
 	}
 
 	public static Letter createLetter() {
+		return createLetter(null);
+	}
+
+	public static Letter createLetter(String id) {
 		return LetterBuilder.create()
+			.withId(id)
 			.build();
 	}
 

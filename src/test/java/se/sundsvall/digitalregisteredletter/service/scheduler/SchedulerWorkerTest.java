@@ -47,13 +47,13 @@ class SchedulerWorkerTest {
 
 	@Test
 	void updateLetterStatuses() {
-		var keyValue1 = KeyValueBuilder.create().withResponseKey("responseKey").withStatus("status").build();
-		var keyValue2 = KeyValueBuilder.create().withResponseKey("responseKey").withStatus("status2").build();
-		var keyValues = List.of(keyValue1, keyValue2);
-		var letter = createLetterEntity();
-		var status = "signed";
+		final var keyValue1 = KeyValueBuilder.create().withResponseKey("responseKey").withStatus("status").build();
+		final var keyValue2 = KeyValueBuilder.create().withResponseKey("responseKey").withStatus("status2").build();
+		final var keyValues = List.of(keyValue1, keyValue2);
+		final var letter = createLetterEntity();
+		final var status = "signed";
 
-		var registeredLetterResponse = RegisteredLetterResponseBuilder.create()
+		final var registeredLetterResponse = RegisteredLetterResponseBuilder.create()
 			.withSignedAt(NOW).withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter.getId())).build();
 
 		when(kivraIntegrationMock.getAllResponses()).thenReturn(keyValues);
@@ -66,7 +66,7 @@ class SchedulerWorkerTest {
 		verify(kivraIntegrationMock, times(2)).getRegisteredLetterResponse("responseKey");
 		verify(letterRepositoryMock, times(2)).findByIdAndDeleted(letter.getId(), false);
 		verify(letterRepositoryMock, times(2)).save(letterEntityCaptor.capture());
-		var savedLetter = letterEntityCaptor.getValue();
+		final var savedLetter = letterEntityCaptor.getValue();
 		assertThat(savedLetter.getStatus()).isEqualTo(status.toUpperCase());
 		verify(kivraIntegrationMock, times(2)).deleteResponse("responseKey");
 	}
