@@ -28,6 +28,6 @@ class SchedulerServiceTest {
 	void updateLetterStatuses() {
 		schedulerService.updateLetterStatuses();
 
-		verify(schedulerWorkerMock).updateLetterStatuses();
+		verify(schedulerWorkerMock).updateLetterInformation();
 	}
 }

@@ -29,6 +29,6 @@ public class SchedulerService {
 		lockAtMostFor = "${scheduler.update-letter-statuses.shedlock-lock-at-most-for}",
 		maximumExecutionTime = "${scheduler.update-letter-statuses.maximum-execution-time}")
 	void updateLetterStatuses() {
-		schedulerWorker.updateLetterStatuses();
+		schedulerWorker.updateLetterInformation();
 	}
 }

@@ -2,22 +2,39 @@ package se.sundsvall.digitalregisteredletter.service.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static se.sundsvall.TestDataFactory.createAttachmentEntity;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createSupportInformationEmbeddable;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.springframework.data.domain.PageImpl;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.BankIdOrderBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.CompletionDataBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.DeviceBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponseBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.SenderReferenceBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.StepUpBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserBuilder;
 
 class LetterMapperTest {
 
@@ -336,5 +353,177 @@ class LetterMapperTest {
 	@Test
 	void toLetterAttachmentFromNull() {
 		assertThat(LetterMapper.toLetterAttachment(null)).isNull();
+	}
+
+	@Test
+	void updateSigningInformationWithNullValues() {
+		final var responseMock = Mockito.mock(RegisteredLetterResponse.class);
+		final var entityMock = Mockito.mock(SigningInformationEntity.class);
+
+		assertDoesNotThrow(() -> LetterMapper.updateSigningInformation(null, null));
+		assertDoesNotThrow(() -> LetterMapper.updateSigningInformation(null, responseMock));
+		assertDoesNotThrow(() -> LetterMapper.updateSigningInformation(entityMock, null));
+
+		verifyNoInteractions(responseMock, entityMock);
+	}
+
+	@ParameterizedTest
+	@MethodSource("updateSigningInformationParameterProvider")
+	void updateSigningInformation(RegisteredLetterResponse response, SigningInformationEntity expectedResult) {
+		final var entity = SigningInformationEntity.create();
+		LetterMapper.updateSigningInformation(entity, response);
+
+		assertThat(entity).usingRecursiveAssertion().isEqualTo(expectedResult);
+	}
+
+	private static Stream<Arguments> updateSigningInformationParameterProvider() {
+		final var contentKey = "contentKey";
+		final var signedAt = OffsetDateTime.now();
+		final var status = "status";
+		final var internalId = "internalId";
+		final var ocspResponse = "ocspResponse";
+		final var orderRef = "orderRef";
+		final var signature = "signature";
+		final var mrtd = true;
+		final var ipAddress = "ipAddress";
+		final var givenName = "givenName";
+		final var name = "name";
+		final var personalNumber = "personalNumber";
+		final var surname = "surname";
+
+		return Stream.of(
+			// Empty response
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create().build(),
+				SigningInformationEntity.create()),
+
+			// Response with values on top level
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withContentKey(contentKey)
+					.withSignedAt(signedAt)
+					.withStatus(status) // This should not be mapped into the signing information entity, thus it is not added to the expected result
+					.build(),
+				SigningInformationEntity.create()
+					.withContentKey(contentKey)
+					.withSigned(signedAt)),
+
+			// Response empty sender reference
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withSenderReference(SenderReferenceBuilder.create()
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for sender reference values
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withSenderReference(SenderReferenceBuilder.create()
+						.withInternalId(internalId)
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withInternalId(internalId)),
+
+			// Response with empty bank id order
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for bank id order
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withOcspResponse(ocspResponse)
+						.withOrderRef(orderRef)
+						.withSignature(signature)
+						.withStatus(status)
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withOcspResponse(ocspResponse)
+					.withOrderRef(orderRef)
+					.withSignature(signature)
+					.withStatus(status.toUpperCase())),
+
+			// Response with empty step up
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withStepUp(StepUpBuilder.create().build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for step up
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withStepUp(StepUpBuilder.create()
+							.withMrtd(mrtd)
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withMrtd(mrtd)),
+
+			// Response with empty completion data
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create().build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with empty device and user in completion data object
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withDevice(DeviceBuilder.create().build())
+							.withUser(UserBuilder.create().build())
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for device in completion data object
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withDevice(DeviceBuilder.create()
+								.withIpAddress(ipAddress)
+								.build())
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withIpAddress(ipAddress)),
+
+			// Response with values for user in completion data object
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withUser(UserBuilder.create()
+								.withGivenName(givenName)
+								.withName(name)
+								.withPersonalNumber(personalNumber)
+								.withSurname(surname)
+								.build())
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withGivenName(givenName)
+					.withName(name)
+					.withPersonalNumber(personalNumber)
+					.withSurname(surname)));
 	}
 }
