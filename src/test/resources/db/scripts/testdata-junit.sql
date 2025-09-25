@@ -45,9 +45,9 @@ VALUES ('43a32404-28ee-480f-a095-00d48109afab', '2281', 'body for municipality 2
         null);
 
 INSERT INTO attachment(id, file_name, content, content_type, letter_id)
-VALUES (1, 'attachment1.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
-       (2, 'attachment2.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
-       (3, 'attachment3.txt', 'dGVzdA==', 'text/plain', '9bb97fd2-4410-4a4b-9019-fdd98f01bd7c'),
-       (4, 'attachment4.txt', 'dGVzdA==', 'text/plain', 'f8853893-46a9-4249-a0e5-35d5595efd91'),
-       (5, 'attachment5.txt', 'dGVzdA==', 'text/plain', '450970bb-118c-43a8-8813-6b67c2d33a3b'),
-       (6, 'attachment6.txt', 'dGVzdA==', 'text/plain', '59eeec4c-81f3-4a96-918e-43a5e08a8ef0');
+VALUES ('f4666ea6-0324-490f-8e27-2b704e580a0a', 'attachment1.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
+       ('e5c653e4-285a-4e46-b7ad-f79fc6e95463', 'attachment2.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
+       ('c723e56a-21bd-4753-a7cf-1e428d7baeaa', 'attachment3.txt', 'dGVzdA==', 'text/plain', '9bb97fd2-4410-4a4b-9019-fdd98f01bd7c'),
+       ('514f8c46-acca-45d6-b1ff-f11d10fbd9d4', 'attachment4.txt', 'dGVzdA==', 'text/plain', 'f8853893-46a9-4249-a0e5-35d5595efd91'),
+       ('c4380df7-8971-424f-acd7-71307d24d9ad', 'attachment5.txt', 'dGVzdA==', 'text/plain', '450970bb-118c-43a8-8813-6b67c2d33a3b'),
+       ('c0fa7fa4-4149-440a-84a1-50946a57cf01', 'attachment6.txt', 'dGVzdA==', 'text/plain', '59eeec4c-81f3-4a96-918e-43a5e08a8ef0');

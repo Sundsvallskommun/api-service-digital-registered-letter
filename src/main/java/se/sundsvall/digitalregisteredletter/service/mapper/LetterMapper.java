@@ -3,6 +3,7 @@ package se.sundsvall.digitalregisteredletter.service.mapper;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.ObjectUtils.anyNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,10 @@ import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 
 public final class LetterMapper {
 
@@ -149,5 +152,35 @@ public final class LetterMapper {
 				.withContentType(attachmentEntity.getContentType())
 				.build())
 			.orElse(null);
+	}
+
+	public static void updateSigningInformation(final SigningInformationEntity signingInformation, final RegisteredLetterResponse kivraResponse) {
+		if (anyNull(signingInformation, kivraResponse)) {
+			return;
+		}
+
+		ofNullable(kivraResponse.contentKey()).ifPresent(signingInformation::setContentKey);
+		ofNullable(kivraResponse.signedAt()).ifPresent(signingInformation::setSigned);
+		ofNullable(kivraResponse.senderReference()).ifPresent(value -> signingInformation.setInternalId(value.internalId()));
+		ofNullable(kivraResponse.bankIdOrder()).ifPresent(value -> updateBankIdOrder(signingInformation, value));
+	}
+
+	private static void updateBankIdOrder(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder bankIdOrder) {
+		ofNullable(bankIdOrder.ocspResponse()).ifPresent(signingInformation::setOcspResponse);
+		ofNullable(bankIdOrder.orderRef()).ifPresent(signingInformation::setOrderRef);
+		ofNullable(bankIdOrder.signature()).ifPresent(signingInformation::setSignature);
+		ofNullable(bankIdOrder.status()).ifPresent(value -> signingInformation.setStatus(value.toUpperCase()));
+		ofNullable(bankIdOrder.completionData()).ifPresent(value -> updateCompletionData(signingInformation, value));
+		ofNullable(bankIdOrder.stepUp()).ifPresent(value -> signingInformation.setMrtd(value.mrtd()));
+	}
+
+	private static void updateCompletionData(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder.CompletionData completionData) {
+		ofNullable(completionData.device()).ifPresent(value -> signingInformation.setIpAddress(value.ipAddress()));
+		ofNullable(completionData.user()).ifPresent(value -> {
+			signingInformation.setGivenName(value.givenName());
+			signingInformation.setName(value.name());
+			signingInformation.setPersonalNumber(value.personalNumber());
+			signingInformation.setSurname(value.surname());
+		});
 	}
 }
