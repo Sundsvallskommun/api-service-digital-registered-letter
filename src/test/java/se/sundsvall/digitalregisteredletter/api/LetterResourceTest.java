@@ -111,22 +111,27 @@ class LetterResourceTest {
 	void sendLetter_Created() {
 		final var createLetterRequest = createLetterRequest();
 		final var letterId = "1234567890";
+		final var letterResponse = createLetter(letterId);
 
 		final var multipartBodyBuilder = new MultipartBodyBuilder();
 		multipartBodyBuilder.part("letterAttachments", "file-content").filename("test1.txt").contentType(APPLICATION_PDF);
 		multipartBodyBuilder.part("letterAttachments", "file-content").filename("tesst2.txt").contentType(APPLICATION_PDF);
 		multipartBodyBuilder.part("letter", createLetterRequest);
 
-		when(letterServiceMock.sendLetter(any(), any(), any())).thenReturn(letterId);
+		when(letterServiceMock.sendLetter(any(), any(), any())).thenReturn(letterResponse);
 
-		webTestClient.post()
+		final var response = webTestClient.post()
 			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
 			.contentType(MULTIPART_FORM_DATA)
 			.body(fromMultipartData(multipartBodyBuilder.build()))
 			.exchange()
 			.expectStatus().isCreated()
-			.expectHeader().valueEquals("Location", "/%s/letters/%s".formatted(MUNICIPALITY_ID, letterId));
+			.expectHeader().valueEquals("Location", "/%s/letters/%s".formatted(MUNICIPALITY_ID, letterId))
+			.expectBody(Letter.class)
+			.returnResult()
+			.getResponseBody();
 
+		assertThat(response).usingRecursiveComparison().isEqualTo(letterResponse);
 		verify(letterServiceMock).sendLetter(any(), any(), any());
 	}
 }

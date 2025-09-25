@@ -67,17 +67,11 @@ class LetterIT extends AbstractAppTest {
 			.withRequestFile("letterAttachments", "test.pdf")
 			.withExpectedResponseStatus(CREATED)
 			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
-			.sendRequest()
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse()
 			.getResponseHeaders();
 
 		assertThat(headers.get(LOCATION)).isNotNull();
-
-		setupCall()
-			.withServicePath(headers.get(LOCATION).getFirst())
-			.withHttpMethod(GET)
-			.withExpectedResponseStatus(OK)
-			.withExpectedResponse(RESPONSE)
-			.sendRequestAndVerifyResponse();
 
 		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly successfully sent letter)
 	}
@@ -95,17 +89,11 @@ class LetterIT extends AbstractAppTest {
 			.withRequestFile("letterAttachments", "test.pdf")
 			.withExpectedResponseStatus(CREATED)
 			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
-			.sendRequest()
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse()
 			.getResponseHeaders();
 
 		assertThat(headers.get(LOCATION)).isNotNull();
-
-		setupCall()
-			.withServicePath(headers.get(LOCATION).getFirst())
-			.withHttpMethod(GET)
-			.withExpectedResponseStatus(OK)
-			.withExpectedResponse(RESPONSE)
-			.sendRequestAndVerifyResponse();
 
 		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly failed sent letter)
 	}
@@ -123,17 +111,11 @@ class LetterIT extends AbstractAppTest {
 			.withRequestFile("letterAttachments", "test.pdf")
 			.withExpectedResponseStatus(CREATED)
 			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
-			.sendRequest()
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse()
 			.getResponseHeaders();
 
 		assertThat(headers.get(LOCATION)).isNotNull();
-
-		setupCall()
-			.withServicePath(headers.get(LOCATION).getFirst())
-			.withHttpMethod(GET)
-			.withExpectedResponseStatus(OK)
-			.withExpectedResponse(RESPONSE)
-			.sendRequestAndVerifyResponse();
 
 		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly failed sent letter)
 	}

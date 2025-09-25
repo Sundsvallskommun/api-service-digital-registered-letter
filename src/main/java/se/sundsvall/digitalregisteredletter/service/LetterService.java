@@ -34,7 +34,7 @@ public class LetterService {
 		this.repositoryIntegration = repositoryIntegration;
 	}
 
-	public String sendLetter(final String municipalityId, final LetterRequest letterRequest, final Attachments attachments) {
+	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final Attachments attachments) {
 		final var username = IdentifierUtil.getAdUser();
 		final var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId()); // Verify that match for party in request exists as there is no point in persisting entity otherwise
 
@@ -42,14 +42,14 @@ public class LetterService {
 		final var status = kivraIntegration.sendContent(letterEntity, legalId); // Send letter to Kivra
 		repositoryIntegration.updateStatus(letterEntity, status); // Update entity with status from Kivra response
 
-		return letterEntity.getId();
+		return toLetter(letterEntity);
 	}
 
 	public Letter getLetter(final String municipalityId, final String letterId) {
-		final var letter = repositoryIntegration.getLetterEntity(municipalityId, letterId)
+		final var letterEntity = repositoryIntegration.getLetterEntity(municipalityId, letterId)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 
-		return toLetter(letter);
+		return toLetter(letterEntity);
 	}
 
 	public Letters getLetters(final String municipalityId, final LetterFilter filter, final Pageable pageable) {
