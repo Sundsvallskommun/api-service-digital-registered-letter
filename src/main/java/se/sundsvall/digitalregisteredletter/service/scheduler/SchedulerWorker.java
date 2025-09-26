@@ -4,7 +4,6 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
-import static se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper.updateSigningInformation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformat
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
+import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 
 @Component
 public class SchedulerWorker {
@@ -23,10 +23,16 @@ public class SchedulerWorker {
 
 	private final KivraIntegration kivraIntegration;
 	private final LetterRepository letterRepository;
+	private final LetterMapper letterMapper;
 
-	SchedulerWorker(final KivraIntegration kivraIntegration, final LetterRepository letterRepository) {
+	SchedulerWorker(
+		final KivraIntegration kivraIntegration,
+		final LetterRepository letterRepository,
+		final LetterMapper letterMapper) {
+
 		this.kivraIntegration = kivraIntegration;
 		this.letterRepository = letterRepository;
+		this.letterMapper = letterMapper;
 	}
 
 	public void updateLetterInformation() {
@@ -62,9 +68,8 @@ public class SchedulerWorker {
 	private boolean updateLetter(final RegisteredLetterResponse kivraResponse, final LetterEntity letterEntity) {
 		LOG.info("Updating letter with id '{}'", letterEntity.getId());
 		try {
-			ofNullable(kivraResponse.status()).ifPresent(value -> letterEntity.setStatus(value.toUpperCase()));
-			updateSigningInformation(retrieveSigningInfoformationEntity(letterEntity), kivraResponse);
-
+			letterMapper.updateLetterStatus(letterEntity, kivraResponse.status());
+			letterMapper.updateSigningInformation(retrieveSigningInfoformationEntity(letterEntity), kivraResponse);
 			letterRepository.save(letterEntity);
 		} catch (final Exception e) {
 			// Log and return false to not remove post from kivra

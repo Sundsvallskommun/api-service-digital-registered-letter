@@ -1,10 +1,6 @@
 package se.sundsvall.digitalregisteredletter.integration.db;
 
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NEW;
-import static se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper.addLetter;
-import static se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper.toLetterEntity;
-import static se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper.toOrganizationEntity;
-import static se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper.toUserEntity;
 
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -19,6 +15,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 import se.sundsvall.digitalregisteredletter.service.mapper.AttachmentMapper;
+import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 
 @Component
 public class RepositoryIntegration {
@@ -27,17 +24,20 @@ public class RepositoryIntegration {
 	private final LetterRepository letterRepository;
 	private final OrganizationRepository organizationRepository;
 	private final UserRepository userRepository;
+	private final LetterMapper letterMapper;
 
 	public RepositoryIntegration(
 		final AttachmentMapper attachmentMapper,
 		final LetterRepository letterRepository,
 		final OrganizationRepository organizationRepository,
-		final UserRepository userRepository) {
+		final UserRepository userRepository,
+		final LetterMapper letterMapper) {
 
 		this.attachmentMapper = attachmentMapper;
 		this.letterRepository = letterRepository;
 		this.organizationRepository = organizationRepository;
 		this.userRepository = userRepository;
+		this.letterMapper = letterMapper;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class RepositoryIntegration {
 	 */
 	@Transactional
 	public LetterEntity persistLetter(final String municipalityId, final String username, final LetterRequest letterRequest, final Attachments attachments) {
-		final var letterEntity = toLetterEntity(letterRequest)
+		final var letterEntity = letterMapper.toLetterEntity(letterRequest)
 			.withAttachments(attachmentMapper.toAttachmentEntities(attachments))
 			.withMunicipalityId(municipalityId)
 			.withStatus(STATUS_NEW);
@@ -72,8 +72,8 @@ public class RepositoryIntegration {
 	 */
 	private OrganizationEntity retrieveOrganizationEntity(Organization organization, LetterEntity letterEntity) {
 		return organizationRepository.findByNumber(organization.number())
-			.map(organizationEntity -> addLetter(organizationEntity, letterEntity))
-			.orElse(toOrganizationEntity(organization, letterEntity));
+			.map(organizationEntity -> letterMapper.addLetter(organizationEntity, letterEntity))
+			.orElse(letterMapper.toOrganizationEntity(organization, letterEntity));
 	}
 
 	/**
@@ -86,8 +86,8 @@ public class RepositoryIntegration {
 	 */
 	private UserEntity retrieveUserEntity(String username, LetterEntity letterEntity) {
 		return userRepository.findByUsernameIgnoreCase(username)
-			.map(userEntity -> addLetter(userEntity, letterEntity))
-			.orElse(toUserEntity(username, letterEntity));
+			.map(userEntity -> letterMapper.addLetter(userEntity, letterEntity))
+			.orElse(letterMapper.toUserEntity(username, letterEntity));
 	}
 
 	/**
