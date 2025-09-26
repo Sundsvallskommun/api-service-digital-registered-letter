@@ -2,30 +2,49 @@ package se.sundsvall.digitalregisteredletter.service.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static se.sundsvall.TestDataFactory.createAttachmentEntity;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createSupportInformationEmbeddable;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.springframework.data.domain.PageImpl;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.BankIdOrderBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.CompletionDataBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.DeviceBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponseBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.SenderReferenceBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.StepUpBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserBuilder;
 
 class LetterMapperTest {
+
+	private final LetterMapper letterMapper = new LetterMapper();
 
 	@Test
 	void toLetterEntity() {
 		final var letterRequest = createLetterRequest();
 
-		final var result = LetterMapper.toLetterEntity(letterRequest);
+		final var result = letterMapper.toLetterEntity(letterRequest);
 
 		assertThat(result.getBody()).isEqualTo(letterRequest.body());
 		assertThat(result.getContentType()).isEqualTo(letterRequest.contentType());
@@ -40,7 +59,7 @@ class LetterMapperTest {
 
 	@Test
 	void toLetterEntityFromNull() {
-		assertThat(LetterMapper.toLetterEntity(null)).isNull();
+		assertThat(letterMapper.toLetterEntity(null)).isNull();
 	}
 
 	@Test
@@ -52,7 +71,7 @@ class LetterMapperTest {
 			.withContactInformationPhoneNumber("supportPhone")
 			.build();
 
-		final var result = LetterMapper.toSupportInformation(supportInfo);
+		final var result = letterMapper.toSupportInformation(supportInfo);
 
 		assertThat(result.getSupportText()).isEqualTo(supportInfo.supportText());
 		assertThat(result.getContactInformationEmail()).isEqualTo(supportInfo.contactInformationEmail());
@@ -62,7 +81,7 @@ class LetterMapperTest {
 
 	@Test
 	void toSupportInformationEmbeddableFromNull() {
-		assertThat(LetterMapper.toSupportInformation((se.sundsvall.digitalregisteredletter.api.model.SupportInfo) null)).isNull();
+		assertThat(letterMapper.toSupportInformation((se.sundsvall.digitalregisteredletter.api.model.SupportInfo) null)).isNull();
 	}
 
 	@Test
@@ -75,7 +94,7 @@ class LetterMapperTest {
 			.withNumber(number)
 			.build();
 
-		final var bean = LetterMapper.toOrganizationEntity(organization, letterEntity);
+		final var bean = letterMapper.toOrganizationEntity(organization, letterEntity);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(bean.getLetters()).containsExactly(letterEntity);
@@ -92,7 +111,7 @@ class LetterMapperTest {
 			.withNumber(number)
 			.build();
 
-		final var bean = LetterMapper.toOrganizationEntity(organization, null);
+		final var bean = letterMapper.toOrganizationEntity(organization, null);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(bean.getLetters()).isEmpty();
@@ -102,8 +121,8 @@ class LetterMapperTest {
 
 	@Test
 	void toOrganizationEntityFromNull() {
-		assertThat(LetterMapper.toOrganizationEntity(null, null)).isNull();
-		assertThat(LetterMapper.toOrganizationEntity(null, LetterEntity.create())).isNull();
+		assertThat(letterMapper.toOrganizationEntity(null, null)).isNull();
+		assertThat(letterMapper.toOrganizationEntity(null, LetterEntity.create())).isNull();
 	}
 
 	@Test
@@ -111,7 +130,7 @@ class LetterMapperTest {
 		final var letterEntity = LetterEntity.create();
 		final var username = "username";
 
-		final var bean = LetterMapper.toUserEntity(username, letterEntity);
+		final var bean = letterMapper.toUserEntity(username, letterEntity);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(bean.getUsername()).isEqualTo(username);
@@ -122,7 +141,7 @@ class LetterMapperTest {
 	void toUserEntityWithNullLetterList() {
 		final var username = "username";
 
-		final var bean = LetterMapper.toUserEntity(username, null);
+		final var bean = letterMapper.toUserEntity(username, null);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(bean.getUsername()).isEqualTo(username);
@@ -131,8 +150,8 @@ class LetterMapperTest {
 
 	@Test
 	void toUserEntityFromNull() {
-		assertThat(LetterMapper.toUserEntity(null, null)).isNull();
-		assertThat(LetterMapper.toUserEntity(null, LetterEntity.create())).isNull();
+		assertThat(letterMapper.toUserEntity(null, null)).isNull();
+		assertThat(letterMapper.toUserEntity(null, LetterEntity.create())).isNull();
 	}
 
 	@Test
@@ -142,7 +161,7 @@ class LetterMapperTest {
 		final var organizationEntity = OrganizationEntity.create()
 			.withLetters(new ArrayList<>(List.of(oldEntity)));
 
-		final var bean = LetterMapper.addLetter(organizationEntity, newEntity);
+		final var bean = letterMapper.addLetter(organizationEntity, newEntity);
 
 		assertThat(bean).isSameAs(organizationEntity);
 		assertThat(bean.getLetters()).containsExactlyInAnyOrder(oldEntity, newEntity);
@@ -154,7 +173,7 @@ class LetterMapperTest {
 		final var organizationEntity = OrganizationEntity.create()
 			.withLetters(new ArrayList<>(List.of(oldEntity)));
 
-		final var bean = LetterMapper.addLetter(organizationEntity, null);
+		final var bean = letterMapper.addLetter(organizationEntity, null);
 
 		assertThat(bean).isSameAs(organizationEntity);
 		assertThat(bean.getLetters()).containsExactlyInAnyOrder(oldEntity);
@@ -166,7 +185,7 @@ class LetterMapperTest {
 		final var organizationEntity = OrganizationEntity.create()
 			.withLetters(null);
 
-		final var bean = LetterMapper.addLetter(organizationEntity, newEntity);
+		final var bean = letterMapper.addLetter(organizationEntity, newEntity);
 
 		assertThat(bean).isSameAs(organizationEntity);
 		assertThat(bean.getLetters()).containsExactlyInAnyOrder(newEntity);
@@ -179,7 +198,7 @@ class LetterMapperTest {
 		final var userEntity = UserEntity.create()
 			.withLetters(new ArrayList<>(List.of(oldEntity)));
 
-		final var bean = LetterMapper.addLetter(userEntity, newEntity);
+		final var bean = letterMapper.addLetter(userEntity, newEntity);
 
 		assertThat(bean).isSameAs(userEntity);
 		assertThat(bean.getLetters()).containsExactlyInAnyOrder(oldEntity, newEntity);
@@ -191,7 +210,7 @@ class LetterMapperTest {
 		final var userEntity = UserEntity.create()
 			.withLetters(new ArrayList<>(List.of(oldEntity)));
 
-		final var bean = LetterMapper.addLetter(userEntity, null);
+		final var bean = letterMapper.addLetter(userEntity, null);
 
 		assertThat(bean).isSameAs(userEntity);
 		assertThat(bean.getLetters()).containsExactlyInAnyOrder(oldEntity);
@@ -203,7 +222,7 @@ class LetterMapperTest {
 		final var userEntity = UserEntity.create()
 			.withLetters(null);
 
-		final var bean = LetterMapper.addLetter(userEntity, newEntity);
+		final var bean = letterMapper.addLetter(userEntity, newEntity);
 
 		assertThat(bean).isSameAs(userEntity);
 		assertThat(bean.getLetters()).containsExactlyInAnyOrder(newEntity);
@@ -213,7 +232,7 @@ class LetterMapperTest {
 	void toLetter() {
 		final var entity = createLetterEntity();
 
-		final var bean = LetterMapper.toLetter(entity);
+		final var bean = letterMapper.toLetter(entity);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(bean.body()).isEqualTo("This is the body of the letter");
@@ -245,20 +264,22 @@ class LetterMapperTest {
 
 	@Test
 	void toLetterFromNull() {
-		assertThat(LetterMapper.toLetter(null)).isNull();
+		assertThat(letterMapper.toLetter(null)).isNull();
 	}
 
 	@Test
 	void toLetters() {
 		final var entity = createLetterEntity();
-		final var letter = LetterMapper.toLetter(entity);
+		final var letter = letterMapper.toLetter(entity);
 
-		final var pagedResponse = LetterMapper.toLetters(new PageImpl<>(List.of(entity)));
+		final var pagedResponse = letterMapper.toLetters(new PageImpl<>(List.of(entity)));
 
 		assertThat(pagedResponse).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(pagedResponse.letters()).hasSize(1).satisfiesExactly(assertedLetter -> {
 			assertThat(assertedLetter).usingRecursiveAssertion().isEqualTo(letter);
 		});
+		assertThat(pagedResponse.metaData().getPage()).isEqualTo(1);
+		assertThat(pagedResponse.metaData().getSortDirection()).isNull();
 	}
 
 	@Test
@@ -267,7 +288,7 @@ class LetterMapperTest {
 		final var listWithNull = new ArrayList<>(List.of(entity));
 		listWithNull.addFirst(null);
 
-		final var pagedResponse = LetterMapper.toLetters(new PageImpl<>(listWithNull));
+		final var pagedResponse = letterMapper.toLetters(new PageImpl<>(listWithNull));
 
 		assertThat(pagedResponse).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(pagedResponse.letters()).hasSize(1);
@@ -275,14 +296,14 @@ class LetterMapperTest {
 
 	@Test
 	void toLettersFromNull() {
-		assertThat(LetterMapper.toLetters(null)).isNull();
+		assertThat(letterMapper.toLetters(null)).isNull();
 	}
 
 	@Test
 	void toSupportInfo() {
 		final var embeddable = createSupportInformationEmbeddable();
 
-		final var bean = LetterMapper.toSupportInfo(embeddable);
+		final var bean = letterMapper.toSupportInfo(embeddable);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(bean.contactInformationEmail()).isEqualTo("support@email.com");
@@ -292,15 +313,15 @@ class LetterMapperTest {
 
 	@Test
 	void toSupportInfoFromNull() {
-		assertThat(LetterMapper.toSupportInfo((SupportInformation) null)).isNull();
+		assertThat(letterMapper.toSupportInfo((SupportInformation) null)).isNull();
 	}
 
 	@Test
 	void toLetterAttachments() {
 		final var entity = createAttachmentEntity();
-		final var attachment = LetterMapper.toLetterAttachment(entity);
+		final var attachment = letterMapper.toLetterAttachment(entity);
 
-		final var list = LetterMapper.toLetterAttachments(List.of(entity));
+		final var list = letterMapper.toLetterAttachments(List.of(entity));
 
 		assertThat(list).hasSize(1).satisfiesExactly(assertedAttachment -> {
 			assertThat(assertedAttachment).usingRecursiveAssertion().isEqualTo(attachment);
@@ -313,19 +334,19 @@ class LetterMapperTest {
 		final var listWithNull = new ArrayList<>(List.of(entity));
 		listWithNull.addFirst(null);
 
-		assertThat(LetterMapper.toLetterAttachments(listWithNull)).hasSize(1);
+		assertThat(letterMapper.toLetterAttachments(listWithNull)).hasSize(1);
 	}
 
 	@Test
 	void toLetterAttachmentsFromNull() {
-		assertThat(LetterMapper.toLetterAttachments(null)).isEmpty();
+		assertThat(letterMapper.toLetterAttachments(null)).isEmpty();
 	}
 
 	@Test
 	void toLetterAttachment() {
 		final var entity = createAttachmentEntity();
 
-		final var bean = LetterMapper.toLetterAttachment(entity);
+		final var bean = letterMapper.toLetterAttachment(entity);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(bean.contentType()).isEqualTo("text/plain");
@@ -335,6 +356,178 @@ class LetterMapperTest {
 
 	@Test
 	void toLetterAttachmentFromNull() {
-		assertThat(LetterMapper.toLetterAttachment(null)).isNull();
+		assertThat(letterMapper.toLetterAttachment(null)).isNull();
+	}
+
+	@Test
+	void updateSigningInformationWithNullValues() {
+		final var responseMock = Mockito.mock(RegisteredLetterResponse.class);
+		final var entityMock = Mockito.mock(SigningInformationEntity.class);
+
+		assertDoesNotThrow(() -> letterMapper.updateSigningInformation(null, null));
+		assertDoesNotThrow(() -> letterMapper.updateSigningInformation(null, responseMock));
+		assertDoesNotThrow(() -> letterMapper.updateSigningInformation(entityMock, null));
+
+		verifyNoInteractions(responseMock, entityMock);
+	}
+
+	@ParameterizedTest
+	@MethodSource("updateSigningInformationParameterProvider")
+	void updateSigningInformation(RegisteredLetterResponse response, SigningInformationEntity expectedResult) {
+		final var entity = SigningInformationEntity.create();
+		letterMapper.updateSigningInformation(entity, response);
+
+		assertThat(entity).usingRecursiveAssertion().isEqualTo(expectedResult);
+	}
+
+	private static Stream<Arguments> updateSigningInformationParameterProvider() {
+		final var contentKey = "contentKey";
+		final var signedAt = OffsetDateTime.now();
+		final var status = "status";
+		final var internalId = "internalId";
+		final var ocspResponse = "ocspResponse";
+		final var orderRef = "orderRef";
+		final var signature = "signature";
+		final var mrtd = true;
+		final var ipAddress = "ipAddress";
+		final var givenName = "givenName";
+		final var name = "name";
+		final var personalNumber = "personalNumber";
+		final var surname = "surname";
+
+		return Stream.of(
+			// Empty response
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create().build(),
+				SigningInformationEntity.create()),
+
+			// Response with values on top level
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withContentKey(contentKey)
+					.withSignedAt(signedAt)
+					.withStatus(status) // This should not be mapped into the signing information entity, thus it is not added to the expected result
+					.build(),
+				SigningInformationEntity.create()
+					.withContentKey(contentKey)
+					.withSigned(signedAt)),
+
+			// Response empty sender reference
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withSenderReference(SenderReferenceBuilder.create()
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for sender reference values
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withSenderReference(SenderReferenceBuilder.create()
+						.withInternalId(internalId)
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withInternalId(internalId)),
+
+			// Response with empty bank id order
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for bank id order
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withOcspResponse(ocspResponse)
+						.withOrderRef(orderRef)
+						.withSignature(signature)
+						.withStatus(status)
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withOcspResponse(ocspResponse)
+					.withOrderRef(orderRef)
+					.withSignature(signature)
+					.withStatus(status.toUpperCase())),
+
+			// Response with empty step up
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withStepUp(StepUpBuilder.create().build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for step up
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withStepUp(StepUpBuilder.create()
+							.withMrtd(mrtd)
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withMrtd(mrtd)),
+
+			// Response with empty completion data
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create().build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with empty device and user in completion data object
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withDevice(DeviceBuilder.create().build())
+							.withUser(UserBuilder.create().build())
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()),
+
+			// Response with values for device in completion data object
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withDevice(DeviceBuilder.create()
+								.withIpAddress(ipAddress)
+								.build())
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withIpAddress(ipAddress)),
+
+			// Response with values for user in completion data object
+			Arguments.of(
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withUser(UserBuilder.create()
+								.withGivenName(givenName)
+								.withName(name)
+								.withPersonalNumber(personalNumber)
+								.withSurname(surname)
+								.build())
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withGivenName(givenName)
+					.withName(name)
+					.withPersonalNumber(personalNumber)
+					.withSurname(surname)));
 	}
 }

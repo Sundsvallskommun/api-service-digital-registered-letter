@@ -50,12 +50,12 @@ VALUES ('43a32404-28ee-480f-a095-00d48109afab', '2281', 'body for municipality 2
         'support@email.com', '+46123456789', 'fe85fe5e-7de1-4a48-bda7-8df8556b0265', '36c85960-0b77-4228-a8b3-da86ca8078e7', 'f87e34e4-8e8a-4476-9ec2-8f2451538d22');
 
 INSERT INTO attachment(id, file_name, content, content_type, letter_id)
-VALUES (1, 'attachment1.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
-       (2, 'attachment2.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
-       (3, 'attachment3.txt', 'dGVzdA==', 'text/plain', '9bb97fd2-4410-4a4b-9019-fdd98f01bd7c'),
-       (4, 'attachment4.txt', 'dGVzdA==', 'text/plain', 'f8853893-46a9-4249-a0e5-35d5595efd91'),
-       (5, 'attachment5.txt', 'dGVzdA==', 'text/plain', '450970bb-118c-43a8-8813-6b67c2d33a3b'),
-       (6, 'attachment6.txt', 'dGVzdA==', 'text/plain', '59eeec4c-81f3-4a96-918e-43a5e08a8ef0'),
-       (7, 'attachment7.txt', 'dGVzdA==', 'text/plain', '5c8634f2-078e-4ef0-888b-63cb1aaa0b11'),
-       (8, 'attachment8.txt', 'dGVzdA==', 'text/plain', 'bd3d2128-0d5a-457c-8629-0da4ffea85d9'),
-       (9, 'attachment9.txt', 'dGVzdA==', 'text/plain', '4ace2698-7dea-4d0b-9c5d-eeac32c1b49a');
+VALUES ('186fd449-e757-4add-badf-4835fc9e1cee', 'attachment1.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
+       ('d922ba6b-89f3-4640-b823-a5d8f0fbd94b', 'attachment2.txt', 'dGVzdA==', 'text/plain', '43a32404-28ee-480f-a095-00d48109afab'),
+       ('3109456a-ba3a-4ad3-a100-4762ef32ae0c', 'attachment3.txt', 'dGVzdA==', 'text/plain', '9bb97fd2-4410-4a4b-9019-fdd98f01bd7c'),
+       ('6f8cdbe2-9309-41bd-89ce-e136e7c49858', 'attachment4.txt', 'dGVzdA==', 'text/plain', 'f8853893-46a9-4249-a0e5-35d5595efd91'),
+       ('897d81e4-9b56-4fd5-b3cb-a82208089aac', 'attachment5.txt', 'dGVzdA==', 'text/plain', '450970bb-118c-43a8-8813-6b67c2d33a3b'),
+       ('d49aa5d4-fba4-4255-948c-ab449aa2614a', 'attachment6.txt', 'dGVzdA==', 'text/plain', '59eeec4c-81f3-4a96-918e-43a5e08a8ef0'),
+       ('0cf88e2d-c118-4555-998d-2b027b09ffc0', 'attachment7.txt', 'dGVzdA==', 'text/plain', '5c8634f2-078e-4ef0-888b-63cb1aaa0b11'),
+       ('074e60e5-9c4b-465f-8bbf-5cf904eed648', 'attachment8.txt', 'dGVzdA==', 'text/plain', 'bd3d2128-0d5a-457c-8629-0da4ffea85d9'),
+       ('6484b8c1-41e8-4519-8b5c-2868fff67d6b', 'attachment9.txt', 'dGVzdA==', 'text/plain', '4ace2698-7dea-4d0b-9c5d-eeac32c1b49a');

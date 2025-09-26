@@ -21,9 +21,9 @@ paths:
     post:
       tags:
       - Scheduler Resource
-      summary: Trigger update letter statuses task
-      description: Triggers the task that updates letter statuses
-      operationId: updateLetterStatuses
+      summary: Trigger update letter information task
+      description: Triggers the task that updates letter information
+      operationId: updateLetterInformation
       parameters:
       - name: municipalityId
         in: path
