@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 import se.sundsvall.dept44.models.api.paging.PagingAndSortingMetaData;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
@@ -26,15 +27,14 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformat
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 
-public final class LetterMapper {
-
-	private LetterMapper() {}
+@Component
+public class LetterMapper {
 
 	/*
 	 * Methods for mapping API objects to their entity counterparts
 	 */
 
-	public static LetterEntity toLetterEntity(final LetterRequest nullableLetterRequest) {
+	public LetterEntity toLetterEntity(final LetterRequest nullableLetterRequest) {
 		return ofNullable(nullableLetterRequest)
 			.map(letterRequest -> LetterEntity.create()
 				.withBody(letterRequest.body())
@@ -45,7 +45,7 @@ public final class LetterMapper {
 			.orElse(null);
 	}
 
-	public static OrganizationEntity toOrganizationEntity(Organization nullableOrganization, LetterEntity nullableLetterEntity) {
+	public OrganizationEntity toOrganizationEntity(Organization nullableOrganization, LetterEntity nullableLetterEntity) {
 		return ofNullable(nullableOrganization)
 			.map(organization -> OrganizationEntity.create()
 				.withLetters(ofNullable(nullableLetterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
@@ -54,7 +54,7 @@ public final class LetterMapper {
 			.orElse(null);
 	}
 
-	public static UserEntity toUserEntity(String nullableUsername, LetterEntity nullableLetterEntity) {
+	public UserEntity toUserEntity(String nullableUsername, LetterEntity nullableLetterEntity) {
 		return ofNullable(nullableUsername)
 			.map(username -> UserEntity.create()
 				.withLetters(ofNullable(nullableLetterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
@@ -62,7 +62,7 @@ public final class LetterMapper {
 			.orElse(null);
 	}
 
-	public static OrganizationEntity addLetter(OrganizationEntity organizationEntity, LetterEntity nullableLetterEntity) {
+	public OrganizationEntity addLetter(OrganizationEntity organizationEntity, LetterEntity nullableLetterEntity) {
 		if (isNull(organizationEntity.getLetters())) {
 			organizationEntity.setLetters(new ArrayList<>());
 		}
@@ -71,7 +71,7 @@ public final class LetterMapper {
 		return organizationEntity;
 	}
 
-	public static UserEntity addLetter(UserEntity userEntity, LetterEntity nullableLetterEntity) {
+	public UserEntity addLetter(UserEntity userEntity, LetterEntity nullableLetterEntity) {
 		if (isNull(userEntity.getLetters())) {
 			userEntity.setLetters(new ArrayList<>());
 		}
@@ -80,7 +80,7 @@ public final class LetterMapper {
 		return userEntity;
 	}
 
-	public static SupportInformation toSupportInformation(final se.sundsvall.digitalregisteredletter.api.model.SupportInfo nullableSupportInfo) {
+	public SupportInformation toSupportInformation(final se.sundsvall.digitalregisteredletter.api.model.SupportInfo nullableSupportInfo) {
 		return ofNullable(nullableSupportInfo)
 			.map(supportInfo -> SupportInformation.create()
 				.withSupportText(supportInfo.supportText())
@@ -94,7 +94,7 @@ public final class LetterMapper {
 	 * Methods for mapping database entities to their API counterparts
 	 */
 
-	public static Letters toLetters(final Page<LetterEntity> nullablePage) {
+	public Letters toLetters(final Page<LetterEntity> nullablePage) {
 		return ofNullable(nullablePage)
 			.map(page -> LettersBuilder.create()
 				.withMetaData(PagingAndSortingMetaData.create().withPageData(page))
@@ -103,14 +103,14 @@ public final class LetterMapper {
 			.orElse(null);
 	}
 
-	private static List<Letter> toLetterList(final List<LetterEntity> nullableLetterEntities) {
+	private List<Letter> toLetterList(final List<LetterEntity> nullableLetterEntities) {
 		return ofNullable(nullableLetterEntities).orElse(emptyList()).stream()
-			.map(LetterMapper::toLetter)
+			.map(this::toLetter)
 			.filter(Objects::nonNull)
 			.toList();
 	}
 
-	public static Letter toLetter(final LetterEntity nullableLetterEntity) {
+	public Letter toLetter(final LetterEntity nullableLetterEntity) {
 		return ofNullable(nullableLetterEntity)
 			.map(etterEntity -> LetterBuilder.create()
 				.withId(etterEntity.getId())
@@ -126,7 +126,7 @@ public final class LetterMapper {
 			.orElse(null);
 	}
 
-	public static se.sundsvall.digitalregisteredletter.api.model.SupportInfo toSupportInfo(final SupportInformation nullableSupportInformation) {
+	public se.sundsvall.digitalregisteredletter.api.model.SupportInfo toSupportInfo(final SupportInformation nullableSupportInformation) {
 		return ofNullable(nullableSupportInformation)
 			.map(supportInformation -> SupportInfoBuilder.create()
 				.withContactInformationUrl(supportInformation.getContactInformationUrl())
@@ -137,14 +137,14 @@ public final class LetterMapper {
 			.orElse(null);
 	}
 
-	public static List<Letter.Attachment> toLetterAttachments(final List<AttachmentEntity> nullableAttachmentEntities) {
+	public List<Letter.Attachment> toLetterAttachments(final List<AttachmentEntity> nullableAttachmentEntities) {
 		return ofNullable(nullableAttachmentEntities).orElse(emptyList()).stream()
-			.map(LetterMapper::toLetterAttachment)
+			.map(this::toLetterAttachment)
 			.filter(Objects::nonNull)
 			.toList();
 	}
 
-	public static Letter.Attachment toLetterAttachment(final AttachmentEntity nullableAttachmentEntity) {
+	public Letter.Attachment toLetterAttachment(final AttachmentEntity nullableAttachmentEntity) {
 		return ofNullable(nullableAttachmentEntity)
 			.map(attachmentEntity -> AttachmentBuilder.create()
 				.withId(attachmentEntity.getId())
@@ -154,7 +154,15 @@ public final class LetterMapper {
 			.orElse(null);
 	}
 
-	public static void updateSigningInformation(final SigningInformationEntity signingInformation, final RegisteredLetterResponse kivraResponse) {
+	public void updateLetterStatus(final LetterEntity letter, String status) {
+		if (isNull(letter)) {
+			return;
+		}
+
+		ofNullable(status).ifPresent(value -> letter.setStatus(value.toUpperCase()));
+	}
+
+	public void updateSigningInformation(final SigningInformationEntity signingInformation, final RegisteredLetterResponse kivraResponse) {
 		if (anyNull(signingInformation, kivraResponse)) {
 			return;
 		}
@@ -165,7 +173,7 @@ public final class LetterMapper {
 		ofNullable(kivraResponse.bankIdOrder()).ifPresent(value -> updateBankIdOrder(signingInformation, value));
 	}
 
-	private static void updateBankIdOrder(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder bankIdOrder) {
+	private void updateBankIdOrder(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder bankIdOrder) {
 		ofNullable(bankIdOrder.ocspResponse()).ifPresent(signingInformation::setOcspResponse);
 		ofNullable(bankIdOrder.orderRef()).ifPresent(signingInformation::setOrderRef);
 		ofNullable(bankIdOrder.signature()).ifPresent(signingInformation::setSignature);
@@ -174,7 +182,7 @@ public final class LetterMapper {
 		ofNullable(bankIdOrder.stepUp()).ifPresent(value -> signingInformation.setMrtd(value.mrtd()));
 	}
 
-	private static void updateCompletionData(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder.CompletionData completionData) {
+	private void updateCompletionData(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder.CompletionData completionData) {
 		ofNullable(completionData.device()).ifPresent(value -> signingInformation.setIpAddress(value.ipAddress()));
 		ofNullable(completionData.user()).ifPresent(value -> {
 			signingInformation.setGivenName(value.givenName());

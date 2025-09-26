@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
@@ -21,7 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
@@ -29,12 +30,14 @@ import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
-import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
+import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 import se.sundsvall.digitalregisteredletter.service.util.IdentifierUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,12 +52,15 @@ class LetterServiceTest {
 	@Mock
 	private RepositoryIntegration repositoryIntegrationMock;
 
+	@Mock
+	private LetterMapper letterMapperMock;
+
 	@InjectMocks
 	private LetterService letterService;
 
 	@AfterEach
 	void ensureNoInteractionsWereMissed() {
-		verifyNoMoreInteractions(repositoryIntegrationMock, partyIntegrationMock, kivraIntegrationMock);
+		verifyNoMoreInteractions(repositoryIntegrationMock, partyIntegrationMock, kivraIntegrationMock, letterMapperMock);
 	}
 
 	@Test
@@ -130,26 +136,18 @@ class LetterServiceTest {
 	void getLetter() {
 		final var municipalityId = "2281";
 		final var letterId = "12345";
-		final var letterEntity = createLetterEntity();
+		final var letterEntityMock = mock(LetterEntity.class);
+		final var letterMock = mock(Letter.class);
 
-		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntity));
+		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntityMock));
+		when(letterMapperMock.toLetter(letterEntityMock)).thenReturn(letterMock);
 
 		final var result = letterService.getLetter(municipalityId, letterId);
 
-		assertThat(result).isNotNull().isInstanceOf(Letter.class);
-		assertThat(result.id()).isEqualTo(letterEntity.getId());
-		assertThat(result.municipalityId()).isEqualTo(letterEntity.getMunicipalityId());
-		assertThat(result.body()).isEqualTo(letterEntity.getBody());
-		assertThat(result.contentType()).isEqualTo(letterEntity.getContentType());
-		assertThat(result.status()).isEqualTo(letterEntity.getStatus());
-		assertThat(result.attachments()).isNotNull().hasSize(letterEntity.getAttachments().size());
-		assertThat(result.supportInfo()).isNotNull();
-		assertThat(result.supportInfo().supportText()).isEqualTo(letterEntity.getSupportInformation().getSupportText());
-		assertThat(result.supportInfo().contactInformationUrl()).isEqualTo(letterEntity.getSupportInformation().getContactInformationUrl());
-		assertThat(result.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInformation().getContactInformationEmail());
-		assertThat(result.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInformation().getContactInformationPhoneNumber());
+		assertThat(result).isSameAs(letterMock);
 
 		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verifyNoInteractions(letterEntityMock, letterMock);
 	}
 
 	@Test
@@ -166,37 +164,24 @@ class LetterServiceTest {
 		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void getLetters() {
 		final var municipalityId = "2281";
-		final var pageable = mock(Pageable.class);
-		final var letterEntity = createLetterEntity();
-		final var letterFilter = LetterFilterBuilder.create().build();
+		final var letterFilterMock = mock(LetterFilter.class);
+		final var pageableMock = mock(Pageable.class);
+		final var pageMock = mock(Page.class);
+		final var lettersMock = mock(Letters.class);
 
-		when(repositoryIntegrationMock.getPagedLetterEntities(municipalityId, letterFilter, pageable)).thenReturn(new PageImpl<>(List.of(letterEntity)));
+		when(repositoryIntegrationMock.getPagedLetterEntities(municipalityId, letterFilterMock, pageableMock)).thenReturn(pageMock);
+		when(letterMapperMock.toLetters(pageMock)).thenReturn(lettersMock);
 
-		final var result = letterService.getLetters(municipalityId, letterFilter, pageable);
+		final var result = letterService.getLetters(municipalityId, letterFilterMock, pageableMock);
 
-		assertThat(result).isNotNull().isInstanceOf(Letters.class);
-		assertThat(result.metaData()).satisfies(metaData -> {
-			assertThat(metaData.getPage()).isEqualTo(1);
-			assertThat(metaData.getSortDirection()).isNull();
-		});
-		assertThat(result.letters()).hasSize(1).allSatisfy(assertedLetter -> {
-			assertThat(assertedLetter.id()).isEqualTo(letterEntity.getId());
-			assertThat(assertedLetter.municipalityId()).isEqualTo(letterEntity.getMunicipalityId());
-			assertThat(assertedLetter.body()).isEqualTo(letterEntity.getBody());
-			assertThat(assertedLetter.contentType()).isEqualTo(letterEntity.getContentType());
-			assertThat(assertedLetter.status()).isEqualTo(letterEntity.getStatus());
-			assertThat(assertedLetter.attachments()).isNotNull().hasSize(letterEntity.getAttachments().size());
-			assertThat(assertedLetter.supportInfo()).isNotNull();
-			assertThat(assertedLetter.supportInfo().supportText()).isEqualTo(letterEntity.getSupportInformation().getSupportText());
-			assertThat(assertedLetter.supportInfo().contactInformationUrl()).isEqualTo(letterEntity.getSupportInformation().getContactInformationUrl());
-			assertThat(assertedLetter.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInformation().getContactInformationEmail());
-			assertThat(assertedLetter.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInformation().getContactInformationPhoneNumber());
-		});
+		assertThat(result).isSameAs(lettersMock);
 
-		verify(repositoryIntegrationMock).getPagedLetterEntities(municipalityId, letterFilter, pageable);
+		verify(repositoryIntegrationMock).getPagedLetterEntities(municipalityId, letterFilterMock, pageableMock);
+		verifyNoInteractions(letterFilterMock, pageableMock, pageMock, lettersMock);
 	}
 
 }
