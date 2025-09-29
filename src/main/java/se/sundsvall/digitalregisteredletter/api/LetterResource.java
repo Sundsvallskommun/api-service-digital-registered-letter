@@ -1,8 +1,6 @@
 package se.sundsvall.digitalregisteredletter.api;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpHeaders.LOCATION;
-import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -77,11 +75,11 @@ class LetterResource {
 		return ok(letterService.getLetter(municipalityId, letterId));
 	}
 
-	@PostMapping(produces = ALL_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
 	@Operation(summary = "Send letter",
 		description = "Send a digital registered letter using Kivra",
 		responses = @ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
-	ResponseEntity<Void> sendLetter(
+	ResponseEntity<Letter> sendLetter(
 		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@RequestPart(name = "letter") @Schema(description = "LetterRequest as a JSON string", implementation = LetterRequest.class) final String letterString,
 		@RequestPart(name = "letterAttachments") @ValidPdf final List<MultipartFile> files) {
@@ -96,11 +94,9 @@ class LetterResource {
 			.build();
 		validate(attachments);
 
-		final var id = letterService.sendLetter(municipalityId, letterRequest, attachments);
+		final var letter = letterService.sendLetter(municipalityId, letterRequest, attachments);
 
-		return created(fromPath("/{municipalityId}/letters/{letterId}")
-			.buildAndExpand(municipalityId, id).toUri())
-			.header(CONTENT_TYPE, ALL_VALUE)
-			.build();
+		return created(fromPath("/{municipalityId}/letters/{letterId}").buildAndExpand(municipalityId, letter.id()).toUri())
+			.body(letter);
 	}
 }

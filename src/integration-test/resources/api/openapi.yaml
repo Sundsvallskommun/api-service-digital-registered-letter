@@ -83,8 +83,8 @@ paths:
         example: joe01doe
       - name: createdEarliest
         in: query
-        description: Optional filter with format YYYY-MM-DD for matching earliest date
-          when letter was sent
+        description: Optional filter with format YYYY-MM-DD for matching earliest
+          date when letter was sent
         required: false
         schema:
           type: string
@@ -99,8 +99,8 @@ paths:
         required: false
         schema:
           type: string
-          description: Optional filter with format YYYY-MM-DD for matching latest date
-            when letter was sent
+          description: Optional filter with format YYYY-MM-DD for matching latest
+            date when letter was sent
           format: date-time
         example: 2025-09-18
       - name: page
@@ -185,6 +185,10 @@ paths:
               style: simple
               schema:
                 type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Letter"
         "400":
           description: Bad request
           content:
@@ -308,6 +312,10 @@ components:
     Problem:
       type: object
       properties:
+        detail:
+          type: string
+        title:
+          type: string
         instance:
           type: string
           format: uri
@@ -320,18 +328,14 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
-        title:
-          type: string
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -372,6 +376,8 @@ components:
           type: string
         message:
           type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -379,8 +385,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        detail:
-          type: string
         suppressed:
           type: array
           items:
@@ -443,6 +447,10 @@ components:
                 type: boolean
         message:
           type: string
+        detail:
+          type: string
+        title:
+          type: string
         instance:
           type: string
           format: uri
@@ -455,10 +463,6 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
-        title:
-          type: string
         suppressed:
           type: array
           items:
@@ -593,13 +597,6 @@ components:
           description: Content type of the attachment
           example: application/pdf
       description: List of attachments for the letter
-    Direction:
-      type: string
-      description: The sort order direction
-      example: ASC
-      enum:
-      - ASC
-      - DESC
     Letter:
       type: object
       properties:
@@ -639,6 +636,13 @@ components:
             $ref: "#/components/schemas/Attachment"
       description: Digital registered letter response
       readOnly: true
+    Direction:
+      type: string
+      description: The sort order direction
+      example: ASC
+      enum:
+      - ASC
+      - DESC
     Letters:
       type: object
       properties:
