@@ -11,14 +11,19 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
+import se.sundsvall.digitalregisteredletter.integration.db.OrganizationRepository;
+import se.sundsvall.digitalregisteredletter.integration.db.UserRepository;
 
 @WireMockAppTestSuite(files = "classpath:/LetterIT/", classes = Application.class)
 @Sql({
@@ -32,7 +37,23 @@ class LetterIT extends AbstractAppTest {
 	private static final String REQUEST = "request.json";
 
 	@Autowired
+	private PlatformTransactionManager transactionManager;
+
+	private TransactionTemplate transactionTemplate;
+
+	@Autowired
 	private LetterRepository letterRepository;
+
+	@Autowired
+	private OrganizationRepository organizationRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@BeforeEach
+	void setUp() {
+		transactionTemplate = new TransactionTemplate(transactionManager);
+	}
 
 	@Test
 	void test01_getLetter() {
@@ -56,7 +77,11 @@ class LetterIT extends AbstractAppTest {
 
 	@Test
 	void test03_sendLetter() throws FileNotFoundException {
-		final var initialLetterSize = letterRepository.count();
+		final var initialLetterSize = transactionTemplate.execute(status -> {
+			assertThat(organizationRepository.findByNumber(44)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(3));
+			assertThat(userRepository.findByUsernameIgnoreCase("joe01doe")).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(7));
+			return letterRepository.count();
+		});
 
 		final var headers = setupCall()
 			.withServicePath("/2281/letters")
@@ -73,7 +98,11 @@ class LetterIT extends AbstractAppTest {
 
 		assertThat(headers.get(LOCATION)).isNotNull();
 
-		assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly successfully sent letter)
+		transactionTemplate.executeWithoutResult(status -> {
+			assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly successfully sent letter)
+			assertThat(organizationRepository.findByNumber(44)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(4));
+			assertThat(userRepository.findByUsernameIgnoreCase("joe01doe")).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(8));
+		});
 	}
 
 	@Test
