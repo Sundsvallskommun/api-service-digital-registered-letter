@@ -2,6 +2,7 @@ package se.sundsvall.digitalregisteredletter.integration.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -9,7 +10,6 @@ import static org.mockito.Mockito.when;
 import static se.sundsvall.TestDataFactory.createAttachments;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -28,6 +28,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 import se.sundsvall.digitalregisteredletter.service.mapper.AttachmentMapper;
+import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 
 @ExtendWith(MockitoExtension.class)
 class RepositoryIntegrationTest {
@@ -36,16 +37,28 @@ class RepositoryIntegrationTest {
 	private AttachmentMapper attachmentMapperMock;
 
 	@Mock
-	private LetterRepository letterRepositoryMock;
+	private LetterMapper letterMapperMock;
 
 	@Mock
-	private LetterEntity letterEntityMock;
+	private LetterRepository letterRepositoryMock;
 
 	@Mock
 	private OrganizationRepository organizationRepositoryMock;
 
 	@Mock
 	private UserRepository userRepositoryMock;
+
+	@Mock
+	private AttachmentEntity attachmentEntityMock;
+
+	@Mock
+	private LetterEntity letterEntityMock;
+
+	@Mock
+	private OrganizationEntity organizationEntityMock;
+
+	@Mock
+	private UserEntity userEntityMock;
 
 	@InjectMocks
 	private RepositoryIntegration repositoryIntegration;
@@ -56,102 +69,95 @@ class RepositoryIntegrationTest {
 	@AfterEach
 	void tearDown() {
 		verifyNoMoreInteractions(
+			attachmentMapperMock,
 			letterEntityMock,
+			letterMapperMock,
 			letterRepositoryMock,
 			organizationRepositoryMock,
-			userRepositoryMock);
+			userRepositoryMock,
+			attachmentEntityMock,
+			letterEntityMock,
+			organizationEntityMock,
+			userEntityMock);
 	}
 
 	@Test
 	void persistLetterWhenOrganizationAndUserExist() {
 		final var municipalityId = "2281";
 		final var username = "username";
-		final var letterId = "letterId";
 		final var letterRequest = createLetterRequest();
 		final var attachments = createAttachments();
 
-		final var attachmentEntity = AttachmentEntity.create();
-		final var existingLetterEntity = LetterEntity.create()
-			.withId("existingLetterId");
-		final var organizationEntity = OrganizationEntity.create()
-			.withId("organizationId")
-			.withLetters(new ArrayList<>(List.of(existingLetterEntity)));
-		final var userEntity = UserEntity.create()
-			.withId("userId")
-			.withLetters(new ArrayList<>(List.of(existingLetterEntity)));
-
-		when(attachmentMapperMock.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntity));
-		when(organizationRepositoryMock.findByNumber(234)).thenReturn(Optional.of(organizationEntity));
-		when(userRepositoryMock.findByUsernameIgnoreCase(username)).thenReturn(Optional.of(userEntity));
-		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0, LetterEntity.class).withId(letterId));
+		when(letterMapperMock.toLetterEntity(letterRequest)).thenReturn(letterEntityMock);
+		when(letterMapperMock.addLetter(organizationEntityMock, letterEntityMock)).thenReturn(organizationEntityMock);
+		when(letterMapperMock.addLetter(userEntityMock, letterEntityMock)).thenReturn(userEntityMock);
+		when(attachmentMapperMock.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntityMock));
+		when(organizationRepositoryMock.findByNumber(anyInt())).thenReturn(Optional.of(organizationEntityMock));
+		when(userRepositoryMock.findByUsernameIgnoreCase(any())).thenReturn(Optional.of(userEntityMock));
+		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+		when(letterEntityMock.withAttachments(List.of(attachmentEntityMock))).thenReturn(letterEntityMock);
+		when(letterEntityMock.withMunicipalityId(municipalityId)).thenReturn(letterEntityMock);
+		when(letterEntityMock.withStatus(any())).thenReturn(letterEntityMock);
 
 		final var response = repositoryIntegration.persistLetter(municipalityId, username, letterRequest, attachments);
 
+		verify(letterMapperMock).toLetterEntity(letterRequest);
+		verify(letterMapperMock).addLetter(organizationEntityMock, letterEntityMock);
+		verify(letterMapperMock).addLetter(userEntityMock, letterEntityMock);
+		verify(letterMapperMock).toOrganizationEntity(letterRequest.organization(), letterEntityMock);
+		verify(letterMapperMock).toUserEntity(username, letterEntityMock);
 		verify(attachmentMapperMock).toAttachmentEntities(attachments);
-		verify(letterRepositoryMock).save(letterEntityArgumentCaptor.capture());
 		verify(organizationRepositoryMock).findByNumber(234);
 		verify(userRepositoryMock).findByUsernameIgnoreCase(username);
+		verify(letterRepositoryMock).save(letterEntityMock);
+		verify(letterEntityMock).withAttachments(List.of(attachmentEntityMock));
+		verify(letterEntityMock).withMunicipalityId(municipalityId);
+		verify(letterEntityMock).withStatus("NEW");
+		verify(letterEntityMock).setOrganization(organizationEntityMock);
+		verify(letterEntityMock).setUser(userEntityMock);
 
-		final var capturedLetterEntity = letterEntityArgumentCaptor.getValue();
-		assertThat(response).isNotNull().extracting(LetterEntity::getId).isEqualTo(letterId);
-		assertThat(capturedLetterEntity).isNotNull();
-		assertThat(capturedLetterEntity.getMunicipalityId()).isEqualTo(municipalityId);
-		assertThat(capturedLetterEntity.getAttachments()).containsExactly(attachmentEntity);
-		assertThat(capturedLetterEntity.getUser()).isEqualTo(userEntity);
-		assertThat(capturedLetterEntity.getUser()).satisfies(assertedUserEntity -> {
-			assertThat(assertedUserEntity.getId()).isEqualTo("userId");
-			assertThat(assertedUserEntity.getLetters()).hasSize(2)
-				.containsExactlyInAnyOrder(existingLetterEntity, capturedLetterEntity);
-		});
-		assertThat(capturedLetterEntity.getOrganization()).isEqualTo(organizationEntity);
-		assertThat(capturedLetterEntity.getOrganization()).satisfies(assertedOrganizationEntity -> {
-			assertThat(assertedOrganizationEntity.getId()).isEqualTo("organizationId");
-			assertThat(assertedOrganizationEntity.getLetters()).hasSize(2)
-				.containsExactlyInAnyOrder(existingLetterEntity, capturedLetterEntity);
-		});
+		assertThat(response).isEqualTo(letterEntityMock);
 	}
 
 	@Test
 	void persistLetterWhenOrganizationAndUserDoesNotExist() {
-		final var letterId = "letterId";
 		final var municipalityId = "2281";
 		final var username = "username";
 		final var letterRequest = createLetterRequest();
 		final var attachments = createAttachments();
 
-		final var attachmentEntity = AttachmentEntity.create()
-			.withContentType("application/pdf")
-			.withFileName("attachment.pdf");
+		when(letterMapperMock.toLetterEntity(letterRequest)).thenReturn(letterEntityMock);
+		when(letterMapperMock.toOrganizationEntity(any(), any())).thenCallRealMethod();
+		when(letterMapperMock.toUserEntity(any(), any())).thenCallRealMethod();
+		when(attachmentMapperMock.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntityMock));
 
-		when(attachmentMapperMock.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntity));
-		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0, LetterEntity.class).withId(letterId));
+		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0, LetterEntity.class));
+		when(letterEntityMock.withAttachments(List.of(attachmentEntityMock))).thenReturn(letterEntityMock);
+		when(letterEntityMock.withMunicipalityId(municipalityId)).thenReturn(letterEntityMock);
+		when(letterEntityMock.withStatus(any())).thenReturn(letterEntityMock);
 
 		final var response = repositoryIntegration.persistLetter(municipalityId, username, letterRequest, attachments);
 
+		verify(letterMapperMock).toLetterEntity(letterRequest);
+		verify(letterMapperMock).toOrganizationEntity(letterRequest.organization(), letterEntityMock);
+		verify(letterMapperMock).toUserEntity(username, letterEntityMock);
+		verify(letterMapperMock).toOrganizationEntity(letterRequest.organization(), letterEntityMock);
+		verify(letterMapperMock).toUserEntity(username, letterEntityMock);
+		verify(letterMapperMock, never()).addLetter(any(OrganizationEntity.class), any());
+		verify(letterMapperMock, never()).addLetter(any(UserEntity.class), any());
 		verify(attachmentMapperMock).toAttachmentEntities(attachments);
-		verify(letterRepositoryMock).save(letterEntityArgumentCaptor.capture());
 		verify(organizationRepositoryMock).findByNumber(234);
 		verify(userRepositoryMock).findByUsernameIgnoreCase(username);
+		verify(letterRepositoryMock).save(letterEntityMock);
+		verify(letterEntityMock).withAttachments(List.of(attachmentEntityMock));
+		verify(letterEntityMock).withMunicipalityId(municipalityId);
+		verify(letterEntityMock).withStatus("NEW");
+		verify(letterEntityMock, never()).setOrganization(organizationEntityMock);
+		verify(letterEntityMock, never()).setUser(userEntityMock);
+		verify(letterEntityMock).setOrganization(any());
+		verify(letterEntityMock).setUser(any());
 
-		final var capturedLetterEntity = letterEntityArgumentCaptor.getValue();
-		assertThat(response).isNotNull().extracting(LetterEntity::getId).isEqualTo(letterId);
-		assertThat(capturedLetterEntity).isNotNull();
-		assertThat(capturedLetterEntity.getMunicipalityId()).isEqualTo(municipalityId);
-		assertThat(capturedLetterEntity.getAttachments()).containsExactly(attachmentEntity);
-		assertThat(capturedLetterEntity.getUser()).isNotNull();
-		assertThat(capturedLetterEntity.getUser()).satisfies(assertedUserEntity -> {
-			assertThat(assertedUserEntity.getId()).isNull();
-			assertThat(assertedUserEntity.getUsername()).isEqualTo(username);
-			assertThat(assertedUserEntity.getLetters()).hasSize(1)
-				.contains(capturedLetterEntity);
-		});
-		assertThat(capturedLetterEntity.getOrganization()).isNotNull();
-		assertThat(capturedLetterEntity.getOrganization()).satisfies(assertedOrganizationEntity -> {
-			assertThat(assertedOrganizationEntity.getId()).isNull();
-			assertThat(assertedOrganizationEntity.getNumber()).isEqualTo(234);
-			assertThat(assertedOrganizationEntity.getLetters()).hasSize(1)
-				.contains(capturedLetterEntity);
-		});
+		assertThat(response).isEqualTo(letterEntityMock);
 	}
 
 	@Test

@@ -31,7 +31,7 @@ class SchedulerResourceTest {
 			.exchange()
 			.expectStatus().isOk();
 
-		verify(schedulerWorker).updateLetterStatuses();
+		verify(schedulerWorker).updateLetterInformation();
 	}
 
 }

@@ -23,12 +23,12 @@
 			},
 			"attachments": [
 				{
-					"id": "1",
+					"id": "186fd449-e757-4add-badf-4835fc9e1cee",
 					"fileName": "attachment1.txt",
 					"contentType": "text/plain"
 				},
 				{
-					"id": "2",
+					"id": "d922ba6b-89f3-4640-b823-a5d8f0fbd94b",
 					"fileName": "attachment2.txt",
 					"contentType": "text/plain"
 				}
@@ -50,7 +50,7 @@
 			},
 			"attachments": [
 				{
-					"id": "9",
+					"id": "6484b8c1-41e8-4519-8b5c-2868fff67d6b",
 					"fileName": "attachment9.txt",
 					"contentType": "text/plain"
 				}
@@ -72,7 +72,7 @@
 			},
 			"attachments": [
 				{
-					"id": "7",
+					"id": "0cf88e2d-c118-4555-998d-2b027b09ffc0",
 					"fileName": "attachment7.txt",
 					"contentType": "text/plain"
 				}
@@ -94,7 +94,7 @@
 			},
 			"attachments": [
 				{
-					"id": "8",
+					"id": "074e60e5-9c4b-465f-8bbf-5cf904eed648",
 					"fileName": "attachment8.txt",
 					"contentType": "text/plain"
 				}
@@ -116,7 +116,7 @@
 			},
 			"attachments": [
 				{
-					"id": "4",
+					"id": "6f8cdbe2-9309-41bd-89ce-e136e7c49858",
 					"fileName": "attachment4.txt",
 					"contentType": "text/plain"
 				}
