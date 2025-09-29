@@ -44,14 +44,14 @@ public class LetterService {
 		final var status = kivraIntegration.sendContent(letterEntity, legalId); // Send letter to Kivra
 		repositoryIntegration.updateStatus(letterEntity, status); // Update entity with status from Kivra response
 
-		return toLetter(letterEntity);
+		return letterMapper.toLetter(letterEntity);
 	}
 
 	public Letter getLetter(final String municipalityId, final String letterId) {
 		final var letterEntity = repositoryIntegration.getLetterEntity(municipalityId, letterId)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 
-		return toLetter(letterEntity);
+		return letterMapper.toLetter(letterEntity);
 	}
 
 	public Letters getLetters(final String municipalityId, final LetterFilter filter, final Pageable pageable) {

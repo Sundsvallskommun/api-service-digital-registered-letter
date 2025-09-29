@@ -74,36 +74,27 @@ class LetterServiceTest {
 			.withFiles(List.of(multipartFile))
 			.build();
 		final var letterEntity = createLetterEntity();
-
+		final var letterMock = mock(Letter.class);
 		final var status = "status";
 
 		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(legalId);
 		when(repositoryIntegrationMock.persistLetter(any(), any(), any(), any())).thenReturn(letterEntity);
 		when(kivraIntegrationMock.sendContent(letterEntity, legalId)).thenReturn(status);
+		when(letterMapperMock.toLetter(letterEntity)).thenReturn(letterMock);
 
 		try (final MockedStatic<IdentifierUtil> identifierUtilMock = mockStatic(IdentifierUtil.class)) {
 			identifierUtilMock.when(IdentifierUtil::getAdUser).thenReturn(username);
 
 			final var response = letterService.sendLetter(municipalityId, letterRequest, attachments);
 
-			assertThat(response).isNotNull().isInstanceOf(Letter.class);
-			assertThat(response.id()).isEqualTo(letterEntity.getId());
-			assertThat(response.municipalityId()).isEqualTo(letterEntity.getMunicipalityId());
-			assertThat(response.body()).isEqualTo(letterEntity.getBody());
-			assertThat(response.contentType()).isEqualTo(letterEntity.getContentType());
-			assertThat(response.status()).isEqualTo(letterEntity.getStatus());
-			assertThat(response.attachments()).isNotNull().hasSize(letterEntity.getAttachments().size());
-			assertThat(response.supportInfo()).isNotNull();
-			assertThat(response.supportInfo().supportText()).isEqualTo(letterEntity.getSupportInformation().getSupportText());
-			assertThat(response.supportInfo().contactInformationUrl()).isEqualTo(letterEntity.getSupportInformation().getContactInformationUrl());
-			assertThat(response.supportInfo().contactInformationEmail()).isEqualTo(letterEntity.getSupportInformation().getContactInformationEmail());
-			assertThat(response.supportInfo().contactInformationPhoneNumber()).isEqualTo(letterEntity.getSupportInformation().getContactInformationPhoneNumber());
+			assertThat(response).isEqualTo(letterMock);
 
 			identifierUtilMock.verify(IdentifierUtil::getAdUser);
 			verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
 			verify(repositoryIntegrationMock).persistLetter(municipalityId, username, letterRequest, attachments);
 			verify(kivraIntegrationMock).sendContent(letterEntity, legalId);
 			verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
+			verifyNoInteractions(letterMock);
 			identifierUtilMock.verifyNoMoreInteractions();
 		}
 	}
