@@ -1,9 +1,12 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME;
+
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 import se.sundsvall.digitalregisteredletter.support.Builder;
 
 @Builder
@@ -22,9 +25,9 @@ public record Letter(
 
 	@Schema(description = "Content type of the letter body", example = "text/html") String contentType,
 
-	@Schema(description = "When the letter was sent", example = "2023-10-09T12:34:56+00:00") OffsetDateTime created,
+	@Schema(description = "When the letter was sent", example = "2023-10-09T12:34:56+00:00") @DateTimeFormat(iso = DATE_TIME) OffsetDateTime created,
 
-	@Schema(description = "When the letter was last updated", example = "2023-10-09T12:34:56+00:00") OffsetDateTime updated,
+	@Schema(description = "When the letter was last updated", example = "2023-10-09T12:34:56+00:00") @DateTimeFormat(iso = DATE_TIME) OffsetDateTime updated,
 
 	@Schema(description = "Support information for the letter") SupportInfo supportInfo,
 

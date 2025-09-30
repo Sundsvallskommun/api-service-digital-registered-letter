@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import se.sundsvall.digitalregisteredletter.api.model.Attachments;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.DeviceBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
@@ -12,8 +13,12 @@ import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.LettersBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
 import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfoBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.StepUpBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfo;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.UserBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
@@ -74,6 +79,29 @@ public class TestDataFactory {
 
 	public static Letters createLetters() {
 		return LettersBuilder.create()
+			.build();
+	}
+
+	public static SigningInfo createSigningInfo() {
+		return SigningInfoBuilder.create()
+			.withContentKey("contentKey")
+			.withDevice(DeviceBuilder.create()
+				.withIpAddress("ipAddress")
+				.build())
+			.withOcspResponse("ocspResponse")
+			.withOrderRef("orderRef")
+			.withSignature("signature")
+			.withSigned(NOW)
+			.withStatus("status")
+			.withStepUp(StepUpBuilder.create()
+				.withMrtd(true)
+				.build())
+			.withUser(UserBuilder.create()
+				.withGivenName("givenName")
+				.withName("name")
+				.withPersonalIdentityNumber("ersonalIdentityNumber")
+				.withSurname("surname")
+				.build())
 			.build();
 	}
 

@@ -32,9 +32,11 @@ import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
@@ -153,6 +155,59 @@ class LetterServiceTest {
 			.hasMessage("Not Found: Letter with id '%s' and municipalityId '%s' not found", letterId, municipalityId);
 
 		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+	}
+
+	@Test
+	void getSigningInformation() {
+		final var municipalityId = "2281";
+		final var letterId = "12345";
+		final var letterEntityMock = mock(LetterEntity.class);
+		final var signingInformationEntityMock = mock(SigningInformationEntity.class);
+		final var signingInfoMock = mock(SigningInfo.class);
+
+		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntityMock));
+		when(letterEntityMock.getSigningInformation()).thenReturn(signingInformationEntityMock);
+		when(letterMapperMock.toSigningInfo(signingInformationEntityMock)).thenReturn(signingInfoMock);
+
+		final var result = letterService.getSigningInformation(municipalityId, letterId);
+
+		assertThat(result).isSameAs(signingInfoMock);
+
+		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verify(letterMapperMock).toSigningInfo(signingInformationEntityMock);
+		verify(letterEntityMock).getSigningInformation();
+		verifyNoMoreInteractions(letterEntityMock, signingInformationEntityMock, signingInfoMock);
+	}
+
+	@Test
+	void getSigningInformationForMissingLetter() {
+		final var municipalityId = "2281";
+		final var letterId = "12345";
+
+		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> letterService.getSigningInformation(municipalityId, letterId))
+			.isInstanceOf(Problem.class)
+			.hasMessage("Not Found: Letter with id '%s' and municipalityId '%s' not found", letterId, municipalityId);
+
+		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+	}
+
+	@Test
+	void getSigningInformationNotFound() {
+		final var municipalityId = "2281";
+		final var letterId = "12345";
+
+		final var letterEntityMock = mock(LetterEntity.class);
+
+		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntityMock));
+
+		assertThatThrownBy(() -> letterService.getSigningInformation(municipalityId, letterId))
+			.isInstanceOf(Problem.class)
+			.hasMessage("Not Found: Signing information beloning to letter with id '%s' and municipalityId '%s' not found", letterId, municipalityId);
+
+		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verify(letterMapperMock).toSigningInfo(null);
 	}
 
 	@SuppressWarnings("unchecked")

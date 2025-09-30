@@ -13,6 +13,7 @@ import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.TestDataFactory.createLetter;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createLetters;
+import static se.sundsvall.TestDataFactory.createSigningInfo;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.service.LetterService;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
@@ -105,6 +107,25 @@ class LetterResourceTest {
 			.expectStatus().isNotFound();
 
 		verify(letterServiceMock).getLetter(MUNICIPALITY_ID, letterId);
+	}
+
+	@Test
+	void getSigningInfo_OK() {
+		final var signingInfoResponse = createSigningInfo();
+		final var letterId = "1234567890";
+
+		when(letterServiceMock.getSigningInformation(MUNICIPALITY_ID, letterId)).thenReturn(signingInfoResponse);
+
+		final var response = webTestClient.get()
+			.uri("/%s/letters/%s/signinginfo".formatted(MUNICIPALITY_ID, letterId))
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(SigningInfo.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).usingRecursiveComparison().isEqualTo(signingInfoResponse);
+		verify(letterServiceMock).getSigningInformation(MUNICIPALITY_ID, letterId);
 	}
 
 	@Test

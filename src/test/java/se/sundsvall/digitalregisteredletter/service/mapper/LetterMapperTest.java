@@ -21,6 +21,8 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageImpl;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfoBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
@@ -371,6 +373,13 @@ class LetterMapperTest {
 		verifyNoInteractions(responseMock, entityMock);
 	}
 
+	/**
+	 * Method for validating that mapper works as expected when mapping different combinations of RegisteredLetterResponse
+	 * data to SigningInformationEntity data
+	 *
+	 * @param entity         object to use in test
+	 * @param expectedResult object to verify mapping result against
+	 */
 	@ParameterizedTest
 	@MethodSource("updateSigningInformationParameterProvider")
 	void updateSigningInformation(RegisteredLetterResponse response, SigningInformationEntity expectedResult) {
@@ -529,5 +538,133 @@ class LetterMapperTest {
 					.withName(name)
 					.withPersonalNumber(personalNumber)
 					.withSurname(surname)));
+	}
+
+	/**
+	 * Method for validating that mapper works as expected when mapping different combinations of SigningInformationEntity
+	 * data to SigningInfo data
+	 *
+	 * @param entity         object to use in test
+	 * @param expectedResult object to verify map result against
+	 */
+	@ParameterizedTest
+	@MethodSource("toSigningInfoParameterProvider")
+	void toSigningInfo(SigningInformationEntity entity, SigningInfo expectedResult) {
+		assertThat(letterMapper.toSigningInfo(entity)).usingRecursiveAssertion().isEqualTo(expectedResult);
+	}
+
+	private static Stream<Arguments> toSigningInfoParameterProvider() {
+		final var contentKey = "contentKey";
+		final var signed = OffsetDateTime.now();
+		final var status = "status";
+		final var ocspResponse = "ocspResponse";
+		final var orderRef = "orderRef";
+		final var signature = "signature";
+		final var mrtd = true;
+		final var ipAddress = "ipAddress";
+		final var givenName = "givenName";
+		final var name = "name";
+		final var personalNumber = "personalNumber";
+		final var surname = "surname";
+
+		return Stream.of(
+			// Null response
+			Arguments.of(null, null),
+
+			// Empty response
+			Arguments.of(SigningInformationEntity.create(), SigningInfoBuilder.create().build()),
+
+			// Response with values on top level
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withContentKey(contentKey)
+					.withOcspResponse(ocspResponse)
+					.withOrderRef(orderRef)
+					.withSignature(signature)
+					.withSigned(signed)
+					.withStatus(status),
+				SigningInfoBuilder.create()
+					.withContentKey(contentKey)
+					.withOcspResponse(ocspResponse)
+					.withOrderRef(orderRef)
+					.withSignature(signature)
+					.withSigned(signed)
+					.withStatus(status).build()),
+
+			// Response with values for step up section
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withMrtd(mrtd),
+				SigningInfoBuilder.create()
+					.withStepUp(se.sundsvall.digitalregisteredletter.api.model.StepUpBuilder.create()
+						.withMrtd(mrtd)
+						.build())
+					.build()),
+
+			// Response with values for device section
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withIpAddress(ipAddress),
+				SigningInfoBuilder.create()
+					.withDevice(se.sundsvall.digitalregisteredletter.api.model.DeviceBuilder.create()
+						.withIpAddress(ipAddress)
+						.build())
+					.build()),
+
+			// Response with all values set for signatory user section
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withGivenName(givenName)
+					.withName(name)
+					.withPersonalNumber(personalNumber)
+					.withSurname(surname),
+				SigningInfoBuilder.create()
+					.withUser(se.sundsvall.digitalregisteredletter.api.model.UserBuilder.create()
+						.withGivenName(givenName)
+						.withName(name)
+						.withPersonalIdentityNumber(personalNumber)
+						.withSurname(surname)
+						.build())
+					.build()),
+
+			// Response with only value for given name set for signatory user section
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withGivenName(givenName),
+				SigningInfoBuilder.create()
+					.withUser(se.sundsvall.digitalregisteredletter.api.model.UserBuilder.create()
+						.withGivenName(givenName)
+						.build())
+					.build()),
+
+			// Response with only value for name set for signatory user section
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withName(name),
+				SigningInfoBuilder.create()
+					.withUser(se.sundsvall.digitalregisteredletter.api.model.UserBuilder.create()
+						.withName(name)
+						.build())
+					.build()),
+
+			// Response with only value for personal identity number set for signatory user section
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withPersonalNumber(personalNumber),
+				SigningInfoBuilder.create()
+					.withUser(se.sundsvall.digitalregisteredletter.api.model.UserBuilder.create()
+						.withPersonalIdentityNumber(personalNumber)
+						.build())
+					.build()),
+
+			// Response with only value for surname set for signatory user section
+			Arguments.of(
+				SigningInformationEntity.create()
+					.withSurname(surname),
+				SigningInfoBuilder.create()
+					.withUser(se.sundsvall.digitalregisteredletter.api.model.UserBuilder.create()
+						.withSurname(surname)
+						.build())
+					.build()));
 	}
 }

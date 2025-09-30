@@ -77,6 +77,24 @@ class LetterResourceFailureTest {
 	}
 
 	@Test
+	void getSigningInfo_badMunicipalityId_badRequest() {
+		final var letterId = "1234567890";
+
+		final var response = webTestClient.get()
+			.uri("/%s/letters/%s/signinginfo".formatted("bad-municipality-id", letterId))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::getField, Violation::getMessage)
+			.containsExactlyInAnyOrder(tuple("getSigningInformation.municipalityId", "not a valid municipality ID"));
+	}
+
+	@Test
 	void sendLetter_badMunicipalityId_badRequest() {
 		final var createLetterRequest = createLetterRequest();
 

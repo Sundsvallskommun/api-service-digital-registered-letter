@@ -36,6 +36,7 @@ import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.api.validation.ValidPdf;
 import se.sundsvall.digitalregisteredletter.service.LetterService;
 
@@ -73,6 +74,15 @@ class LetterResource {
 	})
 	ResponseEntity<Letter> getLetter(@PathVariable @ValidMunicipalityId final String municipalityId, @PathVariable final String letterId) {
 		return ok(letterService.getLetter(municipalityId, letterId));
+	}
+
+	@GetMapping(value = "/{letterId}/signinginfo", produces = APPLICATION_JSON_VALUE)
+	@Operation(summary = "Get signing information", description = "Retrieves signing information connected to letter matching provided id", responses = {
+		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true),
+		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+	})
+	ResponseEntity<SigningInfo> getSigningInformation(@PathVariable @ValidMunicipalityId final String municipalityId, @PathVariable final String letterId) {
+		return ok(letterService.getSigningInformation(municipalityId, letterId));
 	}
 
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)

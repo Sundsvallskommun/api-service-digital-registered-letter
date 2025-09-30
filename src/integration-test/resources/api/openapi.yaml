@@ -5,7 +5,7 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.1"
+  version: "2.2"
 servers:
 - url: http://localhost:8080
   description: Generated server url
@@ -248,6 +248,52 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /{municipalityId}/letters/{letterId}/signinginfo:
+    get:
+      tags:
+      - Letter Resource
+      summary: Get signing information
+      description: Retrieves signing information connected to letter matching provided
+        id
+      operationId: getSigningInformation
+      parameters:
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: letterId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful Operation - OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SigningInfo"
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/eligibility/kivra:
     get:
       tags:
@@ -312,10 +358,6 @@ components:
     Problem:
       type: object
       properties:
-        detail:
-          type: string
-        title:
-          type: string
         instance:
           type: string
           format: uri
@@ -328,6 +370,10 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
     StatusType:
       type: object
       properties:
@@ -376,8 +422,6 @@ components:
           type: string
         message:
           type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -385,6 +429,8 @@ components:
           type: object
           additionalProperties:
             type: object
+        detail:
+          type: string
         suppressed:
           type: array
           items:
@@ -447,10 +493,6 @@ components:
                 type: boolean
         message:
           type: string
-        detail:
-          type: string
-        title:
-          type: string
         instance:
           type: string
           format: uri
@@ -463,6 +505,10 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
         suppressed:
           type: array
           items:
@@ -698,6 +744,80 @@ components:
         sortDirection:
           $ref: "#/components/schemas/Direction"
       description: PagingAndSortingMetaData model
+      readOnly: true
+    Device:
+      type: object
+      properties:
+        ipAddress:
+          type: string
+          description: Ip address used when the letter was signed
+          readOnly: true
+      description: Information regarding the device used for the signing order
+      readOnly: true
+    SigningInfo:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the signing order
+          readOnly: true
+        signed:
+          type: string
+          description: Timestamp when the letter was signed by receiving party
+          format: date-time
+          readOnly: true
+        contentKey:
+          type: string
+          description: The unique Kivra id for the signing order
+          readOnly: true
+        orderRef:
+          type: string
+          description: Order reference in Kivra for the signing order
+          readOnly: true
+        signature:
+          type: string
+          description: The signature made by the receiving party
+          readOnly: true
+        ocspResponse:
+          type: string
+          description: Online certificate status protocol for the signing order
+          readOnly: true
+        user:
+          $ref: "#/components/schemas/User"
+        device:
+          $ref: "#/components/schemas/Device"
+        stepUp:
+          $ref: "#/components/schemas/StepUp"
+    StepUp:
+      type: object
+      properties:
+        mrtd:
+          type: boolean
+          description: Whether an MRTD check was performed before the order was completed
+          readOnly: true
+      description: Information about possible additional verifications that were part
+        of the signing order
+      readOnly: true
+    User:
+      type: object
+      properties:
+        personalIdentityNumber:
+          type: string
+          description: Personal identity number for the signing party
+          readOnly: true
+        name:
+          type: string
+          description: Full name of the signing party
+          readOnly: true
+        givenName:
+          type: string
+          description: Last name of the signing party
+          readOnly: true
+        surname:
+          type: string
+          description: First name of the signing party
+          readOnly: true
+      description: Information regarding the signing party
       readOnly: true
     EligibilityRequest:
       type: object
