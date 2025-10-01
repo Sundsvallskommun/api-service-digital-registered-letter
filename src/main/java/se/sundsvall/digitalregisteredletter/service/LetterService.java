@@ -30,7 +30,7 @@ public class LetterService {
 		final KivraIntegration kivraIntegration,
 		final PartyIntegration partyIntegration,
 		final RepositoryIntegration repositoryIntegration,
-		final se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper letterMapper) {
+		final LetterMapper letterMapper) {
 
 		this.kivraIntegration = kivraIntegration;
 		this.partyIntegration = partyIntegration;
@@ -67,6 +67,6 @@ public class LetterService {
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 
 		return ofNullable(letterMapper.toSigningInfo(letterEntity.getSigningInformation()))
-			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Signing information beloning to letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Signing information belonging to letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 	}
 }

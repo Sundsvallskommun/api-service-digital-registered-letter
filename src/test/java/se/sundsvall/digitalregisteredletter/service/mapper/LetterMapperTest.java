@@ -377,12 +377,12 @@ class LetterMapperTest {
 	 * Method for validating that mapper works as expected when mapping different combinations of RegisteredLetterResponse
 	 * data to SigningInformationEntity data
 	 *
-	 * @param entity         object to use in test
+	 * @param response       object to use in test
 	 * @param expectedResult object to verify mapping result against
 	 */
 	@ParameterizedTest
 	@MethodSource("updateSigningInformationParameterProvider")
-	void updateSigningInformation(RegisteredLetterResponse response, SigningInformationEntity expectedResult) {
+	void updateSigningInformation(final RegisteredLetterResponse response, final SigningInformationEntity expectedResult) {
 		final var entity = SigningInformationEntity.create();
 		letterMapper.updateSigningInformation(entity, response);
 
@@ -549,7 +549,7 @@ class LetterMapperTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("toSigningInfoParameterProvider")
-	void toSigningInfo(SigningInformationEntity entity, SigningInfo expectedResult) {
+	void toSigningInfo(final SigningInformationEntity entity, final SigningInfo expectedResult) {
 		assertThat(letterMapper.toSigningInfo(entity)).usingRecursiveAssertion().isEqualTo(expectedResult);
 	}
 

@@ -204,7 +204,7 @@ class LetterServiceTest {
 
 		assertThatThrownBy(() -> letterService.getSigningInformation(municipalityId, letterId))
 			.isInstanceOf(Problem.class)
-			.hasMessage("Not Found: Signing information beloning to letter with id '%s' and municipalityId '%s' not found", letterId, municipalityId);
+			.hasMessage("Not Found: Signing information belonging to letter with id '%s' and municipalityId '%s' not found", letterId, municipalityId);
 
 		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
 		verify(letterMapperMock).toSigningInfo(null);

@@ -22,6 +22,7 @@ import se.sundsvall.digitalregisteredletter.api.model.UserBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.PartsResponsiveBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterBuilder;
@@ -105,8 +106,8 @@ public class TestDataFactory {
 			.build();
 	}
 
-	public static se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation createSupportInformationEmbeddable() {
-		return se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation.create()
+	public static SupportInformation createSupportInformationEmbeddable() {
+		return SupportInformation.create()
 			.withSupportText("Support text")
 			.withContactInformationUrl("https://example.com/support")
 			.withContactInformationEmail("support@email.com")

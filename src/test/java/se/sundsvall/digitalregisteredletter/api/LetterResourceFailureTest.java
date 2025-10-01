@@ -57,7 +57,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("getLetter.municipalityId", "not a valid municipality ID"));
+			.containsExactly(tuple("getLetter.municipalityId", "not a valid municipality ID"));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("getLetters.municipalityId", "not a valid municipality ID"));
+			.containsExactly(tuple("getLetters.municipalityId", "not a valid municipality ID"));
 	}
 
 	@Test
@@ -91,7 +91,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("getSigningInformation.municipalityId", "not a valid municipality ID"));
+			.containsExactly(tuple("getSigningInformation.municipalityId", "not a valid municipality ID"));
 	}
 
 	@Test
@@ -116,7 +116,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("sendLetter.municipalityId", "not a valid municipality ID"));
+			.containsExactly(tuple("sendLetter.municipalityId", "not a valid municipality ID"));
 	}
 
 	@Test
@@ -168,7 +168,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("files", "no duplicate file names allowed in the list of files"));
+			.containsExactly(tuple("files", "no duplicate file names allowed in the list of files"));
 	}
 
 	@Test
@@ -192,7 +192,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("sendLetter.files", "content type must be application/pdf"));
+			.containsExactly(tuple("sendLetter.files", "content type must be application/pdf"));
 	}
 
 	@Test
