@@ -3,9 +3,11 @@ package se.sundsvall.digitalregisteredletter.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
@@ -15,6 +17,7 @@ import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createLetters;
 import static se.sundsvall.TestDataFactory.createSigningInfo;
 
+import java.io.OutputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,6 +32,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
+import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
@@ -154,5 +158,57 @@ class LetterResourceTest {
 
 		assertThat(response).usingRecursiveComparison().isEqualTo(letterResponse);
 		verify(letterServiceMock).sendLetter(any(), any(), any());
+	}
+
+	@Test
+	void downloadLetterAttachment_OK() {
+		final var letterId = "11111111-1111-1111-1111-111111111111";
+		final var attachmentId = "22222222-2222-2222-2222-222222222222";
+		final var bytes = "some-random-content".getBytes();
+
+		when(letterServiceMock.getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId))
+			.thenReturn(new Attachment(attachmentId, "file.pdf", "application/pdf"));
+
+		doAnswer(invocation -> {
+			final var output = (OutputStream) invocation.getArgument(3);
+			output.write(bytes);
+			output.flush();
+			return null;
+		}).when(letterServiceMock)
+			.writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
+
+		final var responseBytes = webTestClient.get()
+			.uri("/%s/letters/%s/attachments/%s".formatted(MUNICIPALITY_ID, letterId, attachmentId))
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(APPLICATION_PDF)
+			.expectHeader().valueMatches("Content-Disposition", ".*attachment;.*file\\.pdf.*")
+			.expectBody(byte[].class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(responseBytes).isNotNull();
+		assertThat(responseBytes).isEqualTo(bytes);
+
+		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
+		verify(letterServiceMock).writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
+	}
+
+	@Test
+	void downloadLetterAttachment_fallbackContentType() {
+		final var letterId = "11111111-1111-1111-1111-111111111111";
+		final var attachmentId = "22222222-2222-2222-2222-222222222222";
+
+		when(letterServiceMock.getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId))
+			.thenReturn(new Attachment(attachmentId, "some.file", "invalid-content-type"));
+
+		webTestClient.get()
+			.uri("/%s/letters/%s/attachments/%s".formatted(MUNICIPALITY_ID, letterId, attachmentId))
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(APPLICATION_OCTET_STREAM);
+
+		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
+		verify(letterServiceMock).writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
 	}
 }

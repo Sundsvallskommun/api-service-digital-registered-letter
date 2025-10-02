@@ -1,6 +1,7 @@
 package se.sundsvall.digitalregisteredletter.apptest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -9,6 +10,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -166,6 +168,17 @@ class LetterIT extends AbstractAppTest {
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(OK)
 			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test08_downloadLetterAttachment() throws IOException {
+		setupCall()
+			.withServicePath("/2281/letters/9bb97fd2-4410-4a4b-9019-fdd98f01bd7c/attachments/5a70a27f-997e-431e-9155-cc50d01e80c5")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponseHeader(CONTENT_TYPE, List.of("application/pdf"))
+			.withExpectedBinaryResponse("attachment.pdf")
 			.sendRequestAndVerifyResponse();
 	}
 }
