@@ -317,16 +317,14 @@ class LetterServiceTest {
 			.withContentType("text/plain")
 			.withContent(new SerialBlob(bytes));
 
-		final var letterEntity = createLetterEntity().withAttachments(List.of(attachmentEntity));
-
-		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntity));
+		when(repositoryIntegrationMock.getAttachmentEntity(municipalityId, letterId, attachmentId)).thenReturn(Optional.of(attachmentEntity));
 
 		final var output = new ByteArrayOutputStream();
 
 		letterService.writeAttachmentContent(municipalityId, letterId, attachmentId, output);
 
 		assertThat(output.toByteArray()).isEqualTo(bytes);
-		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verify(repositoryIntegrationMock).getAttachmentEntity(municipalityId, letterId, attachmentId);
 	}
 
 	@Test
@@ -341,9 +339,7 @@ class LetterServiceTest {
 			.withContentType("text/plain")
 			.withContent(null);
 
-		final var letterEntity = createLetterEntity().withAttachments(List.of(attachmentEntity));
-
-		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntity));
+		when(repositoryIntegrationMock.getAttachmentEntity(municipalityId, letterId, attachmentId)).thenReturn(Optional.of(attachmentEntity));
 
 		final var output = new ByteArrayOutputStream();
 
@@ -351,6 +347,6 @@ class LetterServiceTest {
 			.isInstanceOf(Problem.class)
 			.hasMessageContaining("No content for attachment with id '%s'".formatted(attachmentId));
 
-		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verify(repositoryIntegrationMock).getAttachmentEntity(municipalityId, letterId, attachmentId);
 	}
 }

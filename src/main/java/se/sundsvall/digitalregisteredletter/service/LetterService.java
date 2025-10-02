@@ -106,13 +106,7 @@ public class LetterService {
 	}
 
 	private AttachmentEntity getAttachmentEntity(final String municipalityId, final String letterId, final String attachmentId) {
-		final var letter = getLetterEntity(municipalityId, letterId);
-
-		return ofNullable(letter.getAttachments())
-			.orElse(emptyList())
-			.stream()
-			.filter(attachmentEntity -> attachmentEntity.getId().equals(attachmentId))
-			.findFirst()
+		return repositoryIntegration.getAttachmentEntity(municipalityId, letterId, attachmentId)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Attachment with id '%s' not found in letter '%s'".formatted(attachmentId, letterId)));
 	}
 

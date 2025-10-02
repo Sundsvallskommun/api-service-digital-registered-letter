@@ -15,8 +15,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,6 +33,9 @@ class RepositoryIntegrationTest {
 
 	@Mock
 	private AttachmentMapper attachmentMapperMock;
+
+	@Mock
+	private AttachmentRepository attachmentRepositoryMock;
 
 	@Mock
 	private LetterMapper letterMapperMock;
@@ -63,13 +64,11 @@ class RepositoryIntegrationTest {
 	@InjectMocks
 	private RepositoryIntegration repositoryIntegration;
 
-	@Captor
-	private ArgumentCaptor<LetterEntity> letterEntityArgumentCaptor;
-
 	@AfterEach
 	void tearDown() {
 		verifyNoMoreInteractions(
 			attachmentMapperMock,
+			attachmentRepositoryMock,
 			letterEntityMock,
 			letterMapperMock,
 			letterRepositoryMock,
@@ -218,5 +217,21 @@ class RepositoryIntegrationTest {
 		verify(letterRepositoryMock).findById(letterId);
 		verify(letterEntityMock, never()).setDeleted(true);
 		verify(letterRepositoryMock, never()).save(letterEntityMock);
+	}
+
+	@Test
+	void getAttachmentEntity() {
+		final var attachmentId = "attachmentId";
+		final var letterId = "letterId";
+		final var municipalityId = "municipalityId";
+
+		when(attachmentRepositoryMock.findByIdAndLetterIdAndLetter_MunicipalityId(attachmentId, letterId, municipalityId))
+			.thenReturn(Optional.of(attachmentEntityMock));
+
+		assertThat(repositoryIntegration.getAttachmentEntity(municipalityId, letterId, attachmentId))
+			.isPresent()
+			.contains(attachmentEntityMock);
+
+		verify(attachmentRepositoryMock).findByIdAndLetterIdAndLetter_MunicipalityId(attachmentId, letterId, municipalityId);
 	}
 }

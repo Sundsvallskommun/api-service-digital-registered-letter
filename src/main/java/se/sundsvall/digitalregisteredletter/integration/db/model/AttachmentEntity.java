@@ -7,7 +7,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Blob;
 import java.util.Objects;
@@ -31,6 +33,10 @@ public class AttachmentEntity {
 	@Lob
 	@Column(name = "content", columnDefinition = "longblob")
 	private Blob content;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "letter_id", nullable = false, updatable = false, insertable = false)
+	private LetterEntity letter;
 
 	public static AttachmentEntity create() {
 		return new AttachmentEntity();
