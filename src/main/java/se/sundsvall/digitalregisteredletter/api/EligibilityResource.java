@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
@@ -38,9 +40,11 @@ class EligibilityResource {
 		this.eligibilityService = eligibilityService;
 	}
 
-	@GetMapping("/kivra")
+	@PostMapping("/kivra")
 	@Operation(summary = "Check if the given partyIds are eligible for receiving digital registered letters with Kivra", description = "Returns a list of party IDs that are eligible for Kivra based on the provided municipality ID and party IDs")
-	ResponseEntity<List<String>> checkKivraEligibility(@ValidMunicipalityId @PathVariable final String municipalityId, final EligibilityRequest request) {
+	ResponseEntity<List<String>> checkKivraEligibility(
+		@ValidMunicipalityId @PathVariable final String municipalityId,
+		@RequestBody @Valid final EligibilityRequest request) {
 		return ok(eligibilityService.checkEligibility(municipalityId, request));
 	}
 

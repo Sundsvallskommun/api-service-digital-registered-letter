@@ -7,8 +7,8 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.3"
 servers:
-- url: http://localhost:8080
-  description: Generated server url
+  - url: http://localhost:63688
+    description: Generated server url
 tags:
   - name: Scheduler Resource
     description: Manually trigger scheduled tasks
@@ -203,6 +203,50 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /{municipalityId}/eligibility/kivra:
+    post:
+      tags:
+        - Eligibility Resource
+      summary: Check if the given partyIds are eligible for receiving digital registered
+        letters with Kivra
+      description: Returns a list of party IDs that are eligible for Kivra based on
+        the provided municipality ID and party IDs
+      operationId: checkKivraEligibility
+      parameters:
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/letters/{letterId}:
     get:
       tags:
@@ -228,52 +272,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Letter"
-        "404":
-          description: Not Found
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-  /{municipalityId}/letters/{letterId}/signinginfo:
-    get:
-      tags:
-        - Letter Resource
-      summary: Get signing information
-      description: Retrieves signing information connected to letter matching provided
-        id
-      operationId: getSigningInformation
-      parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: letterId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Successful Operation - OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SigningInfo"
         "404":
           description: Not Found
           content:
@@ -345,35 +343,38 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-  /{municipalityId}/eligibility/kivra:
+  /{municipalityId}/letters/{letterId}/signinginfo:
     get:
       tags:
-        - Eligibility Resource
-      summary: Check if the given partyIds are eligible for receiving digital registered
-        letters with Kivra
-      description: Returns a list of party IDs that are eligible for Kivra based on
-        the provided municipality ID and party IDs
-      operationId: checkKivraEligibility
+        - Letter Resource
+      summary: Get signing information
+      description: Retrieves signing information connected to letter matching provided
+        id
+      operationId: getSigningInformation
       parameters:
         - name: municipalityId
           in: path
           required: true
           schema:
             type: string
-        - name: request
-          in: query
+        - name: letterId
+          in: path
           required: true
           schema:
-            $ref: "#/components/schemas/EligibilityRequest"
+            type: string
       responses:
         "200":
-          description: Successful operation
+          description: Successful Operation - OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                $ref: "#/components/schemas/SigningInfo"
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
@@ -409,12 +410,6 @@ components:
     Problem:
       type: object
       properties:
-        status:
-          $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -425,6 +420,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
     StatusType:
       type: object
       properties:
@@ -473,8 +474,6 @@ components:
           type: string
         message:
           type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -482,6 +481,8 @@ components:
           type: object
           additionalProperties:
             type: object
+        detail:
+          type: string
         suppressed:
           type: array
           items:
@@ -544,12 +545,6 @@ components:
                 type: boolean
         message:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -560,6 +555,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
         suppressed:
           type: array
           items:
@@ -733,6 +734,14 @@ components:
             $ref: "#/components/schemas/Attachment"
       description: Digital registered letter response
       readOnly: true
+    EligibilityRequest:
+      type: object
+      properties:
+        partyIds:
+          type: array
+          items:
+            type: string
+      description: Eligibility request model
     Direction:
       type: string
       description: The sort order direction
@@ -870,11 +879,4 @@ components:
           readOnly: true
       description: Information regarding the signing party
       readOnly: true
-    EligibilityRequest:
-      type: object
-      properties:
-        partyIds:
-          type: array
-          items:
-            type: string
   securitySchemes: {}

@@ -50,7 +50,9 @@ public class LetterService {
 
 	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final Attachments attachments) {
 		final var username = IdentifierUtil.getAdUser();
-		final var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId()); // Verify that match for party in request exists as there is no point in persisting entity otherwise
+		final var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId())
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND,
+				"No legalId found for partyId '%s' and municipalityId '%s'".formatted(letterRequest.partyId(), municipalityId))); // Verify that match for party in request exists as there is no point in persisting entity otherwise
 
 		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, username, letterRequest, attachments); // Create a new entity in database for the letter
 		final var status = kivraIntegration.sendContent(letterEntity, legalId); // Send letter to Kivra
