@@ -35,9 +35,9 @@ public record SigningInfo(
 
 		@Schema(description = "Full name of the signing party", accessMode = READ_ONLY) String name,
 
-		@Schema(description = "Last name of the signing party", accessMode = READ_ONLY) String givenName,
+		@Schema(description = "First name of the signing party", accessMode = READ_ONLY) String givenName,
 
-		@Schema(description = "First name of the signing party", accessMode = READ_ONLY) String surname) {
+		@Schema(description = "Last name of the signing party", accessMode = READ_ONLY) String surname) {
 	}
 
 	@Builder

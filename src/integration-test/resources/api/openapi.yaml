@@ -1,35 +1,35 @@
 openapi: 3.0.1
 info:
   title: digital-registered-letter
-  contact: {}
+  contact: { }
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "2.2"
 servers:
-- url: http://localhost:8080
-  description: Generated server url
+  - url: http://localhost:53989
+    description: Generated server url
 tags:
-- name: Scheduler Resource
-  description: Manually trigger scheduled tasks
-- name: Letter Resource
-  description: Send and manage digital registered letters
-- name: Eligibility Resource
-  description: Check eligibility for sending digital registered letters
+  - name: Scheduler Resource
+    description: Manually trigger scheduled tasks
+  - name: Letter Resource
+    description: Send and manage digital registered letters
+  - name: Eligibility Resource
+    description: Check eligibility for sending digital registered letters
 paths:
   /{municipalityId}/scheduler:
     post:
       tags:
-      - Scheduler Resource
+        - Scheduler Resource
       summary: Trigger update letter information task
       description: Triggers the task that updates letter information
       operationId: updateLetterInformation
       parameters:
-      - name: municipalityId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -39,8 +39,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: "#/components/schemas/Problem"
-                - $ref: "#/components/schemas/ConstraintViolationProblem"
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -50,84 +50,84 @@ paths:
   /{municipalityId}/letters:
     get:
       tags:
-      - Letter Resource
+        - Letter Resource
       summary: Get all letters
       description: "Retrieves all letters for a municipality. Response is possible\
         \ to filter by any combination of department id, username, earliest and latest\
         \ created date."
       operationId: getLetters
       parameters:
-      - name: municipalityId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: orgId
-        in: query
-        description: Optional filter for matching organization id
-        required: false
-        schema:
-          type: integer
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: orgId
+          in: query
           description: Optional filter for matching organization id
-          format: int32
+          required: false
+          schema:
+            type: integer
+            description: Optional filter for matching organization id
+            format: int32
+            example: 44
           example: 44
-        example: 44
-      - name: username
-        in: query
-        description: Optional filter for matching username
-        required: false
-        schema:
-          type: string
+        - name: username
+          in: query
           description: Optional filter for matching username
+          required: false
+          schema:
+            type: string
+            description: Optional filter for matching username
+            example: joe01doe
           example: joe01doe
-        example: joe01doe
-      - name: createdEarliest
-        in: query
-        description: Optional filter with format YYYY-MM-DD for matching earliest
-          date when letter was sent
-        required: false
-        schema:
-          type: string
+        - name: createdEarliest
+          in: query
           description: Optional filter with format YYYY-MM-DD for matching earliest
             date when letter was sent
-          format: date-time
-        example: 2025-08-18
-      - name: createdLatest
-        in: query
-        description: Optional filter with format YYYY-MM-DD for matching latest date
-          when letter was sent
-        required: false
-        schema:
-          type: string
-          description: Optional filter with format YYYY-MM-DD for matching latest
-            date when letter was sent
-          format: date-time
-        example: 2025-09-18
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          minimum: 0
-          type: integer
-          default: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          minimum: 1
-          type: integer
-          default: 20
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          items:
+          required: false
+          schema:
             type: string
+            description: Optional filter with format YYYY-MM-DD for matching earliest
+              date when letter was sent
+            format: date-time
+          example: 2025-08-18
+        - name: createdLatest
+          in: query
+          description: Optional filter with format YYYY-MM-DD for matching latest date
+            when letter was sent
+          required: false
+          schema:
+            type: string
+            description: Optional filter with format YYYY-MM-DD for matching latest
+              date when letter was sent
+            format: date-time
+          example: 2025-09-18
+        - name: page
+          in: query
+          description: Zero-based page index (0..N)
+          required: false
+          schema:
+            minimum: 0
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: The size of the page to be returned
+          required: false
+          schema:
+            minimum: 1
+            type: integer
+            default: 20
+        - name: sort
+          in: query
+          description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -141,8 +141,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: "#/components/schemas/Problem"
-                - $ref: "#/components/schemas/ConstraintViolationProblem"
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -151,23 +151,23 @@ paths:
                 $ref: "#/components/schemas/Problem"
     post:
       tags:
-      - Letter Resource
+        - Letter Resource
       summary: Send letter
       description: Send a digital registered letter using Kivra
       operationId: sendLetter
       parameters:
-      - name: municipalityId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           multipart/form-data:
             schema:
               required:
-              - letter
-              - letterAttachments
+                - letter
+                - letterAttachments
               type: object
               properties:
                 letter:
@@ -195,8 +195,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: "#/components/schemas/Problem"
-                - $ref: "#/components/schemas/ConstraintViolationProblem"
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -206,21 +206,21 @@ paths:
   /{municipalityId}/letters/{letterId}:
     get:
       tags:
-      - Letter Resource
+        - Letter Resource
       summary: Get letter
       description: Retrieves a letter by id
       operationId: getLetter
       parameters:
-      - name: municipalityId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: letterId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: letterId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -240,8 +240,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: "#/components/schemas/Problem"
-                - $ref: "#/components/schemas/ConstraintViolationProblem"
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -251,22 +251,22 @@ paths:
   /{municipalityId}/letters/{letterId}/signinginfo:
     get:
       tags:
-      - Letter Resource
+        - Letter Resource
       summary: Get signing information
       description: Retrieves signing information connected to letter matching provided
         id
       operationId: getSigningInformation
       parameters:
-      - name: municipalityId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: letterId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: letterId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -286,8 +286,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: "#/components/schemas/Problem"
-                - $ref: "#/components/schemas/ConstraintViolationProblem"
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -297,23 +297,23 @@ paths:
   /{municipalityId}/eligibility/kivra:
     get:
       tags:
-      - Eligibility Resource
+        - Eligibility Resource
       summary: Check if the given partyIds are eligible for receiving digital registered
         letters with Kivra
       description: Returns a list of party IDs that are eligible for Kivra based on
         the provided municipality ID and party IDs
       operationId: checkKivraEligibility
       parameters:
-      - name: municipalityId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: request
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/EligibilityRequest"
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: request
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/EligibilityRequest"
       responses:
         "200":
           description: Successful operation
@@ -329,8 +329,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: "#/components/schemas/Problem"
-                - $ref: "#/components/schemas/ConstraintViolationProblem"
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -340,7 +340,7 @@ paths:
   /api-docs:
     get:
       tags:
-      - API
+        - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -358,6 +358,12 @@ components:
     Problem:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/StatusType"
+        title:
+          type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -368,12 +374,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
-        title:
-          type: string
     StatusType:
       type: object
       properties:
@@ -422,6 +422,8 @@ components:
           type: string
         message:
           type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -429,8 +431,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        detail:
-          type: string
         suppressed:
           type: array
           items:
@@ -493,6 +493,12 @@ components:
                 type: boolean
         message:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
+        title:
+          type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -503,12 +509,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
-        title:
-          type: string
         suppressed:
           type: array
           items:
@@ -551,12 +551,12 @@ components:
           type: string
     LetterRequest:
       required:
-      - body
-      - contentType
-      - organization
-      - partyId
-      - subject
-      - supportInfo
+        - body
+        - contentType
+        - organization
+        - partyId
+        - subject
+        - supportInfo
       type: object
       properties:
         partyId:
@@ -584,8 +584,8 @@ components:
       description: LetterRequest as a JSON string
     Organization:
       required:
-      - name
-      - number
+        - name
+        - number
       type: object
       properties:
         number:
@@ -601,10 +601,10 @@ components:
       description: Information regarding the organizational unit sending the letter
     SupportInfo:
       required:
-      - contactInformationEmail
-      - contactInformationPhoneNumber
-      - contactInformationUrl
-      - supportText
+        - contactInformationEmail
+        - contactInformationPhoneNumber
+        - contactInformationUrl
+        - supportText
       type: object
       properties:
         supportText:
@@ -687,8 +687,8 @@ components:
       description: The sort order direction
       example: ASC
       enum:
-      - ASC
-      - DESC
+        - ASC
+        - DESC
     Letters:
       type: object
       properties:
@@ -811,11 +811,11 @@ components:
           readOnly: true
         givenName:
           type: string
-          description: Last name of the signing party
+          description: First name of the signing party
           readOnly: true
         surname:
           type: string
-          description: First name of the signing party
+          description: Last name of the signing party
           readOnly: true
       description: Information regarding the signing party
       readOnly: true
@@ -826,4 +826,4 @@ components:
           type: array
           items:
             type: string
-  securitySchemes: {}
+  securitySchemes: { }
