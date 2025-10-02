@@ -1,7 +1,10 @@
 package se.sundsvall.digitalregisteredletter.api;
 
+import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpHeaders.LOCATION;
+import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.http.ResponseEntity.created;
@@ -16,9 +19,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +35,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
+import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
@@ -83,6 +92,37 @@ class LetterResource {
 	})
 	ResponseEntity<SigningInfo> getSigningInformation(@PathVariable @ValidMunicipalityId final String municipalityId, @PathVariable final String letterId) {
 		return ok(letterService.getSigningInformation(municipalityId, letterId));
+	}
+
+	@GetMapping(value = "/{letterId}/attachments/{attachmentId}", produces = ALL_VALUE)
+	@Operation(summary = "Downloads letter attachment content", description = "Retrieves attachment content by id", responses = {
+		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", content = @Content(mediaType = ALL_VALUE, schema = @Schema(type = "string", format = "binary"))),
+		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+	})
+	ResponseEntity<StreamingResponseBody> downloadLetterAttachment(@PathVariable @ValidMunicipalityId final String municipalityId, @PathVariable @ValidUuid final String letterId, @PathVariable @ValidUuid final String attachmentId) {
+		final var attachment = letterService.getLetterAttachment(municipalityId, letterId, attachmentId);
+
+		final StreamingResponseBody contentStream = output -> letterService.writeAttachmentContent(
+			municipalityId, letterId, attachmentId, output);
+
+		final var contentType = ofNullable(attachment.contentType())
+			.map(type -> {
+				try {
+					return MediaType.parseMediaType(type);
+				} catch (InvalidMediaTypeException e) {
+					return APPLICATION_OCTET_STREAM;
+				}
+			})
+			.orElse(APPLICATION_OCTET_STREAM);
+
+		final var contentDisposition = ContentDisposition.attachment()
+			.filename(ofNullable(attachment.fileName()).orElse("attachment"), StandardCharsets.UTF_8)
+			.build();
+
+		return ok()
+			.headers(headers -> headers.setContentDisposition(contentDisposition))
+			.contentType(contentType)
+			.body(contentStream);
 	}
 
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)

@@ -11,6 +11,7 @@ import se.sundsvall.digitalregisteredletter.api.model.Attachments;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
+import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
@@ -21,6 +22,7 @@ import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 public class RepositoryIntegration {
 
 	private final AttachmentMapper attachmentMapper;
+	private final AttachmentRepository attachmentRepository;
 	private final LetterRepository letterRepository;
 	private final OrganizationRepository organizationRepository;
 	private final UserRepository userRepository;
@@ -28,12 +30,14 @@ public class RepositoryIntegration {
 
 	public RepositoryIntegration(
 		final AttachmentMapper attachmentMapper,
+		final AttachmentRepository attachmentRepository,
 		final LetterRepository letterRepository,
 		final OrganizationRepository organizationRepository,
 		final UserRepository userRepository,
 		final LetterMapper letterMapper) {
 
 		this.attachmentMapper = attachmentMapper;
+		this.attachmentRepository = attachmentRepository;
 		this.letterRepository = letterRepository;
 		this.organizationRepository = organizationRepository;
 		this.userRepository = userRepository;
@@ -139,5 +143,17 @@ public class RepositoryIntegration {
 				letterEntity.setDeleted(true);
 				letterRepository.save(letterEntity);
 			});
+	}
+
+	/**
+	 * Method returns an optional attachment entity matching municipality id, letter id and attachment id
+	 *
+	 * @param  municipalityId municipality id to match against
+	 * @param  letterId       letter id to match against
+	 * @param  attachmentId   attachment id to match against
+	 * @return                an optional attachment entity (or optional empty if not found)
+	 */
+	public Optional<AttachmentEntity> getAttachmentEntity(final String municipalityId, final String letterId, final String attachmentId) {
+		return attachmentRepository.findByIdAndLetterIdAndLetter_MunicipalityId(attachmentId, letterId, municipalityId);
 	}
 }

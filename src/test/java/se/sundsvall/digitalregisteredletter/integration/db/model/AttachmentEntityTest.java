@@ -42,7 +42,7 @@ class AttachmentEntityTest {
 		assertThat(attachmentEntity.getContentType()).isEqualTo(contentType);
 		assertThat(attachmentEntity.getContent()).isEqualTo(content);
 
-		assertThat(attachmentEntity).hasNoNullFieldsOrProperties();
+		assertThat(attachmentEntity).hasNoNullFieldsOrPropertiesExcept("letter");
 	}
 
 	@Test

@@ -1,5 +1,6 @@
 package se.sundsvall.digitalregisteredletter.service;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,8 +14,12 @@ import static org.mockito.Mockito.when;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import javax.sql.rowset.serial.SerialBlob;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +35,7 @@ import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
+import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
@@ -108,9 +114,7 @@ class LetterServiceTest {
 		final var letterRequest = createLetterRequest();
 		final var attachments = AttachmentsBuilder.create()
 			.build();
-		AttachmentEntity.create()
-			.withContentType("application/pdf")
-			.withFileName("attachment.pdf");
+
 		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenThrow(Problem.valueOf(Status.BAD_REQUEST, "The given partyId [%s] does not exist in the Party API or is not of type PRIVATE".formatted(letterRequest
 			.partyId())));
 
@@ -230,4 +234,119 @@ class LetterServiceTest {
 		verifyNoInteractions(letterFilterMock, pageableMock, pageMock, lettersMock);
 	}
 
+	@Test
+	void getLetterAttachment() {
+		final var municipalityId = "2281";
+		final var letterId = "1234";
+		final var attachmentId = "5678";
+
+		final var letterEntityMock = mock(LetterEntity.class);
+		final var attachment = new Letter.Attachment(attachmentId, "file.txt", "text/plain");
+		final var letter = LetterBuilder.create()
+			.withAttachments(List.of(attachment))
+			.build();
+
+		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntityMock));
+		when(letterMapperMock.toLetter(letterEntityMock)).thenReturn(letter);
+
+		final var result = letterService.getLetterAttachment(municipalityId, letterId, attachmentId);
+
+		assertThat(result).isSameAs(attachment);
+
+		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verify(letterMapperMock).toLetter(letterEntityMock);
+		verifyNoInteractions(letterEntityMock);
+	}
+
+	@Test
+	void getLetterAttachmentNotFound() {
+		final var municipalityId = "2281";
+		final var letterId = "1234";
+		final var attachmentId = "5678";
+
+		final var letterEntityMock = mock(LetterEntity.class);
+		final var letter = LetterBuilder.create()
+			.withAttachments(emptyList())
+			.build();
+
+		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntityMock));
+		when(letterMapperMock.toLetter(letterEntityMock)).thenReturn(letter);
+
+		assertThatThrownBy(() -> letterService.getLetterAttachment(municipalityId, letterId, attachmentId))
+			.isInstanceOf(Problem.class)
+			.hasMessageContaining("Not Found");
+
+		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verify(letterMapperMock).toLetter(letterEntityMock);
+		verifyNoInteractions(letterEntityMock);
+	}
+
+	@Test
+	void getLetterAttachmentNotFound_whenNullAttachments() {
+		final var municipalityId = "2281";
+		final var letterId = "1234";
+		final var attachmentId = "5678";
+
+		final var letterEntityMock = mock(LetterEntity.class);
+		final var letter = LetterBuilder.create()
+			.withAttachments(null)
+			.build();
+
+		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntityMock));
+		when(letterMapperMock.toLetter(letterEntityMock)).thenReturn(letter);
+
+		assertThatThrownBy(() -> letterService.getLetterAttachment(municipalityId, letterId, attachmentId))
+			.isInstanceOf(Problem.class)
+			.hasMessageContaining("Not Found");
+
+		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+		verify(letterMapperMock).toLetter(letterEntityMock);
+		verifyNoInteractions(letterEntityMock);
+	}
+
+	@Test
+	void writeAttachmentContent() throws SQLException {
+		final var municipalityId = "2281";
+		final var letterId = "1234";
+		final var attachmentId = "5678";
+		final var bytes = "some content".getBytes(StandardCharsets.UTF_8);
+
+		final var attachmentEntity = AttachmentEntity.create()
+			.withId(attachmentId)
+			.withFileName("file.txt")
+			.withContentType("text/plain")
+			.withContent(new SerialBlob(bytes));
+
+		when(repositoryIntegrationMock.getAttachmentEntity(municipalityId, letterId, attachmentId)).thenReturn(Optional.of(attachmentEntity));
+
+		final var output = new ByteArrayOutputStream();
+
+		letterService.writeAttachmentContent(municipalityId, letterId, attachmentId, output);
+
+		assertThat(output.toByteArray()).isEqualTo(bytes);
+		verify(repositoryIntegrationMock).getAttachmentEntity(municipalityId, letterId, attachmentId);
+	}
+
+	@Test
+	void writeAttachmentContent_throwsIfNoContent() {
+		final var municipalityId = "2281";
+		final var letterId = "1234";
+		final var attachmentId = "5678";
+
+		final var attachmentEntity = AttachmentEntity.create()
+			.withId(attachmentId)
+			.withFileName("file.txt")
+			.withContentType("text/plain")
+			.withContent(null);
+
+		when(repositoryIntegrationMock.getAttachmentEntity(municipalityId, letterId, attachmentId)).thenReturn(Optional.of(attachmentEntity));
+
+		final var output = new ByteArrayOutputStream();
+
+		assertThatThrownBy(() -> letterService.writeAttachmentContent(municipalityId, letterId, attachmentId, output))
+			.isInstanceOf(Problem.class)
+			.hasMessageContaining("No content for attachment with id '%s'".formatted(attachmentId));
+
+		verify(repositoryIntegrationMock).getAttachmentEntity(municipalityId, letterId, attachmentId);
+	}
 }

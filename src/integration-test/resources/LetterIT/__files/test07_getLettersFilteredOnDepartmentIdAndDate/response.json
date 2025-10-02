@@ -48,6 +48,11 @@
 					"id": "3109456a-ba3a-4ad3-a100-4762ef32ae0c",
 					"fileName": "attachment3.txt",
 					"contentType": "text/plain"
+				},
+				{
+					"id": "5a70a27f-997e-431e-9155-cc50d01e80c5",
+					"fileName": "attachment.pdf",
+					"contentType": "application/pdf"
 				}
 			]
 		}
