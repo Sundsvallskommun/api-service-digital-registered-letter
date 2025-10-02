@@ -25,7 +25,7 @@ public class EligibilityService {
 
 		request.partyIds().forEach(party -> {
 			var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, party);
-			partyIdAndLegalIdMap.put(party, legalId);
+			legalId.ifPresent(legalId1 -> partyIdAndLegalIdMap.put(party, legalId1));
 		});
 
 		var legalIds = partyIdAndLegalIdMap.values().stream().toList();

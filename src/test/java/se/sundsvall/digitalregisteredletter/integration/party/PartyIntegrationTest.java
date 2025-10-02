@@ -1,7 +1,6 @@
 package se.sundsvall.digitalregisteredletter.integration.party;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
 
 @ExtendWith(MockitoExtension.class)
 class PartyIntegrationTest {
@@ -35,13 +33,13 @@ class PartyIntegrationTest {
 	void getLegalIdByPartyId() {
 		var municipalityId = "2281";
 		var partyId = "8d9745ee-f5f3-4edf-ad4c-0cda28dd18a6";
-		var legalId = "199901011234";
+		var optionalLegalId = Optional.of("199901011234");
 
-		when(partyClient.getLegalIdByPartyId(municipalityId, PartyType.PRIVATE, partyId)).thenReturn(Optional.of(legalId));
+		when(partyClient.getLegalIdByPartyId(municipalityId, PartyType.PRIVATE, partyId)).thenReturn(optionalLegalId);
 
 		var result = partyIntegration.getLegalIdByPartyId(municipalityId, partyId);
 
-		assertThat(result).isEqualTo(legalId);
+		assertThat(result).isEqualTo(optionalLegalId);
 		verify(partyClient).getLegalIdByPartyId(municipalityId, PartyType.PRIVATE, partyId);
 	}
 
@@ -52,10 +50,9 @@ class PartyIntegrationTest {
 
 		when(partyClient.getLegalIdByPartyId(municipalityId, PartyType.PRIVATE, partyId)).thenReturn(Optional.empty());
 
-		assertThatThrownBy(() -> partyIntegration.getLegalIdByPartyId(municipalityId, partyId))
-			.isInstanceOf(Problem.class)
-			.hasMessage("Bad Request: The given partyId [%s] does not exist in the Party API or is not of type PRIVATE".formatted(partyId));
+		var result = partyIntegration.getLegalIdByPartyId(municipalityId, partyId);
 
+		assertThat(result).isEmpty();
 		verify(partyClient).getLegalIdByPartyId(municipalityId, PartyType.PRIVATE, partyId);
 	}
 

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,7 +36,7 @@ class EligibilityServiceTest {
 		var legalId = "1234567890";
 		var legalIds = List.of(legalId);
 
-		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, partyId)).thenReturn(legalId);
+		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, partyId)).thenReturn(Optional.of(legalId));
 		when(kivraIntegrationMock.checkEligibility(legalIds)).thenReturn(legalIds);
 
 		var result = eligibilityService.checkEligibility(municipalityId, request);

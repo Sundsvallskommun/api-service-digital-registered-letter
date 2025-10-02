@@ -85,7 +85,7 @@ class LetterServiceTest {
 		final var letterMock = mock(Letter.class);
 		final var status = "status";
 
-		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(legalId);
+		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(Optional.of(legalId));
 		when(repositoryIntegrationMock.persistLetter(any(), any(), any(), any())).thenReturn(letterEntity);
 		when(kivraIntegrationMock.sendContent(letterEntity, legalId)).thenReturn(status);
 		when(letterMapperMock.toLetter(letterEntity)).thenReturn(letterMock);
