@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.3"
 servers:
-  - url: http://localhost:63688
+  - url: http://localhost:51198
     description: Generated server url
 tags:
   - name: Scheduler Resource
@@ -292,6 +292,52 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /{municipalityId}/letters/{letterId}/signinginfo:
+    get:
+      tags:
+        - Letter Resource
+      summary: Get signing information
+      description: Retrieves signing information connected to letter matching provided
+        id
+      operationId: getSigningInformation
+      parameters:
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: letterId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful Operation - OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SigningInfo"
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/letters/{letterId}/attachments/{attachmentId}:
     get:
       tags:
@@ -319,56 +365,10 @@ paths:
         "200":
           description: Successful Operation - OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: string
                 format: binary
-        "404":
-          description: Not Found
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-  /{municipalityId}/letters/{letterId}/signinginfo:
-    get:
-      tags:
-        - Letter Resource
-      summary: Get signing information
-      description: Retrieves signing information connected to letter matching provided
-        id
-      operationId: getSigningInformation
-      parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: letterId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Successful Operation - OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SigningInfo"
         "404":
           description: Not Found
           content:
@@ -879,4 +879,4 @@ components:
           readOnly: true
       description: Information regarding the signing party
       readOnly: true
-  securitySchemes: {}
+  securitySchemes: { }
