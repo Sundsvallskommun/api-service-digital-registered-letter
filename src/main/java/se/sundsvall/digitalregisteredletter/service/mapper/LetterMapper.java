@@ -3,6 +3,7 @@ package se.sundsvall.digitalregisteredletter.service.mapper;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.ObjectUtils.allNull;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
 
 import java.util.ArrayList;
@@ -12,13 +13,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import se.sundsvall.dept44.models.api.paging.PagingAndSortingMetaData;
 import se.sundsvall.digitalregisteredletter.api.model.AttachmentBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.DeviceBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.LettersBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo.Device;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo.StepUp;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo.User;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfoBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.StepUpBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.SupportInfo;
 import se.sundsvall.digitalregisteredletter.api.model.SupportInfoBuilder;
+import se.sundsvall.digitalregisteredletter.api.model.UserBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
@@ -45,7 +55,7 @@ public class LetterMapper {
 			.orElse(null);
 	}
 
-	public OrganizationEntity toOrganizationEntity(Organization nullableOrganization, LetterEntity nullableLetterEntity) {
+	public OrganizationEntity toOrganizationEntity(final Organization nullableOrganization, final LetterEntity nullableLetterEntity) {
 		return ofNullable(nullableOrganization)
 			.map(organization -> OrganizationEntity.create()
 				.withLetters(ofNullable(nullableLetterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
@@ -54,7 +64,7 @@ public class LetterMapper {
 			.orElse(null);
 	}
 
-	public UserEntity toUserEntity(String nullableUsername, LetterEntity nullableLetterEntity) {
+	public UserEntity toUserEntity(final String nullableUsername, final LetterEntity nullableLetterEntity) {
 		return ofNullable(nullableUsername)
 			.map(username -> UserEntity.create()
 				.withLetters(ofNullable(nullableLetterEntity).map(List::of).map(ArrayList::new).orElse(new ArrayList<>()))
@@ -62,7 +72,7 @@ public class LetterMapper {
 			.orElse(null);
 	}
 
-	public OrganizationEntity addLetter(OrganizationEntity organizationEntity, LetterEntity nullableLetterEntity) {
+	public OrganizationEntity addLetter(final OrganizationEntity organizationEntity, final LetterEntity nullableLetterEntity) {
 		if (isNull(organizationEntity.getLetters())) {
 			organizationEntity.setLetters(new ArrayList<>());
 		}
@@ -71,7 +81,7 @@ public class LetterMapper {
 		return organizationEntity;
 	}
 
-	public UserEntity addLetter(UserEntity userEntity, LetterEntity nullableLetterEntity) {
+	public UserEntity addLetter(final UserEntity userEntity, final LetterEntity nullableLetterEntity) {
 		if (isNull(userEntity.getLetters())) {
 			userEntity.setLetters(new ArrayList<>());
 		}
@@ -80,7 +90,7 @@ public class LetterMapper {
 		return userEntity;
 	}
 
-	public SupportInformation toSupportInformation(final se.sundsvall.digitalregisteredletter.api.model.SupportInfo nullableSupportInfo) {
+	public SupportInformation toSupportInformation(final SupportInfo nullableSupportInfo) {
 		return ofNullable(nullableSupportInfo)
 			.map(supportInfo -> SupportInformation.create()
 				.withSupportText(supportInfo.supportText())
@@ -126,7 +136,7 @@ public class LetterMapper {
 			.orElse(null);
 	}
 
-	public se.sundsvall.digitalregisteredletter.api.model.SupportInfo toSupportInfo(final SupportInformation nullableSupportInformation) {
+	public SupportInfo toSupportInfo(final SupportInformation nullableSupportInformation) {
 		return ofNullable(nullableSupportInformation)
 			.map(supportInformation -> SupportInfoBuilder.create()
 				.withContactInformationUrl(supportInformation.getContactInformationUrl())
@@ -154,7 +164,7 @@ public class LetterMapper {
 			.orElse(null);
 	}
 
-	public void updateLetterStatus(final LetterEntity letter, String status) {
+	public void updateLetterStatus(final LetterEntity letter, final String status) {
 		if (isNull(letter)) {
 			return;
 		}
@@ -190,5 +200,54 @@ public class LetterMapper {
 			signingInformation.setPersonalNumber(value.personalNumber());
 			signingInformation.setSurname(value.surname());
 		});
+	}
+
+	public SigningInfo toSigningInfo(final SigningInformationEntity nullableSigningInformation) {
+		return ofNullable(nullableSigningInformation)
+			.map(signingInformation -> SigningInfoBuilder.create()
+				.withContentKey(signingInformation.getContentKey())
+				.withDevice(toDevice(signingInformation.getIpAddress()))
+				.withOcspResponse(signingInformation.getOcspResponse())
+				.withOrderRef(signingInformation.getOrderRef())
+				.withSignature(signingInformation.getSignature())
+				.withSigned(signingInformation.getSigned())
+				.withStatus(signingInformation.getStatus())
+				.withStepUp(toStepUp(signingInformation.getMrtd()))
+				.withUser(toUser(
+					signingInformation.getGivenName(),
+					signingInformation.getName(),
+					signingInformation.getPersonalNumber(),
+					signingInformation.getSurname()))
+				.build())
+			.orElse(null);
+	}
+
+	private Device toDevice(final String nullableIpAddress) {
+		return ofNullable(nullableIpAddress)
+			.map(ipAddress -> DeviceBuilder.create()
+				.withIpAddress(ipAddress)
+				.build())
+			.orElse(null);
+	}
+
+	private StepUp toStepUp(final Boolean nullableMrtd) {
+		return ofNullable(nullableMrtd)
+			.map(mrtd -> StepUpBuilder.create()
+				.withMrtd(mrtd)
+				.build())
+			.orElse(null);
+	}
+
+	private User toUser(final String givenName, final String name, final String personalIdentityNumber, final String surname) {
+		if (allNull(givenName, name, personalIdentityNumber, surname)) {
+			return null;
+		}
+
+		return UserBuilder.create()
+			.withGivenName(givenName)
+			.withName(name)
+			.withPersonalIdentityNumber(personalIdentityNumber)
+			.withSurname(surname)
+			.build();
 	}
 }

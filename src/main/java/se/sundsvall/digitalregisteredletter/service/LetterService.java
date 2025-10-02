@@ -1,5 +1,6 @@
 package se.sundsvall.digitalregisteredletter.service;
 
+import static java.util.Optional.ofNullable;
 import static org.zalando.problem.Status.NOT_FOUND;
 
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
+import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
@@ -28,7 +30,7 @@ public class LetterService {
 		final KivraIntegration kivraIntegration,
 		final PartyIntegration partyIntegration,
 		final RepositoryIntegration repositoryIntegration,
-		final se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper letterMapper) {
+		final LetterMapper letterMapper) {
 
 		this.kivraIntegration = kivraIntegration;
 		this.partyIntegration = partyIntegration;
@@ -58,5 +60,13 @@ public class LetterService {
 		final var page = repositoryIntegration.getPagedLetterEntities(municipalityId, filter, pageable);
 
 		return letterMapper.toLetters(page);
+	}
+
+	public SigningInfo getSigningInformation(final String municipalityId, final String letterId) {
+		final var letterEntity = repositoryIntegration.getLetterEntity(municipalityId, letterId)
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
+
+		return ofNullable(letterMapper.toSigningInfo(letterEntity.getSigningInformation()))
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Signing information belonging to letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 	}
 }
