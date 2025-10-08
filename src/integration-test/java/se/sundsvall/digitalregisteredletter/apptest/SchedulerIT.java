@@ -6,14 +6,12 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.time.OffsetDateTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
@@ -26,7 +24,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 })
 class SchedulerIT extends AbstractAppTest {
 
-	// Id that matches a letter in the test data.
+	// ID that matches a letter in the test data.
 	private static final String LETTER_ID = "43a32404-28ee-480f-a095-00d48109afab";
 
 	@Autowired
