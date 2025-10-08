@@ -7,34 +7,9 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 /**
  * Record matching the following response from Kivra:
  * <code>
- * {
- * 	   "status": "signed",
- * 	   "signed_at": "2023-10-01T12:00:00Z",
- * 	   "sender_reference": {
- *         "internal_id": "43a32404-28ee-480f-a095-00d48109afab"
- *     },
- *     "content_key": "c33e857c-4341-4f54-9044-cdeee56760a8",
- * 	   "bank_id_order": {
- * 	       "orderRef": "be7c5362-7147-47e3-85d6-f358ccec5ca8",
- * 	       "status": "completed",
- * 	       "completionData": {
- *             "user": {
- *                 "personalNumber": "190001011234",
- * 	               "name": "Joe Doe",
- *                 "givenName": "Joe",
- *                 "surname": "Doe"
- *             },
- * 	           "device": {
- * 	               "ipAddress": "127.0.0.1"
- * 	           }
- * 	       },
- *         "stepUp": {
- *             "mrtd": false
- * 	       },
- *         "signature": "PD94bWwgdmVyc2lvb...",
- *         "ocspResponse": "MIIHdgoBAKCCB28wggdrBg..."
- *     }
- * }
+ * { "status": "signed", "signed_at": "2023-10-01T12:00:00Z", "sender_reference": { "sender_internal_id": "43a32404-28ee-480f-a095-00d48109afab" }, "content_key": "c33e857c-4341-4f54-9044-cdeee56760a8", "bank_id_order": { "orderRef":
+ * "be7c5362-7147-47e3-85d6-f358ccec5ca8", "status": "completed", "completionData": { "user": { "personalNumber": "190001011234", "name": "Joe Doe", "givenName": "Joe", "surname": "Doe" }, "device": { "ipAddress": "127.0.0.1" } }, "stepUp": { "mrtd": false
+ * }, "signature": "PD94bWwgdmVyc2lvb...", "ocspResponse": "MIIHdgoBAKCCB28wggdrBg..." } }
  * </code>
  */
 @Builder
@@ -47,7 +22,7 @@ public record RegisteredLetterResponse(
 
 	@Builder
 	public record SenderReference(
-		@JsonProperty("internal_id") String internalId) {
+		@JsonProperty("sender_internal_id") String internalId) {
 	}
 
 	@Builder
