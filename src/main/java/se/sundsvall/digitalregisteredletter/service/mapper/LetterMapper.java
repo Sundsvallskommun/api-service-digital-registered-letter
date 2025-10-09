@@ -122,16 +122,17 @@ public class LetterMapper {
 
 	public Letter toLetter(final LetterEntity nullableLetterEntity) {
 		return ofNullable(nullableLetterEntity)
-			.map(etterEntity -> LetterBuilder.create()
-				.withId(etterEntity.getId())
-				.withMunicipalityId(etterEntity.getMunicipalityId())
-				.withBody(etterEntity.getBody())
-				.withContentType(etterEntity.getContentType())
-				.withStatus(etterEntity.getStatus())
-				.withAttachments(toLetterAttachments(etterEntity.getAttachments()))
-				.withSupportInfo(toSupportInfo(etterEntity.getSupportInformation()))
-				.withCreated(etterEntity.getCreated())
-				.withUpdated(etterEntity.getUpdated())
+			.map(letterEntity -> LetterBuilder.create()
+				.withId(letterEntity.getId())
+				.withSubject(letterEntity.getSubject())
+				.withMunicipalityId(letterEntity.getMunicipalityId())
+				.withBody(letterEntity.getBody())
+				.withContentType(letterEntity.getContentType())
+				.withStatus(letterEntity.getStatus())
+				.withAttachments(toLetterAttachments(letterEntity.getAttachments()))
+				.withSupportInfo(toSupportInfo(letterEntity.getSupportInformation()))
+				.withCreated(letterEntity.getCreated())
+				.withUpdated(letterEntity.getUpdated())
 				.build())
 			.orElse(null);
 	}
@@ -184,15 +185,15 @@ public class LetterMapper {
 	}
 
 	private void updateBankIdOrder(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder bankIdOrder) {
-		ofNullable(bankIdOrder.ocspResponse()).ifPresent(signingInformation::setOcspResponse);
 		ofNullable(bankIdOrder.orderRef()).ifPresent(signingInformation::setOrderRef);
-		ofNullable(bankIdOrder.signature()).ifPresent(signingInformation::setSignature);
 		ofNullable(bankIdOrder.status()).ifPresent(value -> signingInformation.setStatus(value.toUpperCase()));
 		ofNullable(bankIdOrder.completionData()).ifPresent(value -> updateCompletionData(signingInformation, value));
-		ofNullable(bankIdOrder.stepUp()).ifPresent(value -> signingInformation.setMrtd(value.mrtd()));
 	}
 
 	private void updateCompletionData(final SigningInformationEntity signingInformation, final RegisteredLetterResponse.BankIdOrder.CompletionData completionData) {
+		ofNullable(completionData.signature()).ifPresent(signingInformation::setSignature);
+		ofNullable(completionData.ocspResponse()).ifPresent(signingInformation::setOcspResponse);
+		ofNullable(completionData.stepUp()).ifPresent(value -> signingInformation.setMrtd(value.mrtd()));
 		ofNullable(completionData.device()).ifPresent(value -> signingInformation.setIpAddress(value.ipAddress()));
 		ofNullable(completionData.user()).ifPresent(value -> {
 			signingInformation.setGivenName(value.givenName());

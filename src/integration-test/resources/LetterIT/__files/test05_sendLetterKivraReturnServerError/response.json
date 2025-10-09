@@ -1,5 +1,6 @@
 {
 	"id": "${json-unit.any-string}",
+	"subject": "This is the subject",
 	"municipalityId": "2281",
 	"status": "FAILED - Server Error",
 	"body": "body",

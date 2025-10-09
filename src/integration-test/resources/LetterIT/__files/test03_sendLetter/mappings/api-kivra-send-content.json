@@ -10,7 +10,7 @@
 			{
 				"equalToJson": {
 					"ssn": "190101010159",
-					"subject": "subject",
+					"subject": "This is the subject",
 					"type": "registered.letter",
 					"registered": {
 						"hidden": {

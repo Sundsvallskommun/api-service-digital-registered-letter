@@ -15,6 +15,8 @@ public record Letter(
 
 	@Schema(description = "Unique identifier for the letter", example = "123e4567-e89b-12d3-a456-426614174000") String id,
 
+	@Schema(description = "Letter subject", example = "Important Notification") String subject,
+
 	@Schema(description = "Municipality ID for the sender of the letter", example = "2281") String municipalityId,
 
 	@Schema(description = "Status of the letter", examples = {
