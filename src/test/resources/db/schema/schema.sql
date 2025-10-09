@@ -39,10 +39,10 @@
     create table signing_information (
         mrtd bit,
         signed datetime(6),
-        content_key varchar(36),
         id varchar(36) not null,
         internal_id varchar(36),
         order_ref varchar(36),
+        content_key varchar(256),
         given_name varchar(255),
         ip_address varchar(255),
         name varchar(255),

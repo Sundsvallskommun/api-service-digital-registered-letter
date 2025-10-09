@@ -28,7 +28,7 @@ public class SigningInformationEntity {
 	@Column(name = "internal_id", length = 36)
 	private String internalId;
 
-	@Column(name = "content_key", length = 36)
+	@Column(name = "content_key", length = 256)
 	private String contentKey;
 
 	@Column(name = "order_ref", length = 36)
