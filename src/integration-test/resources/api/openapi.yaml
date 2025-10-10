@@ -1,13 +1,13 @@
 openapi: 3.0.1
 info:
   title: digital-registered-letter
-  contact: { }
+  contact: {}
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "2.3"
 servers:
-  - url: http://localhost:56426
+  - url: http://localhost:37531
     description: Generated server url
 tags:
   - name: Scheduler Resource
@@ -17,6 +17,48 @@ tags:
   - name: Eligibility Resource
     description: Check eligibility for sending digital registered letters
 paths:
+  /{municipalityId}/status/letters:
+    post:
+      tags:
+        - Status Resource
+      summary: Get status of given letters
+      description: Returns the current status for each provided letterId
+      operationId: getLetterStatuses
+      parameters:
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LetterStatusRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LetterStatus"
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/scheduler:
     post:
       tags:
@@ -407,9 +449,24 @@ paths:
       x-wso2-mutual-ssl: Optional
 components:
   schemas:
+    LetterStatusRequest:
+      required:
+        - letterIds
+      type: object
+      properties:
+        letterIds:
+          minItems: 1
+          type: array
+          items:
+            type: string
+      description: Request model for checking the statuses of given letters
     Problem:
       type: object
       properties:
+        detail:
+          type: string
+        title:
+          type: string
         instance:
           type: string
           format: uri
@@ -422,10 +479,6 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
-        detail:
-          type: string
     StatusType:
       type: object
       properties:
@@ -474,6 +527,8 @@ components:
           type: string
         message:
           type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -481,8 +536,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        detail:
-          type: string
         suppressed:
           type: array
           items:
@@ -545,6 +598,10 @@ components:
                 type: boolean
         message:
           type: string
+        detail:
+          type: string
+        title:
+          type: string
         instance:
           type: string
           format: uri
@@ -557,10 +614,6 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
-        detail:
-          type: string
         suppressed:
           type: array
           items:
@@ -601,6 +654,19 @@ components:
           type: string
         message:
           type: string
+    LetterStatus:
+      type: object
+      properties:
+        letterId:
+          type: string
+          description: Letter ID
+          example: 43a32404-28ee-480f-a095-00d48109afab
+        status:
+          type: string
+          description: Current status of the letter. NOT_FOUND if the entity could
+            not be found
+          example: NEW
+      description: Letter status
     LetterRequest:
       required:
         - body
@@ -884,4 +950,4 @@ components:
           readOnly: true
       description: Information regarding the signing party
       readOnly: true
-  securitySchemes: { }
+  securitySchemes: {}
