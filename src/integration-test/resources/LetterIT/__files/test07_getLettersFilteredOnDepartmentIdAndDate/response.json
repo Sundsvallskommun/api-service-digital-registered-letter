@@ -9,6 +9,7 @@
 	"letters": [
 		{
 			"id": "4ace2698-7dea-4d0b-9c5d-eeac32c1b49a",
+			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
@@ -31,6 +32,7 @@
 		},
 		{
 			"id": "9bb97fd2-4410-4a4b-9019-fdd98f01bd7c",
+			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "NEW",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user sue02doe",

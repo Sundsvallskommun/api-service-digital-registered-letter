@@ -27,9 +27,9 @@ class RegisteredLetterResponseTest {
 		final var senderReference = new RegisteredLetterResponse.SenderReference(INTERNAL_ID);
 		final var user = new RegisteredLetterResponse.BankIdOrder.CompletionData.User(PERSONAL_NUMBER, NAME, GIVEN_NAME, SURNAME);
 		final var device = new RegisteredLetterResponse.BankIdOrder.CompletionData.Device(IP_ADDRESS);
-		final var completionData = new RegisteredLetterResponse.BankIdOrder.CompletionData(user, device);
-		final var stepUp = new RegisteredLetterResponse.BankIdOrder.StepUp(MRTD);
-		final var bankIdOrder = new RegisteredLetterResponse.BankIdOrder(ORDER_REF, SIGN_STATUS, completionData, stepUp, SIGNATURE, OCSP_RESPONSE);
+		final var stepUp = new RegisteredLetterResponse.BankIdOrder.CompletionData.StepUp(MRTD);
+		final var completionData = new RegisteredLetterResponse.BankIdOrder.CompletionData(user, device, stepUp, SIGNATURE, OCSP_RESPONSE);
+		final var bankIdOrder = new RegisteredLetterResponse.BankIdOrder(ORDER_REF, SIGN_STATUS, completionData);
 
 		final var bean = new RegisteredLetterResponse(STATUS, SIGNED_AT, senderReference, CONTENT_KEY, bankIdOrder);
 		assertBean(bean);
@@ -49,20 +49,20 @@ class RegisteredLetterResponseTest {
 		final var device = DeviceBuilder.create()
 			.withIpAddress(IP_ADDRESS)
 			.build();
-		final var completionData = CompletionDataBuilder.create()
-			.withDevice(device)
-			.withUser(user)
-			.build();
 		final var stepUp = StepUpBuilder.create()
 			.withMrtd(MRTD)
 			.build();
+		final var completionData = CompletionDataBuilder.create()
+			.withDevice(device)
+			.withUser(user)
+			.withOcspResponse(OCSP_RESPONSE)
+			.withStepUp(stepUp)
+			.withSignature(SIGNATURE)
+			.build();
 		final var bankIdOrder = BankIdOrderBuilder.create()
 			.withCompletionData(completionData)
-			.withOcspResponse(OCSP_RESPONSE)
 			.withOrderRef(ORDER_REF)
-			.withSignature(SIGNATURE)
 			.withStatus(SIGN_STATUS)
-			.withStepUp(stepUp)
 			.build();
 
 		final var bean = RegisteredLetterResponseBuilder.create()
@@ -81,28 +81,23 @@ class RegisteredLetterResponseTest {
 		assertThat(bean.contentKey()).isEqualTo(CONTENT_KEY);
 		assertThat(bean.signedAt()).isEqualTo(SIGNED_AT);
 		assertThat(bean.status()).isEqualTo(STATUS);
-		assertThat(bean.senderReference()).isNotNull().satisfies(senderReferenceChild -> {
-			assertThat(senderReferenceChild.internalId()).isEqualTo(INTERNAL_ID);
-		});
+		assertThat(bean.senderReference()).isNotNull().satisfies(senderReferenceChild -> assertThat(senderReferenceChild.internalId()).isEqualTo(INTERNAL_ID));
 		assertThat(bean.bankIdOrder()).isNotNull().satisfies(bankIdOrderChild -> {
-			assertThat(bankIdOrderChild.ocspResponse()).isEqualTo(OCSP_RESPONSE);
 			assertThat(bankIdOrderChild.orderRef()).isEqualTo(ORDER_REF);
-			assertThat(bankIdOrderChild.signature()).isEqualTo(SIGNATURE);
 			assertThat(bankIdOrderChild.status()).isEqualTo(SIGN_STATUS);
 		});
-		assertThat(bean.bankIdOrder().stepUp()).isNotNull().satisfies(stepUpChild -> {
-			assertThat(stepUpChild.mrtd()).isEqualTo(MRTD);
-		});
-		assertThat(bean.bankIdOrder().completionData()).isNotNull().satisfies(completionDataChild -> {
-			assertThat(completionDataChild.user()).isNotNull().satisfies(userChild -> {
-				assertThat(userChild.givenName()).isEqualTo(GIVEN_NAME);
-				assertThat(userChild.name()).isEqualTo(NAME);
-				assertThat(userChild.personalNumber()).isEqualTo(PERSONAL_NUMBER);
-				assertThat(userChild.surname()).isEqualTo(SURNAME);
+
+		assertThat(bean.bankIdOrder().completionData()).isNotNull().satisfies(completionData -> {
+			assertThat(completionData.user()).isNotNull().satisfies(user -> {
+				assertThat(user.givenName()).isEqualTo(GIVEN_NAME);
+				assertThat(user.name()).isEqualTo(NAME);
+				assertThat(user.personalNumber()).isEqualTo(PERSONAL_NUMBER);
+				assertThat(user.surname()).isEqualTo(SURNAME);
 			});
-			assertThat(completionDataChild.device()).isNotNull().satisfies(deviceChild -> {
-				assertThat(deviceChild.ipAddress()).isEqualTo(IP_ADDRESS);
-			});
+			assertThat(completionData.stepUp()).isNotNull().satisfies(stepUp -> assertThat(stepUp.mrtd()).isEqualTo(MRTD));
+			assertThat(completionData.device()).isNotNull().satisfies(device -> assertThat(device.ipAddress()).isEqualTo(IP_ADDRESS));
+			assertThat(completionData.signature()).isEqualTo(SIGNATURE);
+			assertThat(completionData.ocspResponse()).isEqualTo(OCSP_RESPONSE);
 		});
 	}
 }

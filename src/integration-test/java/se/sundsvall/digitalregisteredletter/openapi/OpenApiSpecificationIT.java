@@ -85,5 +85,4 @@ class OpenApiSpecificationIT {
 			throw new IllegalStateException("Unable to convert YAML to JSON", e);
 		}
 	}
-
 }

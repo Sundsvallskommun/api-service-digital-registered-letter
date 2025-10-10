@@ -9,6 +9,7 @@
 	"letters": [
 		{
 			"id": "43a32404-28ee-480f-a095-00d48109afab",
+			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "NEW",
 			"body": "body for municipality 2281 and Dept 44 issued by user joe01doe",
@@ -36,6 +37,7 @@
 		},
 		{
 			"id": "4ace2698-7dea-4d0b-9c5d-eeac32c1b49a",
+			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
@@ -58,6 +60,7 @@
 		},
 		{
 			"id": "5c8634f2-078e-4ef0-888b-63cb1aaa0b11",
+			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
@@ -80,6 +83,7 @@
 		},
 		{
 			"id": "bd3d2128-0d5a-457c-8629-0da4ffea85d9",
+			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
@@ -102,6 +106,7 @@
 		},
 		{
 			"id": "f8853893-46a9-4249-a0e5-35d5595efd91",
+			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "SENT",
 			"body": "body for municipality 2281 and Dept 44 issued by user joe01doe",

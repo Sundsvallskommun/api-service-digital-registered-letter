@@ -9,6 +9,8 @@
 		"orderRef": "be7c5362-7147-47e3-85d6-f358ccec5ca8",
 		"status": "completed",
 		"completionData": {
+			"signature": "PD94bWwgdmVyc2lvb",
+			"ocspResponse": "MIIHdgoBAKCCB28wggdrBg",
 			"user": {
 				"personalNumber": "190001011234",
 				"name": "Joe Doe",
@@ -17,12 +19,10 @@
 			},
 			"device": {
 				"ipAddress": "127.0.0.1"
+			},
+			"stepUp": {
+				"mrtd": false
 			}
-		},
-		"stepUp": {
-			"mrtd": false
-		},
-		"signature": "PD94bWwgdmVyc2lvb",
-		"ocspResponse": "MIIHdgoBAKCCB28wggdrBg"
+		}
 	}
 }

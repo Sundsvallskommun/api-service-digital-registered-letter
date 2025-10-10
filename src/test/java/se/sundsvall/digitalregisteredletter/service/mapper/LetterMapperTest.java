@@ -237,6 +237,7 @@ class LetterMapperTest {
 		final var bean = letterMapper.toLetter(entity);
 
 		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(bean.subject()).isEqualTo("This is the subject of the letter");
 		assertThat(bean.body()).isEqualTo("This is the body of the letter");
 		assertThat(bean.contentType()).isEqualTo("text/plain");
 		assertThat(bean.created()).isEqualTo(entity.getCreated());
@@ -380,9 +381,9 @@ class LetterMapperTest {
 	 * @param response       object to use in test
 	 * @param expectedResult object to verify mapping result against
 	 */
-	@ParameterizedTest
+	@ParameterizedTest(name = "{0}")
 	@MethodSource("updateSigningInformationParameterProvider")
-	void updateSigningInformation(final RegisteredLetterResponse response, final SigningInformationEntity expectedResult) {
+	void updateSigningInformation(final String testName, final RegisteredLetterResponse response, final SigningInformationEntity expectedResult) {
 		final var entity = SigningInformationEntity.create();
 		letterMapper.updateSigningInformation(entity, response);
 
@@ -405,13 +406,13 @@ class LetterMapperTest {
 		final var surname = "surname";
 
 		return Stream.of(
-			// Empty response
 			Arguments.of(
+				"Empty response",
 				RegisteredLetterResponseBuilder.create().build(),
 				SigningInformationEntity.create()),
 
-			// Response with values on top level
 			Arguments.of(
+				"Response with values on top level",
 				RegisteredLetterResponseBuilder.create()
 					.withContentKey(contentKey)
 					.withSignedAt(signedAt)
@@ -421,16 +422,16 @@ class LetterMapperTest {
 					.withContentKey(contentKey)
 					.withSigned(signedAt)),
 
-			// Response empty sender reference
 			Arguments.of(
+				"Response with empty sender reference",
 				RegisteredLetterResponseBuilder.create()
 					.withSenderReference(SenderReferenceBuilder.create()
 						.build())
 					.build(),
 				SigningInformationEntity.create()),
 
-			// Response with values for sender reference values
 			Arguments.of(
+				"Response with values for sender reference values",
 				RegisteredLetterResponseBuilder.create()
 					.withSenderReference(SenderReferenceBuilder.create()
 						.withInternalId(internalId)
@@ -439,53 +440,54 @@ class LetterMapperTest {
 				SigningInformationEntity.create()
 					.withInternalId(internalId)),
 
-			// Response with empty bank id order
 			Arguments.of(
+				"Response with empty bank id order",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
 						.build())
 					.build(),
 				SigningInformationEntity.create()),
 
-			// Response with values for bank id order
 			Arguments.of(
+				"Response with values for bank id order",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
-						.withOcspResponse(ocspResponse)
 						.withOrderRef(orderRef)
-						.withSignature(signature)
 						.withStatus(status)
 						.build())
 					.build(),
 				SigningInformationEntity.create()
-					.withOcspResponse(ocspResponse)
 					.withOrderRef(orderRef)
-					.withSignature(signature)
 					.withStatus(status.toUpperCase())),
 
-			// Response with empty step up
 			Arguments.of(
+				"Response with empty step up",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
-						.withStepUp(StepUpBuilder.create().build())
+						.withCompletionData(CompletionDataBuilder.create()
+							.withStepUp(StepUpBuilder.create()
+								.build())
+							.build())
 						.build())
 					.build(),
 				SigningInformationEntity.create()),
 
-			// Response with values for step up
 			Arguments.of(
+				"Response with values for step up",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
-						.withStepUp(StepUpBuilder.create()
-							.withMrtd(mrtd)
+						.withCompletionData(CompletionDataBuilder.create()
+							.withStepUp(StepUpBuilder.create()
+								.withMrtd(mrtd)
+								.build())
 							.build())
 						.build())
 					.build(),
 				SigningInformationEntity.create()
 					.withMrtd(mrtd)),
 
-			// Response with empty completion data
 			Arguments.of(
+				"Response with empty completion data",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
 						.withCompletionData(CompletionDataBuilder.create().build())
@@ -493,8 +495,8 @@ class LetterMapperTest {
 					.build(),
 				SigningInformationEntity.create()),
 
-			// Response with empty device and user in completion data object
 			Arguments.of(
+				"Response with empty device and user in completion data object",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
 						.withCompletionData(CompletionDataBuilder.create()
@@ -505,8 +507,36 @@ class LetterMapperTest {
 					.build(),
 				SigningInformationEntity.create()),
 
-			// Response with values for device in completion data object
 			Arguments.of(
+				"Response with values for signature and ocsp response in completion data object",
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withSignature(signature)
+							.withOcspResponse(ocspResponse)
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withSignature(signature)
+					.withOcspResponse(ocspResponse)),
+
+			Arguments.of(
+				"Response with values for StepUp in completion data object",
+				RegisteredLetterResponseBuilder.create()
+					.withBankIdOrder(BankIdOrderBuilder.create()
+						.withCompletionData(CompletionDataBuilder.create()
+							.withStepUp(StepUpBuilder.create()
+								.withMrtd(mrtd)
+								.build())
+							.build())
+						.build())
+					.build(),
+				SigningInformationEntity.create()
+					.withMrtd(mrtd)),
+
+			Arguments.of(
+				"Response with values for device in completion data object",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
 						.withCompletionData(CompletionDataBuilder.create()
@@ -519,8 +549,8 @@ class LetterMapperTest {
 				SigningInformationEntity.create()
 					.withIpAddress(ipAddress)),
 
-			// Response with values for user in completion data object
 			Arguments.of(
+				"Response with values for user in completion data object",
 				RegisteredLetterResponseBuilder.create()
 					.withBankIdOrder(BankIdOrderBuilder.create()
 						.withCompletionData(CompletionDataBuilder.create()

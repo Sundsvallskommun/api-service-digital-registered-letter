@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 
 class LetterTest {
+
 	private static final OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(2025, 6, 18, 0, 0, 0, 0, OffsetDateTime.now().getOffset());
 	private static final String ID = "id";
+	private static final String SUBJECT = "subject";
 	private static final String MUNICIPALITY_ID = "municipalityId";
 	private static final String STATUS = "status";
 	private static final String BODY = "body";
@@ -30,7 +32,7 @@ class LetterTest {
 
 	@Test
 	void constructorTest() {
-		final var bean = new Letter(ID, MUNICIPALITY_ID, STATUS, BODY, CONTENT_TYPE, CREATED, UPDATED, SUPPORT_INFO, ATTACHMENTS);
+		final var bean = new Letter(ID, SUBJECT, MUNICIPALITY_ID, STATUS, BODY, CONTENT_TYPE, CREATED, UPDATED, SUPPORT_INFO, ATTACHMENTS);
 
 		assertBean(bean);
 	}
@@ -39,6 +41,7 @@ class LetterTest {
 	void builderTest() {
 		final var bean = LetterBuilder.create()
 			.withId(ID)
+			.withSubject(SUBJECT)
 			.withMunicipalityId(MUNICIPALITY_ID)
 			.withStatus(STATUS)
 			.withBody(BODY)
@@ -54,13 +57,14 @@ class LetterTest {
 
 	@Test
 	void noDirtOnEmptyBean() {
-		assertThat(new Letter(null, null, null, null, null, null, null, null, null)).hasAllNullFieldsOrProperties();
+		assertThat(new Letter(null, null, null, null, null, null, null, null, null, null)).hasAllNullFieldsOrProperties();
 		assertThat(LetterBuilder.create().build()).hasAllNullFieldsOrProperties();
 	}
 
 	private static void assertBean(Letter letter) {
 		assertThat(letter).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(letter.id()).isEqualTo(ID);
+		assertThat(letter.subject()).isEqualTo(SUBJECT);
 		assertThat(letter.supportInfo()).isEqualTo(SUPPORT_INFO);
 		assertThat(letter.municipalityId()).isEqualTo(MUNICIPALITY_ID);
 		assertThat(letter.status()).isEqualTo(STATUS);

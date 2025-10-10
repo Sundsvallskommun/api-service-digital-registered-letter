@@ -35,6 +35,7 @@ public class TestDataFactory {
 	public static LetterEntity createLetterEntity() {
 		final var letter = LetterEntity.create()
 			.withId("letter-id")
+			.withSubject("This is the subject of the letter")
 			.withMunicipalityId("municipality-id")
 			.withBody("This is the body of the letter")
 			.withContentType("text/plain")
