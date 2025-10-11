@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.4"
 servers:
-  - url: http://localhost:37531
+  - url: http://localhost:37333
     description: Generated server url
 tags:
   - name: Scheduler Resource
@@ -38,15 +38,15 @@ paths:
         required: true
       responses:
         "200":
-          description: Successful operation
+          description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/LetterStatus"
         "400":
-          description: Bad request
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -54,7 +54,7 @@ paths:
                   - $ref: "#/components/schemas/Problem"
                   - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
-          description: Internal Server error
+          description: Internal Server Error
           content:
             application/problem+json:
               schema:
@@ -463,9 +463,9 @@ components:
     Problem:
       type: object
       properties:
-        detail:
-          type: string
         title:
+          type: string
+        detail:
           type: string
         instance:
           type: string
@@ -598,9 +598,9 @@ components:
                 type: boolean
         message:
           type: string
-        detail:
-          type: string
         title:
+          type: string
+        detail:
           type: string
         instance:
           type: string
