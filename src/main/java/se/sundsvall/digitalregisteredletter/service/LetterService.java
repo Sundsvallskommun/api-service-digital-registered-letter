@@ -5,6 +5,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -81,7 +82,7 @@ public class LetterService {
 			.collect(toMap(LetterEntity::getId, LetterEntity::getStatus));
 
 		return letterIds.stream()
-			.map(id -> new LetterStatus(id, ofNullable(statusById.get(id)).orElse("NOT_FOUND")))
+			.map(id -> new LetterStatus(id, ofNullable(statusById.get(id)).orElse(STATUS_NOT_FOUND)))
 			.toList();
 	}
 

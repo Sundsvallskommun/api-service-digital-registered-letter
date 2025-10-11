@@ -1,5 +1,6 @@
 package se.sundsvall.digitalregisteredletter.api;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -28,11 +29,10 @@ import se.sundsvall.digitalregisteredletter.service.LetterService;
 @Validated
 @RequestMapping("/{municipalityId}/status")
 @Tag(name = "Status Resource")
-@ApiResponse(responseCode = "200", description = "Successful operation", useReturnTypeSchema = true)
-@ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(oneOf = {
+@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(oneOf = {
 	Problem.class, ConstraintViolationProblem.class
 })))
-@ApiResponse(responseCode = "500", description = "Internal Server error", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 class StatusResource {
 
 	private final LetterService letterService;
@@ -41,8 +41,10 @@ class StatusResource {
 		this.letterService = letterService;
 	}
 
-	@PostMapping("/letters")
-	@Operation(summary = "Get status of given letters", description = "Returns the current status for each provided letterId")
+	@PostMapping(path = "/letters", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	@Operation(summary = "Get status of given letters", description = "Returns the current status for each provided letterId", responses = {
+		@ApiResponse(responseCode = "200", description = "OK", useReturnTypeSchema = true)
+	})
 	ResponseEntity<List<LetterStatus>> getLetterStatuses(
 		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@RequestBody @Valid final LetterStatusRequest request) {
