@@ -2,6 +2,7 @@ package se.sundsvall.digitalregisteredletter.integration.db;
 
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NEW;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -116,6 +117,17 @@ public class RepositoryIntegration {
 	 */
 	public Optional<LetterEntity> getLetterEntity(final String municipalityId, final String letterId) {
 		return letterRepository.findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false);
+	}
+
+	/**
+	 * Method returns letter entities matching provided letterIds
+	 *
+	 * @param  municipalityId municipality id to match against
+	 * @param  letterIds      list of letter ids to match against
+	 * @return                list of letter entities
+	 */
+	public List<LetterEntity> getLetterEntities(final String municipalityId, final List<String> letterIds) {
+		return letterRepository.findAllByMunicipalityIdAndIdInAndDeletedFalse(municipalityId, letterIds);
 	}
 
 	/**

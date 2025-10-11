@@ -2,12 +2,15 @@ package se.sundsvall.digitalregisteredletter.service;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toMap;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,7 @@ import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
+import se.sundsvall.digitalregisteredletter.api.model.LetterStatus;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
@@ -71,6 +75,17 @@ public class LetterService {
 		final var page = repositoryIntegration.getPagedLetterEntities(municipalityId, filter, pageable);
 
 		return letterMapper.toLetters(page);
+	}
+
+	@Transactional(readOnly = true)
+	public List<LetterStatus> getLetterStatuses(final String municipalityId, final List<String> letterIds) {
+		final var entities = repositoryIntegration.getLetterEntities(municipalityId, letterIds);
+		final var statusById = entities.stream()
+			.collect(toMap(LetterEntity::getId, LetterEntity::getStatus));
+
+		return letterIds.stream()
+			.map(id -> new LetterStatus(id, ofNullable(statusById.get(id)).orElse(STATUS_NOT_FOUND)))
+			.toList();
 	}
 
 	public SigningInfo getSigningInformation(final String municipalityId, final String letterId) {
