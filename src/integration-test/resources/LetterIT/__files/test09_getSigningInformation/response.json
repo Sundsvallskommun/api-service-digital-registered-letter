@@ -1,0 +1,20 @@
+{
+	"status": "COMPLETED",
+	"signed": "2023-10-15T10:20:00+02:00",
+	"contentKey": "6b33fee5-6380-4cf5-9f53-fe992b57fa49",
+	"orderRef": "4ca9c820-4ecb-4268-9cba-dfa938d17b9e",
+	"signature": "PD94bWwgdmVyc2lvb",
+	"ocspResponse": "MIIHdgoBAKCCB28wggdrBg",
+	"user": {
+		"personalIdentityNumber": "190001011234",
+		"name": "Karl Banal",
+		"givenName": "Karl",
+		"surname": "Banal"
+	},
+	"device": {
+		"ipAddress": "127.0.0.1"
+	},
+	"stepUp": {
+		"mrtd": false
+	}
+}

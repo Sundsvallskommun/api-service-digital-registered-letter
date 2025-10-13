@@ -62,7 +62,7 @@
 			"id": "f8853893-46a9-4249-a0e5-35d5595efd91",
 			"subject": "This is the subject",
 			"municipalityId": "2281",
-			"status": "SENT",
+			"status": "SIGNED",
 			"body": "body for municipality 2281 and Dept 44 issued by user joe01doe",
 			"contentType": "text/plain",
 			"created": "2023-10-01T12:00:00+02:00",

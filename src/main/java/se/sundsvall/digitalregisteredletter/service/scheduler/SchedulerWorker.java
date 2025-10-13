@@ -96,7 +96,7 @@ public class SchedulerWorker {
 	}
 
 	/**
-	 * Method removes post i kivra and is used to tidy up after successful update of letter entity
+	 * Method removes post in kivra and is used to tidy up after successful update of letter entity
 	 *
 	 * @param keyValue object containing id of post in Kivra
 	 */
