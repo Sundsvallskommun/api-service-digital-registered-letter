@@ -6,6 +6,7 @@ import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 
@@ -179,6 +180,46 @@ class LetterIT extends AbstractAppTest {
 			.withExpectedResponseStatus(OK)
 			.withExpectedResponseHeader(CONTENT_TYPE, List.of("application/pdf"))
 			.withExpectedBinaryResponse("attachment.pdf")
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test09_getSigningInformation() {
+		setupCall()
+			.withServicePath("/2281/letters/f8853893-46a9-4249-a0e5-35d5595efd91/signinginfo")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test10_getSigningInformationWhenMissing() {
+		setupCall()
+			.withServicePath("/2281/letters/43a32404-28ee-480f-a095-00d48109afab/signinginfo")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(NOT_FOUND)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test11_getSigningInformationWhenMunicipalityDiffers() {
+		setupCall()
+			.withServicePath("/2262/letters/f8853893-46a9-4249-a0e5-35d5595efd91/signinginfo") // Id exists but for another municipality (2281)
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(NOT_FOUND)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test12_getSigningInformationForNonExistingLetter() {
+		setupCall()
+			.withServicePath("/2281/letters/00000000-0000-0000-0000-000000000000/signinginfo") // Non existing letter id
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(NOT_FOUND)
+			.withExpectedResponse(RESPONSE)
 			.sendRequestAndVerifyResponse();
 	}
 }

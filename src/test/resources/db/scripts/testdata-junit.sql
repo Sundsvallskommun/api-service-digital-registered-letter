@@ -9,7 +9,7 @@ VALUES ('3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', 'joe01doe'),
 INSERT INTO signing_information (mrtd, signed, content_key, id, order_ref, internal_id, given_name, ip_address, 
                                  name, ocsp_response, personal_number, signature, status, surname) 
 VALUES (0, '2023-10-15 10:20:00', '6b33fee5-6380-4cf5-9f53-fe992b57fa49', '0d458afc-526f-4d1d-aa0c-5a7228c37382', '4ca9c820-4ecb-4268-9cba-dfa938d17b9e', 
-        '6e632d7e-9e7c-4ae5-bae6-95531cd51a00', 'Karl', '127.0.0.1', 'Karl Banal', 'MIIHdgoBAKCCB28wggdrBg', '190001011234', 'PD94bWwgdmVyc2lvb', 'COMPLETED', 'Banal');
+        'f8853893-46a9-4249-a0e5-35d5595efd91', 'Karl', '127.0.0.1', 'Karl Banal', 'MIIHdgoBAKCCB28wggdrBg', '190001011234', 'PD94bWwgdmVyc2lvb', 'COMPLETED', 'Banal');
 	 
 INSERT INTO letter(id, municipality_id, body, content_type, status, subject, party_id, deleted, created, updated,
                    support_text, support_information_url, support_information_email, support_information_phone,
