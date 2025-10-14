@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,19 @@ class LetterRepositoryTest {
 		assertThat(letterRepository.findByIdAndMunicipalityIdAndDeleted("450970bb-118c-43a8-8813-6b67c2d33a3b", "2260", false)).isEmpty();
 		assertThat(letterRepository.findByIdAndMunicipalityIdAndDeleted("450970bb-118c-43a8-8813-6b67c2d33a3b", "2281", true)).isEmpty();
 		assertThat(letterRepository.findByIdAndMunicipalityIdAndDeleted("450970bb-118c-43a8-8813-6b67c2d33a3b", "2260", true)).isPresent();
+	}
+
+	@Test
+	void findAllByMunicipalityIdAndIdInAndDeletedFalse() {
+		final var municipalityId = "2281";
+		final var letterIds = List.of(
+			"43a32404-28ee-480f-a095-00d48109afab",
+			"f8853893-46a9-4249-a0e5-35d5595efd91");
+
+		assertThat(letterRepository.findAllByMunicipalityIdAndIdInAndDeletedFalse(municipalityId, letterIds))
+			.hasSize(2)
+			.extracting(LetterEntity::getId)
+			.containsExactlyInAnyOrderElementsOf(letterIds);
 	}
 
 	@Test

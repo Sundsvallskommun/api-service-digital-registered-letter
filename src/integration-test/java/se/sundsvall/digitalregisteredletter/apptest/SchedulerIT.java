@@ -25,7 +25,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 class SchedulerIT extends AbstractAppTest {
 
 	// ID that matches a letter in the test data.
-	private static final String LETTER_ID = "43a32404-28ee-480f-a095-00d48109afab";
+	private static final String LETTER_ID = "9bb97fd2-4410-4a4b-9019-fdd98f01bd7c";
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;

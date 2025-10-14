@@ -33,6 +33,7 @@ import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
+import se.sundsvall.digitalregisteredletter.api.model.LetterStatus;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
@@ -143,6 +144,35 @@ class LetterServiceTest {
 			.hasMessage("Not Found: Letter with id '%s' and municipalityId '%s' not found", letterId, municipalityId);
 
 		verify(repositoryIntegrationMock).getLetterEntity(municipalityId, letterId);
+	}
+
+	@Test
+	void getLetterStatuses() {
+		final var municipalityId = "2281";
+		final var id1 = "11111111-1111-1111-1111-111111111111";
+		final var id2 = "22222222-2222-2222-2222-222222222222";
+		final var id3 = "33333333-3333-3333-3333-333333333333";
+
+		final var e1 = LetterEntity.create().withId(id1).withStatus("NEW");
+		final var e2 = LetterEntity.create().withId(id2).withStatus("SIGNED");
+
+		when(repositoryIntegrationMock.getLetterEntities(municipalityId, List.of(id1, id2, id3)))
+			.thenReturn(List.of(e2, e1));
+		when(letterMapperMock.toLetterStatus(e1))
+			.thenReturn(new LetterStatus(id1, "NEW", "NOT_FOUND"));
+		when(letterMapperMock.toLetterStatus(e2))
+			.thenReturn(new LetterStatus(id2, "SIGNED", "NOT_FOUND"));
+		when(letterMapperMock.toLetterStatus(id3, null, null))
+			.thenReturn(new LetterStatus(id3, "NOT_FOUND", "NOT_FOUND"));
+
+		final var result = letterService.getLetterStatuses(municipalityId, List.of(id1, id2, id3));
+
+		assertThat(result).containsExactly(
+			new LetterStatus(id1, "NEW", "NOT_FOUND"),
+			new LetterStatus(id2, "SIGNED", "NOT_FOUND"),
+			new LetterStatus(id3, "NOT_FOUND", "NOT_FOUND"));
+
+		verify(repositoryIntegrationMock).getLetterEntities(municipalityId, List.of(id1, id2, id3));
 	}
 
 	@Test

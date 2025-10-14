@@ -2,10 +2,10 @@ package se.sundsvall.digitalregisteredletter.service;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -76,13 +76,15 @@ public class LetterService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<LetterStatus> getLetterStatuses(final String municipalityId, final List<String> letterIds) {
-		final var entities = repositoryIntegration.getLetterEntities(municipalityId, letterIds);
-		final var statusById = entities.stream()
-			.collect(toMap(LetterEntity::getId, LetterEntity::getStatus));
+	public List<LetterStatus> getLetterStatuses(String municipalityId, List<String> letterIds) {
+		final var lettersById = repositoryIntegration.getLetterEntities(municipalityId, letterIds)
+			.stream()
+			.collect(toMap(LetterEntity::getId, identity()));
 
 		return letterIds.stream()
-			.map(id -> new LetterStatus(id, ofNullable(statusById.get(id)).orElse(STATUS_NOT_FOUND)))
+			.map(id -> ofNullable(lettersById.get(id))
+				.map(letterMapper::toLetterStatus)
+				.orElseGet(() -> letterMapper.toLetterStatus(id, null, null)))
 			.toList();
 	}
 

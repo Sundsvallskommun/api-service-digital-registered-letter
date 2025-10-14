@@ -6,10 +6,10 @@ INSERT INTO `user`(id, username)
 VALUES ('3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', 'joe01doe'),
        ('36c85960-0b77-4228-a8b3-da86ca8078e7', 'sue02doe');
 
-INSERT INTO signing_information (mrtd, signed, content_key, id, order_ref, internal_id, given_name, ip_address, 
-                                 name, ocsp_response, personal_number, signature, status, surname) 
-VALUES (0, '2023-10-15 10:20:00', '6b33fee5-6380-4cf5-9f53-fe992b57fa49', '0d458afc-526f-4d1d-aa0c-5a7228c37382', '4ca9c820-4ecb-4268-9cba-dfa938d17b9e', 
-        'f8853893-46a9-4249-a0e5-35d5595efd91', 'Karl', '127.0.0.1', 'Karl Banal', 'MIIHdgoBAKCCB28wggdrBg', '190001011234', 'PD94bWwgdmVyc2lvb', 'COMPLETED', 'Banal');
+INSERT INTO signing_information (mrtd, signed, content_key, id, order_ref, internal_id, given_name, ip_address, name, ocsp_response, personal_number, signature, status, surname)
+VALUES (0, '2023-10-15 10:20:00', '6b33fee5-6380-4cf5-9f53-fe992b57fa49', '0d458afc-526f-4d1d-aa0c-5a7228c37382',
+        '4ca9c820-4ecb-4268-9cba-dfa938d17b9e', 'f8853893-46a9-4249-a0e5-35d5595efd91', 'Karl', '127.0.0.1', 'Karl Banal',
+        'MIIHdgoBAKCCB28wggdrBg', '190001011234', 'PD94bWwgdmVyc2lvb', 'COMPLETED', 'Banal');
 
 INSERT INTO letter(id, municipality_id, body, content_type, status, subject, party_id, deleted, created, updated,
                    support_text, support_information_url, support_information_email, support_information_phone,
@@ -19,15 +19,13 @@ VALUES ('43a32404-28ee-480f-a095-00d48109afab', '2281',
         'a51fc859-b867-4a02-b574-ec1040035b4a',
         0, '2023-10-01 12:00:00', '2023-10-01 12:00:00', 'support text', 'https://example.com/support',
         'support@email.com', '+46123456789', 'a95aa330-7cad-4ce1-8bef-1e742fcac6e4',
-        '3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', '51e63788-aa18-4b37-9de8-0296af892c40', null),
-
+        '3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', '51e63788-aa18-4b37-9de8-0296af892c40', '11111111-1111-1111-1111-111111111111', null),
        ('f8853893-46a9-4249-a0e5-35d5595efd91', '2281',
         'body for municipality 2281 and Dept 44 issued by user joe01doe', 'text/plain', 'SIGNED', 'This is the subject',
         '3f4ac4dd-48fe-4303-b48c-93c929a31ee1',
         0, '2023-10-01 12:00:00', '2023-10-01 12:00:00', 'support text', 'https://example.com/support',
         'support@email.com', '+46123456789', 'a95aa330-7cad-4ce1-8bef-1e742fcac6e4',
-        '3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', '7a34fc2e-9efe-472a-b4b5-df1dcfe53aef', '0d458afc-526f-4d1d-aa0c-5a7228c37382'),
-
+        '3bb3dc98-c674-448a-aa1c-bc4bdf3258bc', '7a34fc2e-9efe-472a-b4b5-df1dcfe53aef', '0d458afc-526f-4d1d-aa0c-5a7228c37382', null),
        ('59eeec4c-81f3-4a96-918e-43a5e08a8ef0', '2281',
         'body of deleted message for municipality 2281 and Dept 44 issued by user joe01doe', 'text/plain', 'SENT',
         'This is the subject',

@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.allNull;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import se.sundsvall.digitalregisteredletter.api.model.DeviceBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
+import se.sundsvall.digitalregisteredletter.api.model.LetterStatus;
+import se.sundsvall.digitalregisteredletter.api.model.LetterStatusBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.LettersBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
@@ -135,6 +138,26 @@ public class LetterMapper {
 				.withUpdated(letterEntity.getUpdated())
 				.build())
 			.orElse(null);
+	}
+
+	public LetterStatus toLetterStatus(final LetterEntity nullableLetterEntity) {
+		return ofNullable(nullableLetterEntity)
+			.map(letter -> LetterStatusBuilder.create()
+				.withLetterId(letter.getId())
+				.withStatus(ofNullable(letter.getStatus()).orElse(STATUS_NOT_FOUND))
+				.withSigningInformation(ofNullable(letter.getSigningInformation())
+					.map(SigningInformationEntity::getStatus)
+					.orElse(STATUS_NOT_FOUND))
+				.build())
+			.orElse(null);
+	}
+
+	public LetterStatus toLetterStatus(final String letterId, final String status, final String signingInformation) {
+		return LetterStatusBuilder.create()
+			.withLetterId(letterId)
+			.withStatus(ofNullable(status).orElse(STATUS_NOT_FOUND))
+			.withSigningInformation(ofNullable(signingInformation).orElse(STATUS_NOT_FOUND))
+			.build();
 	}
 
 	public SupportInfo toSupportInfo(final SupportInformation nullableSupportInformation) {

@@ -2,7 +2,7 @@
 	"status": "signed",
 	"signed_at": "2023-10-01T12:00:00Z",
 	"sender_reference": {
-		"sender_internal_id": "43a32404-28ee-480f-a095-00d48109afab"
+		"sender_internal_id": "9bb97fd2-4410-4a4b-9019-fdd98f01bd7c"
 	},
 	"content_key": "c33e857c-4341-4f54-9044-cdeee56760a8",
 	"bank_id_order": {

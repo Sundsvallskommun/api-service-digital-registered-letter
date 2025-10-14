@@ -1,10 +1,12 @@
 [
 	{
 		"letterId": "43a32404-28ee-480f-a095-00d48109afab",
-		"status": "NEW"
+		"status": "NEW",
+		"signingInformation": "COMPLETED"
 	},
 	{
 		"letterId": "43a32404-28ee-480f-a095-00d48109afab",
-		"status": "NEW"
+		"status": "NEW",
+		"signingInformation": "COMPLETED"
 	}
 ]
