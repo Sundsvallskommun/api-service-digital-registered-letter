@@ -2,6 +2,7 @@ package se.sundsvall.digitalregisteredletter.service.mapper;
 
 import static java.util.Collections.emptyList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public final class AttachmentMapper {
 	public List<AttachmentEntity> toAttachmentEntities(final List<MultipartFile> attachments) {
 		return Optional.ofNullable(attachments).orElse(emptyList()).stream()
 			.map(this::toAttachmentEntity)
-			.collect(Collectors.toList());// Mutable list
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public AttachmentEntity toAttachmentEntity(final MultipartFile multipartFile) {
