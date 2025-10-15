@@ -2,12 +2,14 @@ package se.sundsvall.digitalregisteredletter.integration.db;
 
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NEW;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import se.sundsvall.digitalregisteredletter.api.model.Attachments;
+import org.springframework.web.multipart.MultipartFile;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
@@ -54,21 +56,21 @@ public class RepositoryIntegration {
 	 * @return                a persisted entity representation of the data that has been provided to the function
 	 */
 	@Transactional
-	public LetterEntity persistLetter(final String municipalityId, final String username, final LetterRequest letterRequest, final Attachments attachments) {
+	public LetterEntity persistLetter(final String municipalityId, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
 		final var letterEntity = letterMapper.toLetterEntity(letterRequest)
 			.withAttachments(attachmentMapper.toAttachmentEntities(attachments))
 			.withMunicipalityId(municipalityId)
 			.withStatus(STATUS_NEW);
 
 		letterEntity.setOrganization(retrieveOrganizationEntity(letterRequest.organization(), letterEntity));
-		letterEntity.setUser(retrieveUserEntity(username, letterEntity));
+		letterEntity.setUser(retrieveUserEntity(letterEntity));
 
 		return letterRepository.save(letterEntity);
 	}
 
 	/**
-	 * Method fetches and uses existing entity for organization if found, otherwise it creates a new entity. The
-	 * incoming letter entity is then attached to the organization entity.
+	 * Method fetches and uses existing entity for organization if found, otherwise it creates a new entity. The incoming
+	 * letter entity is then attached to the organization entity.
 	 *
 	 * @param  organization the organization to fetch or create a database entity for
 	 * @param  letterEntity the letter entity to add to the organization
@@ -81,14 +83,14 @@ public class RepositoryIntegration {
 	}
 
 	/**
-	 * Method fetches and uses existing entity for user if found, otherwise it creates a new entity. The
-	 * incoming letter entity is then attached to the user entity.
+	 * Method fetches and uses existing entity for user if found, otherwise it creates a new entity. The incoming letter
+	 * entity is then attached to the user entity.
 	 *
-	 * @param  username     the username of the user to fetch or create a database entity for
 	 * @param  letterEntity the letter entity to add to the user
 	 * @return              The entity representation of the incoming username with the LetterEntity added to it.
 	 */
-	private UserEntity retrieveUserEntity(String username, LetterEntity letterEntity) {
+	private UserEntity retrieveUserEntity(final LetterEntity letterEntity) {
+		var username = Identifier.get().getValue();
 		return userRepository.findByUsernameIgnoreCase(username)
 			.map(userEntity -> letterMapper.addLetter(userEntity, letterEntity))
 			.orElse(letterMapper.toUserEntity(username, letterEntity));

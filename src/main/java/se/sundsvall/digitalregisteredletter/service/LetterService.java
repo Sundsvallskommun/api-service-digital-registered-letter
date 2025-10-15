@@ -8,12 +8,13 @@ import static org.zalando.problem.Status.NOT_FOUND;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
-import se.sundsvall.digitalregisteredletter.api.model.Attachments;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
@@ -26,7 +27,6 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
-import se.sundsvall.digitalregisteredletter.service.util.IdentifierUtil;
 
 @Service
 public class LetterService {
@@ -48,13 +48,12 @@ public class LetterService {
 		this.letterMapper = letterMapper;
 	}
 
-	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final Attachments attachments) {
-		final var username = IdentifierUtil.getAdUser();
+	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
 		final var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId())
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND,
 				"No legalId found for partyId '%s' and municipalityId '%s'".formatted(letterRequest.partyId(), municipalityId))); // Verify that match for party in request exists as there is no point in persisting entity otherwise
 
-		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, username, letterRequest, attachments); // Create a new entity in database for the letter
+		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments); // Create a new entity in database for the letter
 		final var status = kivraIntegration.sendContent(letterEntity, legalId); // Send letter to Kivra
 		repositoryIntegration.updateStatus(letterEntity, status); // Update entity with status from Kivra response
 

@@ -3,10 +3,8 @@ package se.sundsvall.digitalregisteredletter.service;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -25,15 +23,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
-import org.zalando.problem.ThrowableProblem;
-import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
@@ -46,7 +42,6 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformat
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
-import se.sundsvall.digitalregisteredletter.service.util.IdentifierUtil;
 
 @ExtendWith(MockitoExtension.class)
 class LetterServiceTest {
@@ -73,60 +68,49 @@ class LetterServiceTest {
 
 	@Test
 	void sendLetter() {
-		final var username = "username";
 		final var multipartFile = mock(MultipartFile.class);
+		final var multipartFileList = List.of(multipartFile);
 		final var municipalityId = "2281";
 		final var letterRequest = createLetterRequest();
 		final var legalId = "legalId";
-		final var attachments = AttachmentsBuilder.create()
-			.withFiles(List.of(multipartFile))
-			.build();
 		final var letterEntity = createLetterEntity();
 		final var letterMock = mock(Letter.class);
 		final var status = "status";
+		Identifier.set(Identifier.parse("type=adAccount; test01user"));
 
 		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(Optional.of(legalId));
-		when(repositoryIntegrationMock.persistLetter(any(), any(), any(), any())).thenReturn(letterEntity);
+		when(repositoryIntegrationMock.persistLetter(any(), any(), any())).thenReturn(letterEntity);
 		when(kivraIntegrationMock.sendContent(letterEntity, legalId)).thenReturn(status);
 		when(letterMapperMock.toLetter(letterEntity)).thenReturn(letterMock);
 
-		try (final MockedStatic<IdentifierUtil> identifierUtilMock = mockStatic(IdentifierUtil.class)) {
-			identifierUtilMock.when(IdentifierUtil::getAdUser).thenReturn(username);
+		final var response = letterService.sendLetter(municipalityId, letterRequest, multipartFileList);
 
-			final var response = letterService.sendLetter(municipalityId, letterRequest, attachments);
+		assertThat(response).isEqualTo(letterMock);
 
-			assertThat(response).isEqualTo(letterMock);
+		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
+		verify(repositoryIntegrationMock).persistLetter(municipalityId, letterRequest, multipartFileList);
+		verify(kivraIntegrationMock).sendContent(letterEntity, legalId);
+		verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
+		verifyNoInteractions(letterMock);
 
-			identifierUtilMock.verify(IdentifierUtil::getAdUser);
-			verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
-			verify(repositoryIntegrationMock).persistLetter(municipalityId, username, letterRequest, attachments);
-			verify(kivraIntegrationMock).sendContent(letterEntity, legalId);
-			verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
-			verifyNoInteractions(letterMock);
-			identifierUtilMock.verifyNoMoreInteractions();
-		}
 	}
 
 	@Test
 	void sendLetterForNonExistingPartyId() {
-		final var username = "username";
 		final var municipalityId = "2281";
 		final var letterRequest = createLetterRequest();
-		final var attachments = AttachmentsBuilder.create()
-			.build();
+		final var multipartFile = mock(MultipartFile.class);
+		final var multipartFileList = List.of(multipartFile);
+		Identifier.set(Identifier.parse("type=adAccount; test01user"));
 
-		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenThrow(Problem.valueOf(Status.BAD_REQUEST, "The given partyId [%s] does not exist in the Party API or is not of type PRIVATE".formatted(letterRequest
-			.partyId())));
+		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId()))
+			.thenThrow(Problem.valueOf(Status.BAD_REQUEST, "The given partyId [%s] does not exist in the Party API or is not of type PRIVATE".formatted(letterRequest.partyId())));
 
-		try (final MockedStatic<IdentifierUtil> identifierUtilMock = mockStatic(IdentifierUtil.class)) {
-			identifierUtilMock.when(IdentifierUtil::getAdUser).thenReturn(username);
+		assertThatThrownBy(() -> letterService.sendLetter(municipalityId, letterRequest, multipartFileList))
+			.isInstanceOf(Problem.class)
+			.hasMessage("Bad Request: The given partyId [%s] does not exist in the Party API or is not of type PRIVATE".formatted(letterRequest.partyId()));
 
-			assertThrows(ThrowableProblem.class, () -> letterService.sendLetter(municipalityId, letterRequest, attachments));
-
-			identifierUtilMock.verify(IdentifierUtil::getAdUser);
-			verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
-			identifierUtilMock.verifyNoMoreInteractions();
-		}
+		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
 	}
 
 	@Test

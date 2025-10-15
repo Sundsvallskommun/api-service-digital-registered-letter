@@ -45,6 +45,7 @@ class EligibilityResource {
 	ResponseEntity<List<String>> checkKivraEligibility(
 		@ValidMunicipalityId @PathVariable final String municipalityId,
 		@RequestBody @Valid final EligibilityRequest request) {
+
 		return ok(eligibilityService.checkEligibility(municipalityId, request));
 	}
 
