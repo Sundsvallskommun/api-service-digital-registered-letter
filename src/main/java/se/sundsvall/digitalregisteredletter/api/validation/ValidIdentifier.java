@@ -11,10 +11,10 @@ import java.lang.annotation.Target;
 	ElementType.FIELD, ElementType.PARAMETER
 })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = NoDuplicateFileNamesConstraintValidator.class)
-public @interface NoDuplicateFileNames {
+@Constraint(validatedBy = ValidIdentifierConstraintValidator.class)
+public @interface ValidIdentifier {
 
-	String message() default "no duplicate file names allowed in the list of files";
+	String message() default "X-Sent-By must be provided and must be in the correct format [type=TYPE; VALUE]";
 
 	Class<?>[] groups() default {};
 

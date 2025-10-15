@@ -34,6 +34,7 @@ import org.zalando.problem.Problem;
 import org.zalando.problem.ThrowableProblem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import org.zalando.problem.violations.Violation;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequestBuilder;
@@ -72,7 +73,9 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("getLetter.municipalityId", "not a valid municipality ID"));
+			.containsExactlyInAnyOrder(
+				tuple("getLetter.municipalityId", "not a valid municipality ID"),
+				tuple("getLetter.letterId", "not a valid UUID"));
 	}
 
 	@Test
@@ -106,7 +109,9 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("getSigningInformation.municipalityId", "not a valid municipality ID"));
+			.containsExactlyInAnyOrder(
+				tuple("getSigningInformation.municipalityId", "not a valid municipality ID"),
+				tuple("getSigningInformation.letterId", "not a valid UUID"));
 	}
 
 	@Test
@@ -121,6 +126,7 @@ class LetterResourceFailureTest {
 		final var response = webTestClient.post()
 			.uri("/%s/letters".formatted("bad-municipality-id"))
 			.contentType(MULTIPART_FORM_DATA)
+			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
 			.exchange()
 			.expectStatus().isBadRequest()
@@ -143,6 +149,7 @@ class LetterResourceFailureTest {
 		final var response = webTestClient.post()
 			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
 			.contentType(MULTIPART_FORM_DATA)
+			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
 			.exchange()
 			.expectStatus().isBadRequest()
@@ -173,6 +180,7 @@ class LetterResourceFailureTest {
 		final var response = webTestClient.post()
 			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
 			.contentType(MULTIPART_FORM_DATA)
+			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
 			.exchange()
 			.expectStatus().isBadRequest()
@@ -183,7 +191,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("files", "no duplicate file names allowed in the list of files"));
+			.containsExactly(tuple("sendLetter.attachments", "no duplicate file names allowed in the list of files"));
 	}
 
 	@Test
@@ -197,6 +205,7 @@ class LetterResourceFailureTest {
 		final var response = webTestClient.post()
 			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
 			.contentType(MULTIPART_FORM_DATA)
+			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
 			.exchange()
 			.expectStatus().isBadRequest()
@@ -207,7 +216,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("sendLetter.files", "content type must be application/pdf"));
+			.containsExactly(tuple("sendLetter.attachments", "content type must be application/pdf"));
 	}
 
 	@Test
@@ -220,6 +229,7 @@ class LetterResourceFailureTest {
 		final var response = webTestClient.post()
 			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
 			.contentType(MULTIPART_FORM_DATA)
+			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
 			.exchange()
 			.expectStatus().isBadRequest()

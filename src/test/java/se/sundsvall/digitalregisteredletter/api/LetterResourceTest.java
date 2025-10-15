@@ -18,6 +18,7 @@ import static se.sundsvall.TestDataFactory.createLetters;
 import static se.sundsvall.TestDataFactory.createSigningInfo;
 
 import java.io.OutputStream;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,6 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.zalando.problem.Problem;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
@@ -83,7 +85,7 @@ class LetterResourceTest {
 	@Test
 	void getLetter_OK() {
 		final var letterResponse = createLetter();
-		final var letterId = "1234567890";
+		final var letterId = UUID.randomUUID().toString();
 
 		when(letterServiceMock.getLetter(MUNICIPALITY_ID, letterId)).thenReturn(letterResponse);
 
@@ -101,7 +103,7 @@ class LetterResourceTest {
 
 	@Test
 	void getLetter_notFound() {
-		final var letterId = "1234567890";
+		final var letterId = UUID.randomUUID().toString();
 
 		when(letterServiceMock.getLetter(MUNICIPALITY_ID, letterId)).thenThrow(Problem.valueOf(NOT_FOUND));
 
@@ -116,7 +118,7 @@ class LetterResourceTest {
 	@Test
 	void getSigningInfo_OK() {
 		final var signingInfoResponse = createSigningInfo();
-		final var letterId = "1234567890";
+		final var letterId = UUID.randomUUID().toString();
 
 		when(letterServiceMock.getSigningInformation(MUNICIPALITY_ID, letterId)).thenReturn(signingInfoResponse);
 
@@ -135,7 +137,7 @@ class LetterResourceTest {
 	@Test
 	void sendLetter_Created() {
 		final var createLetterRequest = createLetterRequest();
-		final var letterId = "1234567890";
+		final var letterId = UUID.randomUUID().toString();
 		final var letterResponse = createLetter(letterId);
 
 		final var multipartBodyBuilder = new MultipartBodyBuilder();
@@ -148,6 +150,7 @@ class LetterResourceTest {
 		final var response = webTestClient.post()
 			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
 			.contentType(MULTIPART_FORM_DATA)
+			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
 			.exchange()
 			.expectStatus().isCreated()

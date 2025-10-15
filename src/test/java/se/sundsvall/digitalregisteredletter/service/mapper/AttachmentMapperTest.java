@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
-import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,11 +39,8 @@ class AttachmentMapperTest {
 		when(blobUtil.convertToBlob(multipartFile)).thenReturn(blob);
 
 		var files = List.of(multipartFile, multipartFile);
-		var attachments = AttachmentsBuilder.create()
-			.withFiles(files)
-			.build();
 
-		var attachmentEntities = attachmentMapper.toAttachmentEntities(attachments);
+		var attachmentEntities = attachmentMapper.toAttachmentEntities(files);
 
 		assertThat(attachmentEntities).isNotNull().allSatisfy(attachment -> {
 			assertThat(attachment.getFileName()).isEqualTo("file");

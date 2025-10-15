@@ -7,19 +7,22 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static se.sundsvall.TestDataFactory.createAttachments;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.web.multipart.MultipartFile;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
@@ -30,6 +33,8 @@ import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 
 @ExtendWith(MockitoExtension.class)
 class RepositoryIntegrationTest {
+
+	private static final String USERNAME = "test01user";
 
 	@Mock
 	private AttachmentMapper attachmentMapperMock;
@@ -64,6 +69,12 @@ class RepositoryIntegrationTest {
 	@InjectMocks
 	private RepositoryIntegration repositoryIntegration;
 
+	@BeforeAll
+	static void setup() {
+		var xSentBy = Identifier.parse("type=adAccount; %s".formatted(USERNAME));
+		Identifier.set(xSentBy);
+	}
+
 	@AfterEach
 	void tearDown() {
 		verifyNoMoreInteractions(
@@ -83,14 +94,14 @@ class RepositoryIntegrationTest {
 	@Test
 	void persistLetterWhenOrganizationAndUserExist() {
 		final var municipalityId = "2281";
-		final var username = "username";
 		final var letterRequest = createLetterRequest();
-		final var attachments = createAttachments();
+		final var multipartFile = Mockito.mock(MultipartFile.class);
+		final var multipartFileList = List.of(multipartFile);
 
 		when(letterMapperMock.toLetterEntity(letterRequest)).thenReturn(letterEntityMock);
 		when(letterMapperMock.addLetter(organizationEntityMock, letterEntityMock)).thenReturn(organizationEntityMock);
 		when(letterMapperMock.addLetter(userEntityMock, letterEntityMock)).thenReturn(userEntityMock);
-		when(attachmentMapperMock.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntityMock));
+		when(attachmentMapperMock.toAttachmentEntities(multipartFileList)).thenReturn(List.of(attachmentEntityMock));
 		when(organizationRepositoryMock.findByNumber(anyInt())).thenReturn(Optional.of(organizationEntityMock));
 		when(userRepositoryMock.findByUsernameIgnoreCase(any())).thenReturn(Optional.of(userEntityMock));
 		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -98,16 +109,16 @@ class RepositoryIntegrationTest {
 		when(letterEntityMock.withMunicipalityId(municipalityId)).thenReturn(letterEntityMock);
 		when(letterEntityMock.withStatus(any())).thenReturn(letterEntityMock);
 
-		final var response = repositoryIntegration.persistLetter(municipalityId, username, letterRequest, attachments);
+		final var response = repositoryIntegration.persistLetter(municipalityId, letterRequest, multipartFileList);
 
 		verify(letterMapperMock).toLetterEntity(letterRequest);
 		verify(letterMapperMock).addLetter(organizationEntityMock, letterEntityMock);
 		verify(letterMapperMock).addLetter(userEntityMock, letterEntityMock);
 		verify(letterMapperMock).toOrganizationEntity(letterRequest.organization(), letterEntityMock);
-		verify(letterMapperMock).toUserEntity(username, letterEntityMock);
-		verify(attachmentMapperMock).toAttachmentEntities(attachments);
+		verify(letterMapperMock).toUserEntity(USERNAME, letterEntityMock);
+		verify(attachmentMapperMock).toAttachmentEntities(multipartFileList);
 		verify(organizationRepositoryMock).findByNumber(234);
-		verify(userRepositoryMock).findByUsernameIgnoreCase(username);
+		verify(userRepositoryMock).findByUsernameIgnoreCase(USERNAME);
 		verify(letterRepositoryMock).save(letterEntityMock);
 		verify(letterEntityMock).withAttachments(List.of(attachmentEntityMock));
 		verify(letterEntityMock).withMunicipalityId(municipalityId);
@@ -121,32 +132,32 @@ class RepositoryIntegrationTest {
 	@Test
 	void persistLetterWhenOrganizationAndUserDoesNotExist() {
 		final var municipalityId = "2281";
-		final var username = "username";
 		final var letterRequest = createLetterRequest();
-		final var attachments = createAttachments();
+		final var multipartFile = Mockito.mock(MultipartFile.class);
+		final var multipartFileList = List.of(multipartFile);
 
 		when(letterMapperMock.toLetterEntity(letterRequest)).thenReturn(letterEntityMock);
 		when(letterMapperMock.toOrganizationEntity(any(), any())).thenCallRealMethod();
 		when(letterMapperMock.toUserEntity(any(), any())).thenCallRealMethod();
-		when(attachmentMapperMock.toAttachmentEntities(attachments)).thenReturn(List.of(attachmentEntityMock));
+		when(attachmentMapperMock.toAttachmentEntities(multipartFileList)).thenReturn(List.of(attachmentEntityMock));
 
 		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0, LetterEntity.class));
 		when(letterEntityMock.withAttachments(List.of(attachmentEntityMock))).thenReturn(letterEntityMock);
 		when(letterEntityMock.withMunicipalityId(municipalityId)).thenReturn(letterEntityMock);
 		when(letterEntityMock.withStatus(any())).thenReturn(letterEntityMock);
 
-		final var response = repositoryIntegration.persistLetter(municipalityId, username, letterRequest, attachments);
+		final var response = repositoryIntegration.persistLetter(municipalityId, letterRequest, multipartFileList);
 
 		verify(letterMapperMock).toLetterEntity(letterRequest);
 		verify(letterMapperMock).toOrganizationEntity(letterRequest.organization(), letterEntityMock);
-		verify(letterMapperMock).toUserEntity(username, letterEntityMock);
+		verify(letterMapperMock).toUserEntity(USERNAME, letterEntityMock);
 		verify(letterMapperMock).toOrganizationEntity(letterRequest.organization(), letterEntityMock);
-		verify(letterMapperMock).toUserEntity(username, letterEntityMock);
+		verify(letterMapperMock).toUserEntity(USERNAME, letterEntityMock);
 		verify(letterMapperMock, never()).addLetter(any(OrganizationEntity.class), any());
 		verify(letterMapperMock, never()).addLetter(any(UserEntity.class), any());
-		verify(attachmentMapperMock).toAttachmentEntities(attachments);
+		verify(attachmentMapperMock).toAttachmentEntities(multipartFileList);
 		verify(organizationRepositoryMock).findByNumber(234);
-		verify(userRepositoryMock).findByUsernameIgnoreCase(username);
+		verify(userRepositoryMock).findByUsernameIgnoreCase(USERNAME);
 		verify(letterRepositoryMock).save(letterEntityMock);
 		verify(letterEntityMock).withAttachments(List.of(attachmentEntityMock));
 		verify(letterEntityMock).withMunicipalityId(municipalityId);

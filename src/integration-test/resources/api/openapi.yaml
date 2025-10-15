@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.3"
+  version: "2.4"
 servers:
-  - url: http://localhost:56426
+  - url: http://localhost:57503
     description: Generated server url
 tags:
   - name: Scheduler Resource
@@ -156,6 +156,11 @@ paths:
       description: Send a digital registered letter using Kivra
       operationId: sendLetter
       parameters:
+        - name: X-Sent-By
+          in: header
+          required: true
+          schema:
+            type: string
         - name: municipalityId
           in: path
           required: true
@@ -633,7 +638,7 @@ components:
           type: string
           description: Body of the letter
           example: This is the content of the letter. Plain-text body
-      description: LetterRequest as a JSON string
+      description: Request to send a digital registered letter
     Organization:
       required:
         - name

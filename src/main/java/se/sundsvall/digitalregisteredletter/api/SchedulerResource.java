@@ -38,7 +38,9 @@ class SchedulerResource {
 
 	@PostMapping(produces = ALL_VALUE)
 	@Operation(summary = "Trigger update letter information task", description = "Triggers the task that updates letter information", responses = @ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true))
-	ResponseEntity<Void> updateLetterInformation(@PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId) {
+	ResponseEntity<Void> updateLetterInformation(
+		@PathVariable @ValidMunicipalityId final String municipalityId) {
+
 		schedulerWorker.updateLetterInformation();
 		return ok().build();
 	}
