@@ -9,6 +9,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -77,5 +79,24 @@ class StatusResourceFailureTest {
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
 			.containsExactly(tuple("letterIds[0]", "not a valid UUID"));
+	}
+
+	@ParameterizedTest
+	@NullAndEmptySource
+	void getLetterStatuses_emptyLetterIdList_badRequest(List<String> letterIds) {
+		final var response = webTestClient.post()
+			.uri("/%s/status/letters".formatted(MUNICIPALITY_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(new LetterStatusRequest(letterIds))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::getField, Violation::getMessage)
+			.containsExactly(tuple("letterIds", "must not be empty"));
 	}
 }

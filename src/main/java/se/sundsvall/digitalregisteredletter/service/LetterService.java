@@ -6,6 +6,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.service.util.CustomPredicate.distinctById;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -85,6 +86,7 @@ public class LetterService {
 			.map(id -> ofNullable(lettersById.get(id))
 				.map(letterMapper::toLetterStatus)
 				.orElseGet(() -> letterMapper.toLetterStatus(id, null, null)))
+			.filter(distinctById(LetterStatus::letterId))
 			.toList();
 	}
 
@@ -115,9 +117,9 @@ public class LetterService {
 
 		try (var input = content.getBinaryStream()) {
 			StreamUtils.copy(input, output);
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to open content stream for attachment with id '%s'".formatted(attachmentId));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to stream content for attachment with id '%s'".formatted(attachmentId));
 		}
 	}
