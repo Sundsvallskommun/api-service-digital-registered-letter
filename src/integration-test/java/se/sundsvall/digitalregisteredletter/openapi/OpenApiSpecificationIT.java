@@ -2,6 +2,7 @@ package se.sundsvall.digitalregisteredletter.openapi;
 
 import static java.nio.file.Files.writeString;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static se.sundsvall.dept44.util.ResourceUtils.asString;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -47,11 +48,9 @@ class OpenApiSpecificationIT {
 	private TestRestTemplate restTemplate;
 
 	@Test
-	void compareOpenApiSpecifications() throws IOException {
-		final String existingOpenApiSpecification = ResourceUtils.asString(openApiResource);
-		final String currentOpenApiSpecification = getCurrentOpenApiSpecification();
-
-		writeString(Path.of("target/generated-api.yaml"), currentOpenApiSpecification);
+	void compareOpenApiSpecifications() {
+		final var existingOpenApiSpecification = asString(openApiResource);
+		final var currentOpenApiSpecification = getCurrentOpenApiSpecification();
 
 		assertThatJson(toJson(currentOpenApiSpecification))
 			.withOptions(List.of(Option.IGNORING_ARRAY_ORDER))

@@ -121,6 +121,17 @@ public class RepositoryIntegration {
 	}
 
 	/**
+	 * Method returns letter entities matching provided letterIds
+	 *
+	 * @param  municipalityId municipality id to match against
+	 * @param  letterIds      list of letter ids to match against
+	 * @return                list of letter entities
+	 */
+	public List<LetterEntity> getLetterEntities(final String municipalityId, final List<String> letterIds) {
+		return letterRepository.findAllByMunicipalityIdAndIdInAndDeletedFalse(municipalityId, letterIds);
+	}
+
+	/**
 	 * Method returns a page based result of letter entities matching provided municipality id and optionally provided
 	 * filters
 	 *

@@ -3,6 +3,7 @@ package se.sundsvall.digitalregisteredletter.integration.db;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -190,6 +191,21 @@ class RepositoryIntegrationTest {
 		assertThat(repositoryIntegration.getLetterEntity(municipalityId, letterId)).isPresent().contains(letterEntityMock);
 
 		verify(letterRepositoryMock).findByIdAndMunicipalityIdAndDeleted(letterId, municipalityId, false);
+	}
+
+	@Test
+	void getLetterEntities() {
+		final var municipalityId = "municipalityId";
+		final var letterIds = List.of("letterId1", "letterId2");
+		final var letterEntities = List.of(
+			mock(LetterEntity.class),
+			mock(LetterEntity.class));
+
+		when(letterRepositoryMock.findAllByMunicipalityIdAndIdInAndDeletedFalse(municipalityId, letterIds)).thenReturn(letterEntities);
+
+		assertThat(repositoryIntegration.getLetterEntities(municipalityId, letterIds)).containsAll(letterEntities);
+
+		verify(letterRepositoryMock).findAllByMunicipalityIdAndIdInAndDeletedFalse(municipalityId, letterIds);
 	}
 
 	@Test

@@ -1,0 +1,17 @@
+[
+	{
+		"letterId": "f8853893-46a9-4249-a0e5-35d5595efd91",
+		"status": "SIGNED",
+		"signingInformation": "COMPLETED"
+	},
+	{
+		"letterId": "11111111-1111-1111-1111-111111111111",
+		"status": "NOT_FOUND",
+		"signingInformation": "NOT_FOUND"
+	},
+	{
+		"letterId": "9bb97fd2-4410-4a4b-9019-fdd98f01bd7c",
+		"status": "NEW",
+		"signingInformation": "NOT_FOUND"
+	}
+]

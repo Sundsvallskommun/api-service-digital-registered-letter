@@ -8,6 +8,7 @@ import static se.sundsvall.TestDataFactory.createAttachmentEntity;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createSupportInformationEmbeddable;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -300,6 +301,58 @@ class LetterMapperTest {
 	@Test
 	void toLettersFromNull() {
 		assertThat(letterMapper.toLetters(null)).isNull();
+	}
+
+	@Test
+	void toLetterStatus() {
+		final var signingInformation = SigningInformationEntity.create()
+			.withStatus("COMPLETED");
+		final var letter = LetterEntity.create()
+			.withId("letterId")
+			.withStatus("SENT")
+			.withSigningInformation(signingInformation);
+
+		final var result = letterMapper.toLetterStatus(letter);
+
+		assertThat(result.letterId()).isEqualTo(letter.getId());
+		assertThat(result.status()).isEqualTo(letter.getStatus());
+		assertThat(result.signingInformation()).isEqualTo(letter.getSigningInformation().getStatus());
+	}
+
+	@Test
+	void toLetterStatus_withoutLetterStatus() {
+		final var letter = LetterEntity.create()
+			.withId("letterId")
+			.withSigningInformation(SigningInformationEntity.create()
+				.withStatus("COMPLETED"));
+
+		final var result = letterMapper.toLetterStatus(letter);
+
+		assertThat(result.letterId()).isEqualTo(letter.getId());
+		assertThat(result.status()).isEqualTo(STATUS_NOT_FOUND);
+		assertThat(result.signingInformation()).isEqualTo(letter.getSigningInformation().getStatus());
+	}
+
+	@Test
+	void toLetterStatus_withoutSigningInformation() {
+		final var letter = LetterEntity.create()
+			.withId("letterId")
+			.withStatus("SENT");
+
+		final var result = letterMapper.toLetterStatus(letter);
+
+		assertThat(result.letterId()).isEqualTo(letter.getId());
+		assertThat(result.status()).isEqualTo(letter.getStatus());
+		assertThat(result.signingInformation()).isEqualTo(STATUS_NOT_FOUND);
+	}
+
+	@Test
+	void toLetterStatus_withNulls() {
+		final var result = letterMapper.toLetterStatus("letterId", null, null);
+
+		assertThat(result.letterId()).isEqualTo("letterId");
+		assertThat(result.status()).isEqualTo(STATUS_NOT_FOUND);
+		assertThat(result.signingInformation()).isEqualTo(STATUS_NOT_FOUND);
 	}
 
 	@Test
