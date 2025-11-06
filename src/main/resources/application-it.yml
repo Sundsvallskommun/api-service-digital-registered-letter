@@ -23,10 +23,15 @@ spring:
           messaging:
             client-id: messaging-client-id
             client-secret: messaging
+          templating:
+            client-id: templating-client-id
+            client-secret: templating
         provider:
           party:
             token-uri: http://localhost:${wiremock.server.port:}/token
           messaging:
+            token-uri: http://localhost:${wiremock.server.port:}/token
+          templating:
             token-uri: http://localhost:${wiremock.server.port:}/token
 integration:
   party:
@@ -45,7 +50,11 @@ integration:
   messaging:
     connect-timeout: 5
     read-timeout: 30
-    url: http://localhost:8080/messaging
+    url: http://localhost:${wiremock.server.port}/messaging
+  templating:
+    connect-timeout: 5
+    read-timeout: 30
+    url: http://localhost:${wiremock.server.port}/templating
 scheduler:
   update-letter-statuses:
     name: update-letter-statuses

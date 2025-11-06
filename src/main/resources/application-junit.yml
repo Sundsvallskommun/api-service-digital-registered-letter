@@ -32,11 +32,16 @@ spring:
           messaging:
             client-id: messaging-client-id
             client-secret: messaging
+          templating:
+            client-id: templating-client-id
+            client-secret: templating
         provider:
           party:
             token-uri: http://token.url
           messaging:
             token-uri: http://messaging.token.url
+          templating:
+            token-uri: http://templating.token.url
 integration:
   party:
     connectTimeout: 5
@@ -55,6 +60,10 @@ integration:
     connect-timeout: 5
     read-timeout: 30
     url: http://localhost:8080/messaging
+  templating:
+    connect-timeout: 5
+    read-timeout: 30
+    url: http://localhost:8080/templating
 scheduler:
   update-letter-statuses:
     name: update-letter-statuses
