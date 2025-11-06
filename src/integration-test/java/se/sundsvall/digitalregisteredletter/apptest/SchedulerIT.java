@@ -1,11 +1,10 @@
 package se.sundsvall.digitalregisteredletter.apptest;
 
-import static java.time.OffsetDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +69,7 @@ class SchedulerIT extends AbstractAppTest {
 				assertThat(signingInformation.getSignature()).isEqualTo("PD94bWwgdmVyc2lvb");
 				assertThat(signingInformation.getStatus()).isEqualTo("COMPLETED");
 				assertThat(signingInformation.getSurname()).isEqualTo("Doe");
-				assertThat(signingInformation.getSigned()).isEqualTo(OffsetDateTime.of(2023, 10, 01, 14, 00, 00, 000, now().getOffset()));
+				assertThat(signingInformation.getSigned().toInstant()).isEqualTo(Instant.parse("2023-10-01T12:00:00Z"));
 			});
 		});
 	}
