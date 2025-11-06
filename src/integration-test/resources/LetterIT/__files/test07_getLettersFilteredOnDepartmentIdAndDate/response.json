@@ -8,29 +8,6 @@
 	},
 	"letters": [
 		{
-			"id": "4ace2698-7dea-4d0b-9c5d-eeac32c1b49a",
-			"subject": "This is the subject",
-			"municipalityId": "2281",
-			"status": "SENT",
-			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
-			"contentType": "text/plain",
-			"created": "2023-10-01T00:00:00+02:00",
-			"updated": "2023-10-01T00:00:00+02:00",
-			"supportInfo": {
-				"supportText": "support text",
-				"contactInformationUrl": "https://example.com/support",
-				"contactInformationPhoneNumber": "+46123456789",
-				"contactInformationEmail": "support@email.com"
-			},
-			"attachments": [
-				{
-					"id": "6484b8c1-41e8-4519-8b5c-2868fff67d6b",
-					"fileName": "attachment9.txt",
-					"contentType": "text/plain"
-				}
-			]
-		},
-		{
 			"id": "9bb97fd2-4410-4a4b-9019-fdd98f01bd7c",
 			"subject": "This is the subject",
 			"municipalityId": "2281",
@@ -55,6 +32,29 @@
 					"id": "5a70a27f-997e-431e-9155-cc50d01e80c5",
 					"fileName": "attachment.pdf",
 					"contentType": "application/pdf"
+				}
+			]
+		},
+		{
+			"id": "bd3d2128-0d5a-457c-8629-0da4ffea85d9",
+			"subject": "This is the subject",
+			"municipalityId": "2281",
+			"status": "SENT",
+			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
+			"contentType": "text/plain",
+			"created": "2023-10-02T00:00:00+02:00",
+			"updated": "2023-10-02T00:00:00+02:00",
+			"supportInfo": {
+				"supportText": "support text",
+				"contactInformationUrl": "https://example.com/support",
+				"contactInformationPhoneNumber": "+46123456789",
+				"contactInformationEmail": "support@email.com"
+			},
+			"attachments": [
+				{
+					"id": "074e60e5-9c4b-465f-8bbf-5cf904eed648",
+					"fileName": "attachment8.txt",
+					"contentType": "text/plain"
 				}
 			]
 		}
