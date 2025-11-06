@@ -16,11 +16,10 @@ letters have been sent, signed and expired._
 
 1. **Clone the repository:**
 
-```bash
-git clone https://github.com/Sundsvallskommun/api-service-digital-registered-letter.git
-cd api-service-digital-registered-letter
-```
-
+   ```bash
+   git clone https://github.com/Sundsvallskommun/api-service-digital-registered-letter.git
+   cd api-service-digital-registered-letter
+   ```
 2. **Configure the application:**
 
    Before running the application, you need to set up configuration settings.
@@ -29,31 +28,14 @@ cd api-service-digital-registered-letter
    **Note:** Ensure all required configurations are set; otherwise, the application may fail to start.
 
 3. **Ensure dependent services are running:**
+   If this microservice depends on other services, make sure they are up and accessible.
+   See [Dependencies](#dependencies) for more details.
 
-   *Party*
-
-   - Purpose: Used for translating between party id and legal id.
-   - Repository: https://github.com/Sundsvallskommun/api-service-party
-   - Setup Instructions: See documentation in repository above for installation and configuration steps.
-
-   *Kivra*
-
-   - Purpose: Used for sending digital registered letters.
-   - Setup Instructions: Ensure you have the necessary credentials and configuration for Kivra. Refer to
-     the [Kivra API documentation](https://developer.kivra.se/) for more details.
 4. **Build and run the application:**
 
-- Using Maven:
-
-```bash
-mvn spring-boot:run
-```
-
-- Using Gradle:
-
-```bash
-gradle bootRun
-```
+   ```bash
+   mvn spring-boot:run
+   ```
 
 ## API Documentation
 
@@ -74,6 +56,27 @@ curl -X 'GET' 'https://localhost:8080/2281/letters?page=0&size=10'
 
 ```
 
+## Dependencies
+
+This microservice depends on the following services:
+
+- **Kivra**
+  - **Purpose:** Used for sending digital registered letters.
+  - **Setup Instructions:** Ensure you have the necessary credentials and configuration for Kivra. Refer to
+    the [Kivra API documentation](https://developer.kivra.se/) for more details.
+- **Party**
+  - **Purpose:** Used for translating between party id and legal id.
+  - **Repository:** https://github.com/Sundsvallskommun/api-service-party
+  - **Setup Instructions:** See documentation in the repository above for installation and configuration steps.
+- **Messaging**
+  - **Purpose:** Used to send messages when certificate issues are detected.
+  - **Repository:** https://github.com/Sundsvallskommun/api-service-messaging
+  - **Setup Instructions:** See documentation in the repository above for installation and configuration steps.
+- **Templating**
+  - **Purpose:** Used to render PDF templates.
+  - **Repository:** https://github.com/Sundsvallskommun/api-service-templating
+  - **Setup Instructions:** See documentation in the repository above for installation and configuration steps.
+
 ## Configuration
 
 Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in
@@ -83,60 +86,68 @@ Configuration is crucial for the application to run successfully. Ensure all nec
 
 - **Server Port:**
 
-```yaml
-server:
-  port: 8080
-```
-
+  ```yaml
+  server:
+    port: 8080
+  ```
 - **Database Settings**
 
-```yaml
-spring:
-  datasource:
-    username: <db_username>
-    password: <db_password>
-    url: jdbc:mariadb://<db_host>:<db_port>/<database>
-  jpa:
-    properties:
-      jakarta:
-        persistence:
-          schema-generation:
-            database:
-              action: validate
-  security:
-    oauth2:
-      client:
-        provider:
-          party:
-            token-uri: <token-uri-for-party>
-        registration:
-          party:
-            client-id: <party-client-id>
-            client-secret: <party-client-secret>
-integration:
-  party:
-    url: <party-url>
-  kivra:
-    api-url: <kivra-url>
-    connect-timeout: <maximum-connection-duration in ISO8601-duration format>
-    read-timeout: <maximum-read-duration in ISO8601-duration format>
-    oauth2:
-      token-url: <token-uri-for-kivra>
-      client-id: <kivra-client-id>
-      client-secret: <kivra-client-secret>
-      authorization-grant-type: <grant-type>
-scheduler:
-  update-letter-statuses:
-    cron: <cron-expression>
-    name: <name-of-the-job>
-    shedlock-lock-at-most-for: <ISO8601-duration format>
-    maximum-execution-time: <ISO8601-duration format>
-```
+  ```yaml
+  spring:
+    datasource:
+      username: <db_username>
+      password: <db_password>
+      url: jdbc:mariadb://<db_host>:<db_port>/<database>
+    jpa:
+      properties:
+        jakarta:
+          persistence:
+            schema-generation:
+              database:
+                action: validate
+  ```
+- **External Service URLs:**
+
+  ```yaml
+  spring:
+    security:
+      oauth2:
+        client:
+          provider:
+            party:
+              token-uri: <token-uri-for-party>
+          registration:
+            party:
+              client-id: <party-client-id>
+              client-secret: <party-client-secret>
+  integration:
+    party:
+      url: <party-url>
+    kivra:
+      api-url: <kivra-url>
+      connect-timeout: <maximum-connection-duration in ISO8601-duration format>
+      read-timeout: <maximum-read-duration in ISO8601-duration format>
+      oauth2:
+        token-url: <token-uri-for-kivra>
+        client-id: <kivra-client-id>
+        client-secret: <kivra-client-secret>
+        authorization-grant-type: <grant-type>
+  ```
+- **Scheduler Settings:**
+
+  ```yaml
+  scheduler:
+    update-letter-statuses:
+      cron: <cron-expression>
+      name: <name-of-the-job>
+      shedlock-lock-at-most-for: <ISO8601-duration format>
+      maximum-execution-time: <ISO8601-duration format>
+  ```
 
 ### Database Initialization
 
 The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by
-default so you will have to enable it to automatically populate the database schema upon application startup.
+default, so you will have to enable it to automatically populate the database schema upon application startup.
 
 ```yaml
 spring:

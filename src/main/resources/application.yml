@@ -22,6 +22,9 @@ spring:
           messaging:
             authorization-grant-type: client_credentials
             provider: messaging
+          templating:
+            authorization-grant-type: client_credentials
+            provider: templating
 openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}

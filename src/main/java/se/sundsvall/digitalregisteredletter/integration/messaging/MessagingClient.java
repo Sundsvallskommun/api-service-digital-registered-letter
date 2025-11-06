@@ -23,17 +23,17 @@ public interface MessagingClient {
 	/**
 	 * Sends a single e-mail
 	 *
-	 * @param  emailRequest containing email information
-	 * @return              response containing id and delivery results for sent message
+	 * @param request containing email information
+	 * @return response containing id and delivery results for the message that was sent
 	 */
 	@PostMapping(path = "/{municipalityId}/email", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	MessageResult sendEmail(@PathVariable("municipalityId") final String municipalityId, @RequestBody final EmailRequest request);
 
 	/**
-	 * Sends a slack message
+	 * Sends a Slack message
 	 *
-	 * @param  slackRequest containing message information
-	 * @return              response containing id and delivery results for sent message
+	 * @param slackRequest containing message information
+	 * @return response containing id and delivery results for the message that was sent
 	 */
 	@PostMapping(path = "/{municipalityId}/slack", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	MessageResult sendSlackMessage(@PathVariable("municipalityId") final String municipalityId, @RequestBody final SlackRequest slackRequest);
