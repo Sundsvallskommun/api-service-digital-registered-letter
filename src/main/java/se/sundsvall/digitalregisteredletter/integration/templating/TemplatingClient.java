@@ -22,9 +22,9 @@ interface TemplatingClient {
 	/**
 	 * Renders a template as PDF.
 	 *
-	 * @param municipalityId the municipality id to use for template rendering
-	 * @param renderRequest the {@link RenderRequest} containing template identifiers and data to render
-	 * @return the rendered PDF as a byte array wrapped in a {@link RenderResponse}
+	 * @param  municipalityId the municipality id to use for template rendering
+	 * @param  renderRequest  the {@link RenderRequest} containing template identifiers and data to render
+	 * @return                the rendered PDF as a byte array wrapped in a {@link RenderResponse}
 	 */
 	@PostMapping(path = "/{municipalityId}/render/pdf", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 	RenderResponse render(@PathVariable(name = "municipalityId") String municipalityId, @RequestBody RenderRequest renderRequest);
