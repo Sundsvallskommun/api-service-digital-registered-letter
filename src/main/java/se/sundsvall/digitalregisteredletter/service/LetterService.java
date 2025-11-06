@@ -8,6 +8,7 @@ import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.digitalregisteredletter.service.util.CustomPredicate.distinctById;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
@@ -77,7 +78,7 @@ public class LetterService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<LetterStatus> getLetterStatuses(String municipalityId, List<String> letterIds) {
+	public List<LetterStatus> getLetterStatuses(final String municipalityId, final List<String> letterIds) {
 		final var lettersById = repositoryIntegration.getLetterEntities(municipalityId, letterIds)
 			.stream()
 			.collect(toMap(LetterEntity::getId, identity()));
@@ -115,7 +116,7 @@ public class LetterService {
 		final var content = ofNullable(attachmentEntity.getContent())
 			.orElseThrow(() -> Problem.valueOf(INTERNAL_SERVER_ERROR, "No content for attachment with id '%s'".formatted(attachmentId)));
 
-		try (var input = content.getBinaryStream()) {
+		try (final var input = content.getBinaryStream()) {
 			StreamUtils.copy(input, output);
 		} catch (final SQLException e) {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to open content stream for attachment with id '%s'".formatted(attachmentId));
@@ -133,4 +134,10 @@ public class LetterService {
 		return repositoryIntegration.getLetterEntity(municipalityId, letterId)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 	}
+
+	public void getLetterReceipt(final String municipalityId, final String letterId, final HttpServletResponse response) {
+		// Will be implemented in the future
+
+	}
+
 }

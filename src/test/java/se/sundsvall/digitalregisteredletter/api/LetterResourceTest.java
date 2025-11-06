@@ -190,8 +190,7 @@ class LetterResourceTest {
 			.returnResult()
 			.getResponseBody();
 
-		assertThat(responseBytes).isNotNull();
-		assertThat(responseBytes).isEqualTo(bytes);
+		assertThat(responseBytes).isNotNull().isEqualTo(bytes);
 
 		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
 		verify(letterServiceMock).writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
@@ -213,5 +212,18 @@ class LetterResourceTest {
 
 		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
 		verify(letterServiceMock).writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
+	}
+
+	@Test
+	void readLetterReceipt() {
+		final var letterId = "11111111-1111-1111-1111-111111111111";
+
+		webTestClient.get()
+			.uri("/%s/letters/%s/receipt".formatted(MUNICIPALITY_ID, letterId))
+			.exchange()
+			.expectStatus().isOk();
+
+		verify(letterServiceMock).getLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
+
 	}
 }
