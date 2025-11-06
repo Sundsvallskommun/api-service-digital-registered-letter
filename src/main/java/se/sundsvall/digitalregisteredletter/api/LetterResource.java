@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -121,7 +122,7 @@ class LetterResource {
 			.map(type -> {
 				try {
 					return MediaType.parseMediaType(type);
-				} catch (InvalidMediaTypeException e) {
+				} catch (final InvalidMediaTypeException e) {
 					return APPLICATION_OCTET_STREAM;
 				}
 			})
@@ -154,4 +155,19 @@ class LetterResource {
 			.buildAndExpand(municipalityId, letter.id()).toUri())
 			.body(letter);
 	}
+
+	@GetMapping(value = "/{letterId}/receipt")
+	@Operation(summary = "Read letter receipt with the complete letter", description = "Retrieves letter receipt combined with the letter", responses = {
+		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", content = @Content(mediaType = ALL_VALUE, schema = @Schema(type = "string", format = "binary"))),
+		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+	})
+	void readLetterReceipt(
+		@PathVariable @ValidMunicipalityId final String municipalityId,
+		@PathVariable @ValidUuid final String letterId,
+		final HttpServletResponse response) {
+
+		letterService.getLetterReceipt(municipalityId, letterId, response);
+
+	}
+
 }

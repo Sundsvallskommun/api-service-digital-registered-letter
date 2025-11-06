@@ -53,6 +53,12 @@ class LetterResourceFailureTest {
 	@Autowired
 	private WebTestClient webTestClient;
 
+	static Stream<Arguments> argumentsProvider() {
+		return Stream.of(
+			Arguments.of("11111111-1111-1111-1111-111111111111", "invalid-attachment-id"),
+			Arguments.of("invalid-letter-id", "22222222-2222-2222-2222-222222222222"));
+	}
+
 	@AfterEach
 	void noMoreInteractions() {
 		verifyNoMoreInteractions(letterServiceMock);
@@ -310,9 +316,60 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 	}
 
-	static Stream<Arguments> argumentsProvider() {
-		return Stream.of(
-			Arguments.of("11111111-1111-1111-1111-111111111111", "invalid-attachment-id"),
-			Arguments.of("invalid-letter-id", "22222222-2222-2222-2222-222222222222"));
+	@Test
+	void readLetterReceipt_invalidMunicipalityId() {
+		final var letterId = "11111111-1111-1111-1111-111111111111";
+
+		final var response = webTestClient.get()
+			.uri("/%s/letters/%s/receipt".formatted("invalid-municipality-id", letterId))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::getField, Violation::getMessage)
+			.containsExactly(tuple("readLetterReceipt.municipalityId", "not a valid municipality ID"));
+	}
+
+	@Test
+	void readLetterReceipt_invalidLetterID() {
+
+		final var response = webTestClient.get()
+			.uri("/%s/letters/1234567890/receipt".formatted(MUNICIPALITY_ID))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::getField, Violation::getMessage)
+			.containsExactly(tuple("readLetterReceipt.letterId", "not a valid UUID"));
+	}
+
+	@Test
+	void readLetterReceipt_notFound() {
+		final var letterId = "11111111-1111-1111-1111-111111111111";
+
+		doThrow(Problem.valueOf(NOT_FOUND, "Letter with id '%s' not found".formatted(letterId)))
+			.when(letterServiceMock).getLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
+
+		final var response = webTestClient.get()
+			.uri("/%s/letters/%s/receipt".formatted(MUNICIPALITY_ID, letterId))
+			.exchange()
+			.expectStatus().isNotFound()
+			.expectBody(ThrowableProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getTitle()).contains("Not Found");
+		assertThat(response.getDetail()).contains("Letter with id '%s' not found".formatted(letterId));
+
+		verify(letterServiceMock).getLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
 	}
 }
