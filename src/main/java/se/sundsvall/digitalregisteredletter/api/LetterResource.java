@@ -168,7 +168,7 @@ class LetterResource {
 			municipalityId, letterId, output);
 
 		final var contentDisposition = ContentDisposition.attachment()
-			.filename("receipt.pdf", StandardCharsets.UTF_8)
+			.filename("kvittens_rekutskick_" + letterId + ".pdf", StandardCharsets.UTF_8)
 			.build();
 
 		return ok()
