@@ -13,14 +13,12 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
@@ -217,6 +215,37 @@ class LetterIT extends AbstractAppTest {
 	void test12_getSigningInformationForNonExistingLetter() {
 		setupCall()
 			.withServicePath("/2281/letters/00000000-0000-0000-0000-000000000000/signinginfo") // Non existing letter id
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(NOT_FOUND)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test13_readLetterReceipt() throws IOException {
+		setupCall()
+			.withServicePath("/2281/letters/f8853893-46a9-4249-a0e5-35d5595efd91/receipt")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponseHeader(CONTENT_TYPE, List.of("application/pdf"))
+			.sendRequestAndVerifyResponse()
+			.withExpectedBinaryResponse("attachment.pdf");
+	}
+
+	@Test
+	void test14_readLetterReceiptWhenLetterNotFound() {
+		setupCall()
+			.withServicePath("/2281/letters/00000000-0000-0000-0000-000000000000/receipt") // Non existing letter id
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(NOT_FOUND)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test15_readLetterReceiptWhenMunicipalityDiffers() {
+		setupCall()
+			.withServicePath("/2262/letters/f8853893-46a9-4249-a0e5-35d5595efd91/receipt") // Id exists but for another municipality (2281)
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(NOT_FOUND)
 			.withExpectedResponse(RESPONSE)
