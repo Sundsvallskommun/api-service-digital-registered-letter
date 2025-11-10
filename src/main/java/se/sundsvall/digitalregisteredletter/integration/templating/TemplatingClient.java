@@ -17,7 +17,7 @@ import se.sundsvall.digitalregisteredletter.integration.templating.configuration
 	configuration = TemplatingConfiguration.class,
 	url = "${integration.templating.url}")
 @CircuitBreaker(name = CLIENT_ID)
-interface TemplatingClient {
+public interface TemplatingClient {
 
 	/**
 	 * Renders a template as PDF.

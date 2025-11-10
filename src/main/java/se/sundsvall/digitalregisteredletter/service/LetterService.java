@@ -7,8 +7,9 @@ import static java.util.stream.Collectors.toMap;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.digitalregisteredletter.service.util.CustomPredicate.distinctById;
+import static se.sundsvall.digitalregisteredletter.service.util.InvoicePdfMerger.mergePdfs;
 
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
@@ -31,6 +32,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntit
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
+import se.sundsvall.digitalregisteredletter.integration.templating.TemplatingIntegration;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 
 @Service
@@ -40,26 +42,28 @@ public class LetterService {
 	private final PartyIntegration partyIntegration;
 	private final RepositoryIntegration repositoryIntegration;
 	private final LetterMapper letterMapper;
+	private final TemplatingIntegration templatingIntegration;
 
 	public LetterService(
 		final KivraIntegration kivraIntegration,
 		final PartyIntegration partyIntegration,
 		final RepositoryIntegration repositoryIntegration,
-		final LetterMapper letterMapper) {
+		final LetterMapper letterMapper, final TemplatingIntegration templatingIntegration) {
 
 		this.kivraIntegration = kivraIntegration;
 		this.partyIntegration = partyIntegration;
 		this.repositoryIntegration = repositoryIntegration;
 		this.letterMapper = letterMapper;
+		this.templatingIntegration = templatingIntegration;
 	}
 
 	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
 		final var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId())
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND,
-				"No legalId found for partyId '%s' and municipalityId '%s'".formatted(letterRequest.partyId(), municipalityId))); // Verify that match for party in request exists as there is no point in persisting entity otherwise
+				"No legalId found for partyId '%s' and municipalityId '%s'".formatted(letterRequest.partyId(), municipalityId))); // Verify that a match for a party in request exists as there is no point in persisting entity otherwise
 
-		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments); // Create a new entity in database for the letter
-		final var status = kivraIntegration.sendContent(letterEntity, legalId); // Send letter to Kivra
+		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments); // Create a new entity in the database for the letter
+		final var status = kivraIntegration.sendContent(letterEntity, legalId); // Send a letter to Kivra
 		repositoryIntegration.updateStatus(letterEntity, status); // Update entity with status from Kivra response
 
 		return letterMapper.toLetter(letterEntity);
@@ -135,9 +139,20 @@ public class LetterService {
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 	}
 
-	public void getLetterReceipt(final String municipalityId, final String letterId, final HttpServletResponse response) {
-		// Will be implemented in the future
+	@Transactional(readOnly = true)
+	public void writeLetterReceipt(final String municipalityId, final String letterId, final OutputStream output) {
+		final var letterEntity = getLetterEntity(municipalityId, letterId);
 
+		final var attachments = letterEntity.getAttachments();
+
+		final var receipt = templatingIntegration.renderPdf(municipalityId, letterEntity);
+
+		try (final var outputStream = (ByteArrayOutputStream) mergePdfs(attachments, receipt)) {
+			final var bytes = outputStream.toByteArray();
+			output.write(bytes);
+		} catch (final IOException e) {
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when writing receipt content: %s".formatted(e.getClass().getSimpleName(), e.getMessage()));
+		}
 	}
 
 }
