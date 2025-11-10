@@ -356,7 +356,7 @@ class LetterResourceFailureTest {
 		final var letterId = "11111111-1111-1111-1111-111111111111";
 
 		doThrow(Problem.valueOf(NOT_FOUND, "Letter with id '%s' not found".formatted(letterId)))
-			.when(letterServiceMock).getLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
+			.when(letterServiceMock).writeLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
 
 		final var response = webTestClient.get()
 			.uri("/%s/letters/%s/receipt".formatted(MUNICIPALITY_ID, letterId))
@@ -370,6 +370,6 @@ class LetterResourceFailureTest {
 		assertThat(response.getTitle()).contains("Not Found");
 		assertThat(response.getDetail()).contains("Letter with id '%s' not found".formatted(letterId));
 
-		verify(letterServiceMock).getLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
+		verify(letterServiceMock).writeLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
 	}
 }

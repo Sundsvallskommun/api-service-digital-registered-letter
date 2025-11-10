@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -129,7 +128,7 @@ class LetterResource {
 			.orElse(APPLICATION_OCTET_STREAM);
 
 		final var contentDisposition = ContentDisposition.attachment()
-			.filename(ofNullable(attachment.fileName()).orElse("attachment"), StandardCharsets.UTF_8)
+			.filename(attachment.fileName(), StandardCharsets.UTF_8)
 			.build();
 
 		return ok()
@@ -156,18 +155,26 @@ class LetterResource {
 			.body(letter);
 	}
 
-	@GetMapping(value = "/{letterId}/receipt")
+	@GetMapping(value = "/{letterId}/receipt", produces = ALL_VALUE)
 	@Operation(summary = "Read letter receipt with the complete letter", description = "Retrieves letter receipt combined with the letter", responses = {
 		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", content = @Content(mediaType = ALL_VALUE, schema = @Schema(type = "string", format = "binary"))),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 	})
-	void readLetterReceipt(
+	ResponseEntity<StreamingResponseBody> readLetterReceipt(
 		@PathVariable @ValidMunicipalityId final String municipalityId,
-		@PathVariable @ValidUuid final String letterId,
-		final HttpServletResponse response) {
+		@PathVariable @ValidUuid final String letterId) {
 
-		letterService.getLetterReceipt(municipalityId, letterId, response);
+		final StreamingResponseBody contentStream = output -> letterService.writeLetterReceipt(
+			municipalityId, letterId, output);
 
+		final var contentDisposition = ContentDisposition.attachment()
+			.filename("receipt.pdf", StandardCharsets.UTF_8)
+			.build();
+
+		return ok()
+			.headers(headers -> headers.setContentDisposition(contentDisposition))
+			.contentType(MediaType.APPLICATION_PDF)
+			.body(contentStream);
 	}
 
 }

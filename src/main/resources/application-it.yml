@@ -55,6 +55,7 @@ integration:
     connect-timeout: 5
     read-timeout: 30
     url: http://localhost:${wiremock.server.port}/templating
+    receipt-template-identifier: some-receipt-identifier
 scheduler:
   update-letter-statuses:
     name: update-letter-statuses

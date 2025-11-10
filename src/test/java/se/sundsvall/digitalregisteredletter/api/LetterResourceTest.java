@@ -223,7 +223,7 @@ class LetterResourceTest {
 			.exchange()
 			.expectStatus().isOk();
 
-		verify(letterServiceMock).getLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
+		verify(letterServiceMock).writeLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
 
 	}
 }
