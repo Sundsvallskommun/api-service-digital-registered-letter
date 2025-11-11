@@ -140,7 +140,7 @@ public class LetterService {
 	}
 
 	@Transactional(readOnly = true)
-	public void writeLetterReceipt(final String municipalityId, final String letterId, final OutputStream output) {
+	public byte[] writeLetterReceipt(final String municipalityId, final String letterId) {
 		final var letterEntity = getLetterEntity(municipalityId, letterId);
 
 		final var attachments = letterEntity.getAttachments();
@@ -148,8 +148,7 @@ public class LetterService {
 		final var receipt = templatingIntegration.renderPdf(municipalityId, letterEntity);
 
 		try (final var outputStream = (ByteArrayOutputStream) mergePdfs(attachments, receipt)) {
-			final var bytes = outputStream.toByteArray();
-			output.write(bytes);
+			return outputStream.toByteArray();
 		} catch (final IOException e) {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when writing receipt content: %s".formatted(e.getClass().getSimpleName(), e.getMessage()));
 		}
