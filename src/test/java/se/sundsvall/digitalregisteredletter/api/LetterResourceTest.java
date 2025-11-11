@@ -218,12 +218,14 @@ class LetterResourceTest {
 	void readLetterReceipt() {
 		final var letterId = "11111111-1111-1111-1111-111111111111";
 
+		when(letterServiceMock.writeLetterReceipt(MUNICIPALITY_ID, letterId)).thenReturn("some-random-content".getBytes());
+
 		webTestClient.get()
 			.uri("/%s/letters/%s/receipt".formatted(MUNICIPALITY_ID, letterId))
 			.exchange()
 			.expectStatus().isOk();
 
-		verify(letterServiceMock).writeLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any());
+		verify(letterServiceMock).writeLetterReceipt(MUNICIPALITY_ID, letterId);
 
 	}
 }

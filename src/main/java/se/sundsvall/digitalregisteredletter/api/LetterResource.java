@@ -10,6 +10,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
@@ -164,8 +166,16 @@ class LetterResource {
 		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@PathVariable @ValidUuid final String letterId) {
 
-		final StreamingResponseBody contentStream = output -> letterService.writeLetterReceipt(
-			municipalityId, letterId, output);
+		final var pdfBytes = letterService.writeLetterReceipt(municipalityId, letterId);
+
+		final StreamingResponseBody contentStream = output -> {
+			try {
+				output.write(pdfBytes);
+			} catch (final IOException e) {
+				throw Problem.valueOf(INTERNAL_SERVER_ERROR,
+					"Failed to write receipt content: %s".formatted(e.getMessage()));
+			}
+		};
 
 		final var contentDisposition = ContentDisposition.attachment()
 			.filename("kvittens_rekutskick_" + letterId + ".pdf", StandardCharsets.UTF_8)

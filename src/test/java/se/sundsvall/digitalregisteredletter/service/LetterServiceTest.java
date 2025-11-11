@@ -393,10 +393,10 @@ class LetterServiceTest {
 		when(templatingIntegrationMock.renderPdf(municipalityId, letterEntityMock))
 			.thenReturn(renderResponse);
 		// Act
-		letterService.writeLetterReceipt(municipalityId, letterId, output);
+		final var result = letterService.writeLetterReceipt(municipalityId, letterId);
 
 		// Assert
-		final var pdfDocument = Loader.loadPDF(output.toByteArray());
+		final var pdfDocument = Loader.loadPDF(result);
 
 		// Assert
 		assertThat(output).isNotNull();
@@ -413,9 +413,7 @@ class LetterServiceTest {
 
 		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.empty());
 
-		final var output = new ByteArrayOutputStream();
-
-		assertThatThrownBy(() -> letterService.writeLetterReceipt(municipalityId, letterId, output))
+		assertThatThrownBy(() -> letterService.writeLetterReceipt(municipalityId, letterId))
 			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Not Found: Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId));
 	}
@@ -425,7 +423,6 @@ class LetterServiceTest {
 		// Arrange
 		final var municipalityId = "2281";
 		final var letterId = "1234";
-		final var output = new ByteArrayOutputStream();
 		final var letterEntityMock = mock(LetterEntity.class);
 
 		when(repositoryIntegrationMock.getLetterEntity(municipalityId, letterId)).thenReturn(Optional.of(letterEntityMock));
@@ -433,7 +430,7 @@ class LetterServiceTest {
 			.thenThrow(Problem.valueOf(org.zalando.problem.Status.NOT_FOUND, "No signing information found for letter with id '1234'"));
 
 		// Act
-		assertThatThrownBy(() -> letterService.writeLetterReceipt(municipalityId, letterId, output))
+		assertThatThrownBy(() -> letterService.writeLetterReceipt(municipalityId, letterId))
 			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Not Found: No signing information found for letter with id '1234'");
 
