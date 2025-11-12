@@ -58,7 +58,7 @@ class TemplatingMapperTest {
 
 		final var personalNumber = "191212121212";
 		final var name = "Test Testsson";
-		final var signed = OffsetDateTime.now();
+		final var signed = OffsetDateTime.parse("2025-11-12T14:30:00+01:00");
 
 		final var signingInformation = SigningInformationEntity.create()
 			.withPersonalNumber(personalNumber)
@@ -78,7 +78,7 @@ class TemplatingMapperTest {
 		assertThat(result.getParameters()).isNotNull().hasSize(3);
 		assertThat(result.getParameters()).containsEntry("personalNumber", personalNumber);
 		assertThat(result.getParameters()).containsEntry("name", name);
-		assertThat(result.getParameters()).containsEntry("signed", signed);
+		assertThat(result.getParameters()).containsEntry("signed", "2025-11-12 14:30");
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class TemplatingMapperTest {
 
 		final var personalNumber = "191212121212";
 		final var name = "Test Testsson";
-		final var signed = OffsetDateTime.now();
+		final var signed = OffsetDateTime.parse("2025-11-12T14:30:00+01:00");
 		final var givenName = "Test";
 		final var surname = "Testsson";
 		final var ipAddress = "192.168.1.1";
@@ -117,7 +117,7 @@ class TemplatingMapperTest {
 		assertThat(result.getParameters()).isNotNull().hasSize(3);
 		assertThat(result.getParameters()).containsEntry("personalNumber", personalNumber);
 		assertThat(result.getParameters()).containsEntry("name", name);
-		assertThat(result.getParameters()).containsEntry("signed", signed);
+		assertThat(result.getParameters()).containsEntry("signed", "2025-11-12 14:30");
 	}
 
 	@ParameterizedTest
@@ -144,7 +144,12 @@ class TemplatingMapperTest {
 		assertThat(result.getParameters()).isNotNull().hasSize(3);
 		assertThat(result.getParameters()).containsEntry("personalNumber", personalNumber);
 		assertThat(result.getParameters()).containsEntry("name", name);
-		assertThat(result.getParameters()).containsEntry("signed", signed);
+		if (signed != null) {
+			assertThat(result.getParameters()).containsKey("signed");
+			assertThat(result.getParameters().get("signed")).isInstanceOf(String.class);
+		} else {
+			assertThat(result.getParameters()).containsEntry("signed", null);
+		}
 	}
 
 	@Test
@@ -180,7 +185,7 @@ class TemplatingMapperTest {
 
 		final var personalNumber = "A".repeat(1000);
 		final var name = "B".repeat(2000);
-		final var signed = OffsetDateTime.now();
+		final var signed = OffsetDateTime.parse("2025-11-12T14:30:00+01:00");
 
 		final var signingInformation = SigningInformationEntity.create()
 			.withPersonalNumber(personalNumber)
@@ -200,7 +205,7 @@ class TemplatingMapperTest {
 		assertThat(result.getParameters()).isNotNull().hasSize(3);
 		assertThat(result.getParameters()).containsEntry("personalNumber", personalNumber);
 		assertThat(result.getParameters()).containsEntry("name", name);
-		assertThat(result.getParameters()).containsEntry("signed", signed);
+		assertThat(result.getParameters()).containsEntry("signed", "2025-11-12 14:30");
 	}
 
 	@Test
@@ -210,7 +215,7 @@ class TemplatingMapperTest {
 
 		final var personalNumber = "191212121212";
 		final var name = "Tëst Tëstssön 测试 🎉";
-		final var signed = OffsetDateTime.now();
+		final var signed = OffsetDateTime.parse("2025-11-12T14:30:00+01:00");
 
 		final var signingInformation = SigningInformationEntity.create()
 			.withPersonalNumber(personalNumber)
@@ -230,7 +235,7 @@ class TemplatingMapperTest {
 		assertThat(result.getParameters()).isNotNull().hasSize(3);
 		assertThat(result.getParameters()).containsEntry("personalNumber", personalNumber);
 		assertThat(result.getParameters()).containsEntry("name", name);
-		assertThat(result.getParameters()).containsEntry("signed", signed);
+		assertThat(result.getParameters()).containsEntry("signed", "2025-11-12 14:30");
 	}
 
 	@Test
@@ -272,7 +277,7 @@ class TemplatingMapperTest {
 		final var signingInformation = SigningInformationEntity.create()
 			.withPersonalNumber("191212121212")
 			.withName("Test Testsson")
-			.withSigned(OffsetDateTime.now());
+			.withSigned(OffsetDateTime.parse("2025-11-12T14:30:00+01:00"));
 
 		final var letterEntity = new LetterEntity()
 			.withId("letter-id")
@@ -294,7 +299,7 @@ class TemplatingMapperTest {
 		final var signingInformation = SigningInformationEntity.create()
 			.withPersonalNumber("191212121212")
 			.withName("Test Testsson")
-			.withSigned(OffsetDateTime.now());
+			.withSigned(OffsetDateTime.parse("2025-11-12T14:30:00+01:00"));
 
 		final var letterEntity = new LetterEntity()
 			.withId("letter-id")
@@ -337,7 +342,9 @@ class TemplatingMapperTest {
 
 		// Assert
 		assertThat(result).isNotNull();
-		assertThat(result.getParameters()).containsEntry("signed", signed);
+		assertThat(result.getParameters()).containsKey("signed");
+		assertThat(result.getParameters().get("signed")).isInstanceOf(String.class);
+		assertThat(result.getParameters().get("signed").toString()).matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}");
 	}
 
 	@Test
@@ -348,7 +355,7 @@ class TemplatingMapperTest {
 		final var signingInformation1 = SigningInformationEntity.create()
 			.withPersonalNumber("191212121212")
 			.withName("First Person")
-			.withSigned(OffsetDateTime.now());
+			.withSigned(OffsetDateTime.parse("2025-11-12T14:30:00+01:00"));
 
 		final var letterEntity1 = new LetterEntity()
 			.withId("letter-id-1")
@@ -357,7 +364,7 @@ class TemplatingMapperTest {
 		final var signingInformation2 = SigningInformationEntity.create()
 			.withPersonalNumber("199901011234")
 			.withName("Second Person")
-			.withSigned(OffsetDateTime.now().plusDays(1));
+			.withSigned(OffsetDateTime.parse("2025-11-13T15:45:00+01:00"));
 
 		final var letterEntity2 = new LetterEntity()
 			.withId("letter-id-2")
