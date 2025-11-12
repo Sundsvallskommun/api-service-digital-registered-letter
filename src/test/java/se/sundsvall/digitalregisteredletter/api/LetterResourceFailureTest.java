@@ -17,7 +17,7 @@ import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 
-import java.io.OutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,6 @@ import org.zalando.problem.violations.ConstraintViolationProblem;
 import org.zalando.problem.violations.Violation;
 import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.Application;
-import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequestBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.OrganizationBuilder;
 import se.sundsvall.digitalregisteredletter.service.LetterService;
@@ -256,8 +255,9 @@ class LetterResourceFailureTest {
 		final var letterId = "11111111-1111-1111-1111-111111111111";
 		final var attachmentId = "22222222-2222-2222-2222-222222222222";
 
-		when(letterServiceMock.getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId))
-			.thenThrow(Problem.valueOf(NOT_FOUND, "Entity not found"));
+		doThrow(Problem.valueOf(NOT_FOUND, "Entity not found"))
+			.when(letterServiceMock)
+			.readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 
 		final var response = webTestClient.get()
 			.uri("/%s/letters/%s/attachments/%s".formatted(MUNICIPALITY_ID, letterId, attachmentId))
@@ -270,7 +270,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getTitle()).contains("Not Found");
 
-		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
+		verify(letterServiceMock).readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 	}
 
 	@Test
@@ -278,13 +278,9 @@ class LetterResourceFailureTest {
 		final var letterId = "11111111-1111-1111-1111-111111111111";
 		final var attachmentId = "22222222-2222-2222-2222-222222222222";
 
-		when(letterServiceMock.getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId))
-			.thenReturn(new Attachment(attachmentId, "file.pdf", APPLICATION_PDF.toString()));
-
 		doThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to stream content for attachment with id '%s'".formatted(attachmentId)))
 			.when(letterServiceMock)
-			.writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
-
+			.readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 		final var response = webTestClient.get()
 			.uri("/%s/letters/%s/attachments/%s".formatted(MUNICIPALITY_ID, letterId, attachmentId))
 			.accept(APPLICATION_PDF)
@@ -298,8 +294,7 @@ class LetterResourceFailureTest {
 		assertThat(response.getTitle()).isEqualTo("Internal Server Error");
 		assertThat(response.getDetail()).contains("Failed to stream content");
 
-		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
-		verify(letterServiceMock).writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
+		verify(letterServiceMock).readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 	}
 
 	@ParameterizedTest
@@ -356,7 +351,7 @@ class LetterResourceFailureTest {
 		final var letterId = "11111111-1111-1111-1111-111111111111";
 
 		doThrow(Problem.valueOf(NOT_FOUND, "Letter with id '%s' not found".formatted(letterId)))
-			.when(letterServiceMock).writeLetterReceipt(MUNICIPALITY_ID, letterId);
+			.when(letterServiceMock).readLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any(HttpServletResponse.class));
 
 		final var response = webTestClient.get()
 			.uri("/%s/letters/%s/receipt".formatted(MUNICIPALITY_ID, letterId))
@@ -370,6 +365,6 @@ class LetterResourceFailureTest {
 		assertThat(response.getTitle()).contains("Not Found");
 		assertThat(response.getDetail()).contains("Letter with id '%s' not found".formatted(letterId));
 
-		verify(letterServiceMock).writeLetterReceipt(MUNICIPALITY_ID, letterId);
+		verify(letterServiceMock).readLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any(HttpServletResponse.class));
 	}
 }
