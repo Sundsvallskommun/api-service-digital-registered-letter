@@ -17,7 +17,7 @@ import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createLetters;
 import static se.sundsvall.TestDataFactory.createSigningInfo;
 
-import java.io.OutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,6 @@ import org.zalando.problem.Problem;
 import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
-import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
@@ -169,16 +168,14 @@ class LetterResourceTest {
 		final var attachmentId = "22222222-2222-2222-2222-222222222222";
 		final var bytes = "some-random-content".getBytes();
 
-		when(letterServiceMock.getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId))
-			.thenReturn(new Attachment(attachmentId, "file.pdf", "application/pdf"));
-
 		doAnswer(invocation -> {
-			final var output = (OutputStream) invocation.getArgument(3);
-			output.write(bytes);
-			output.flush();
+			final var response = (HttpServletResponse) invocation.getArgument(3);
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader("Content-Disposition", "attachment; filename=\"file.pdf\"");
+			response.getOutputStream().write(bytes);
 			return null;
 		}).when(letterServiceMock)
-			.writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
+			.readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 
 		final var responseBytes = webTestClient.get()
 			.uri("/%s/letters/%s/attachments/%s".formatted(MUNICIPALITY_ID, letterId, attachmentId))
@@ -192,8 +189,7 @@ class LetterResourceTest {
 
 		assertThat(responseBytes).isNotNull().isEqualTo(bytes);
 
-		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
-		verify(letterServiceMock).writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
+		verify(letterServiceMock).readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 	}
 
 	@Test
@@ -201,8 +197,13 @@ class LetterResourceTest {
 		final var letterId = "11111111-1111-1111-1111-111111111111";
 		final var attachmentId = "22222222-2222-2222-2222-222222222222";
 
-		when(letterServiceMock.getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId))
-			.thenReturn(new Attachment(attachmentId, "some.file", "invalid-content-type"));
+		doAnswer(invocation -> {
+			final var response = (HttpServletResponse) invocation.getArgument(3);
+			response.addHeader("Content-Type", "application/octet-stream");
+			response.addHeader("Content-Disposition", "attachment; filename=\"some.file\"");
+			return null;
+		}).when(letterServiceMock)
+			.readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 
 		webTestClient.get()
 			.uri("/%s/letters/%s/attachments/%s".formatted(MUNICIPALITY_ID, letterId, attachmentId))
@@ -210,22 +211,28 @@ class LetterResourceTest {
 			.expectStatus().isOk()
 			.expectHeader().contentType(APPLICATION_OCTET_STREAM);
 
-		verify(letterServiceMock).getLetterAttachment(MUNICIPALITY_ID, letterId, attachmentId);
-		verify(letterServiceMock).writeAttachmentContent(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(OutputStream.class));
+		verify(letterServiceMock).readLetterAttachment(eq(MUNICIPALITY_ID), eq(letterId), eq(attachmentId), any(HttpServletResponse.class));
 	}
 
 	@Test
 	void readLetterReceipt() {
 		final var letterId = "11111111-1111-1111-1111-111111111111";
 
-		when(letterServiceMock.writeLetterReceipt(MUNICIPALITY_ID, letterId)).thenReturn("some-random-content".getBytes());
+		doAnswer(invocation -> {
+			final var response = (HttpServletResponse) invocation.getArgument(2);
+			response.addHeader("Content-Type", "application/pdf");
+			response.addHeader("Content-Disposition", "attachment; filename=\"kvittens_rekutskick_" + letterId + ".pdf\"");
+			response.getOutputStream().write("some-random-content".getBytes());
+			return null;
+		}).when(letterServiceMock)
+			.readLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any(HttpServletResponse.class));
 
 		webTestClient.get()
 			.uri("/%s/letters/%s/receipt".formatted(MUNICIPALITY_ID, letterId))
 			.exchange()
 			.expectStatus().isOk();
 
-		verify(letterServiceMock).writeLetterReceipt(MUNICIPALITY_ID, letterId);
+		verify(letterServiceMock).readLetterReceipt(eq(MUNICIPALITY_ID), eq(letterId), any(HttpServletResponse.class));
 
 	}
 }

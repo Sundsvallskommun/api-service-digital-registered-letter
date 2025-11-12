@@ -4,14 +4,17 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.digitalregisteredletter.service.util.CustomPredicate.distinctById;
 import static se.sundsvall.digitalregisteredletter.service.util.InvoicePdfMerger.mergePdfs;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -103,7 +106,7 @@ public class LetterService {
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Signing information belonging to letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 	}
 
-	public Attachment getLetterAttachment(final String municipalityId, final String letterId, final String attachmentId) {
+	private Attachment getLetterAttachment(final String municipalityId, final String letterId, final String attachmentId) {
 		final var letter = getLetter(municipalityId, letterId);
 
 		return ofNullable(letter.attachments())
@@ -115,17 +118,32 @@ public class LetterService {
 	}
 
 	@Transactional(readOnly = true)
-	public void writeAttachmentContent(final String municipalityId, final String letterId, final String attachmentId, final OutputStream output) {
+	public void readLetterAttachment(final String municipalityId, final String letterId, final String attachmentId, final HttpServletResponse response) {
 		final var attachmentEntity = getAttachmentEntity(municipalityId, letterId, attachmentId);
-		final var content = ofNullable(attachmentEntity.getContent())
-			.orElseThrow(() -> Problem.valueOf(INTERNAL_SERVER_ERROR, "No content for attachment with id '%s'".formatted(attachmentId)));
+		final var attachment = getLetterAttachment(municipalityId, letterId, attachmentId);
 
-		try (final var input = content.getBinaryStream()) {
-			StreamUtils.copy(input, output);
-		} catch (final SQLException e) {
-			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to open content stream for attachment with id '%s'".formatted(attachmentId));
+		try {
+			final var content = ofNullable(attachmentEntity.getContent())
+				.orElseThrow(() -> Problem.valueOf(INTERNAL_SERVER_ERROR, "No content for attachment with id '%s'".formatted(attachmentId)));
+
+			final var input = content.getBinaryStream();
+			writeToResponse(response, attachment.contentType(), "attachment; filename=\"" + attachment.fileName() + "\"", (int) content.length(), input);
+			input.close();
+		} catch (final SQLException | IOException e) {
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to read attachment with id '%s': %s".formatted(attachmentId, e.getMessage()));
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public void readLetterReceipt(final String municipalityId, final String letterId, final HttpServletResponse response) {
+		final var letterEntity = getLetterEntity(municipalityId, letterId);
+		final var receipt = templatingIntegration.renderPdf(municipalityId, letterEntity);
+
+		try (final var outputStream = (ByteArrayOutputStream) mergePdfs(letterEntity.getAttachments(), receipt)) {
+			final var pdfBytes = outputStream.toByteArray();
+			writeToResponse(response, "application/pdf", "attachment; filename=\"kvittens_rekutskick_" + letterId + ".pdf\"", pdfBytes.length, pdfBytes);
 		} catch (final IOException e) {
-			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to stream content for attachment with id '%s'".formatted(attachmentId));
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to write receipt content: %s".formatted(e.getMessage()));
 		}
 	}
 
@@ -139,18 +157,15 @@ public class LetterService {
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Letter with id '%s' and municipalityId '%s' not found".formatted(letterId, municipalityId)));
 	}
 
-	@Transactional(readOnly = true)
-	public byte[] writeLetterReceipt(final String municipalityId, final String letterId) {
-		final var letterEntity = getLetterEntity(municipalityId, letterId);
+	private void writeToResponse(final HttpServletResponse response, final String contentType, final String contentDisposition, final int contentLength, final Object content) throws IOException {
+		response.addHeader(CONTENT_TYPE, contentType);
+		response.addHeader(CONTENT_DISPOSITION, contentDisposition);
+		response.setContentLength(contentLength);
 
-		final var attachments = letterEntity.getAttachments();
-
-		final var receipt = templatingIntegration.renderPdf(municipalityId, letterEntity);
-
-		try (final var outputStream = (ByteArrayOutputStream) mergePdfs(attachments, receipt)) {
-			return outputStream.toByteArray();
-		} catch (final IOException e) {
-			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when writing receipt content: %s".formatted(e.getClass().getSimpleName(), e.getMessage()));
+		if (content instanceof final byte[] bytes) {
+			response.getOutputStream().write(bytes);
+		} else if (content instanceof final InputStream inputStream) {
+			StreamUtils.copy(inputStream, response.getOutputStream());
 		}
 	}
 

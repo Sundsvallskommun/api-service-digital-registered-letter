@@ -1,16 +1,13 @@
 package se.sundsvall.digitalregisteredletter.api;
 
-import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -18,15 +15,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.InvalidMediaTypeException;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
@@ -106,37 +98,16 @@ class LetterResource {
 
 	@GetMapping(value = "/{letterId}/attachments/{attachmentId}", produces = ALL_VALUE)
 	@Operation(summary = "Downloads letter attachment content", description = "Retrieves attachment content by id", responses = {
-		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", content = @Content(mediaType = ALL_VALUE, schema = @Schema(type = "string", format = "binary"))),
+		@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 	})
-	ResponseEntity<StreamingResponseBody> downloadLetterAttachment(
+	void downloadLetterAttachment(
 		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@PathVariable @ValidUuid final String letterId,
-		@PathVariable @ValidUuid final String attachmentId) {
+		@PathVariable @ValidUuid final String attachmentId,
+		final HttpServletResponse response) {
 
-		final var attachment = letterService.getLetterAttachment(municipalityId, letterId, attachmentId);
-
-		final StreamingResponseBody contentStream = output -> letterService.writeAttachmentContent(
-			municipalityId, letterId, attachmentId, output);
-
-		final var contentType = ofNullable(attachment.contentType())
-			.map(type -> {
-				try {
-					return MediaType.parseMediaType(type);
-				} catch (final InvalidMediaTypeException e) {
-					return APPLICATION_OCTET_STREAM;
-				}
-			})
-			.orElse(APPLICATION_OCTET_STREAM);
-
-		final var contentDisposition = ContentDisposition.attachment()
-			.filename(attachment.fileName(), StandardCharsets.UTF_8)
-			.build();
-
-		return ok()
-			.headers(headers -> headers.setContentDisposition(contentDisposition))
-			.contentType(contentType)
-			.body(contentStream);
+		letterService.readLetterAttachment(municipalityId, letterId, attachmentId, response);
 	}
 
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
@@ -159,32 +130,15 @@ class LetterResource {
 
 	@GetMapping(value = "/{letterId}/receipt", produces = ALL_VALUE)
 	@Operation(summary = "Read letter receipt with the complete letter", description = "Retrieves letter receipt combined with the letter", responses = {
-		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", content = @Content(mediaType = ALL_VALUE, schema = @Schema(type = "string", format = "binary"))),
+		@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 	})
-	ResponseEntity<StreamingResponseBody> readLetterReceipt(
+	void readLetterReceipt(
 		@PathVariable @ValidMunicipalityId final String municipalityId,
-		@PathVariable @ValidUuid final String letterId) {
+		@PathVariable @ValidUuid final String letterId,
+		final HttpServletResponse response) {
 
-		final var pdfBytes = letterService.writeLetterReceipt(municipalityId, letterId);
-
-		final StreamingResponseBody contentStream = output -> {
-			try {
-				output.write(pdfBytes);
-			} catch (final IOException e) {
-				throw Problem.valueOf(INTERNAL_SERVER_ERROR,
-					"Failed to write receipt content: %s".formatted(e.getMessage()));
-			}
-		};
-
-		final var contentDisposition = ContentDisposition.attachment()
-			.filename("kvittens_rekutskick_" + letterId + ".pdf", StandardCharsets.UTF_8)
-			.build();
-
-		return ok()
-			.headers(headers -> headers.setContentDisposition(contentDisposition))
-			.contentType(MediaType.APPLICATION_PDF)
-			.body(contentStream);
+		letterService.readLetterReceipt(municipalityId, letterId, response);
 	}
 
 }
