@@ -45,7 +45,7 @@ class StatusResourceTest {
 			"33333333-3333-3333-3333-333333333333");
 
 		final var expected = List.of(
-			new LetterStatus(ids.get(0), "SENT", "COMPLETED"),
+			new LetterStatus(ids.get(0), "PENDING", "COMPLETED"),
 			new LetterStatus(ids.get(1), "NEW", "NOT_FOUND"),
 			new LetterStatus(ids.get(2), "NOT_FOUND", "NOT_FOUND"));
 
