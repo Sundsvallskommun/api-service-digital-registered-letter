@@ -121,7 +121,7 @@ class LetterRepositoryTest {
 	@Test
 	void findByIdAndVerifySigningInfo() {
 		assertThat(letterRepository.findById("1a7b65d7-bafd-49be-9e97-6406b1bf5886")).isPresent().hasValueSatisfying(entity -> {
-			assertThat(entity.getStatus()).isEqualTo("SENT");
+			assertThat(entity.getStatus()).isEqualTo("PENDING");
 			assertThat(entity.getSigningInformation()).isNull();
 		});
 		assertThat(letterRepository.findById("f8853893-46a9-4249-a0e5-35d5595efd91")).isPresent().hasValueSatisfying(entity -> {

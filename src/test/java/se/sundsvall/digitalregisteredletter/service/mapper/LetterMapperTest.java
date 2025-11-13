@@ -309,7 +309,7 @@ class LetterMapperTest {
 			.withStatus("COMPLETED");
 		final var letter = LetterEntity.create()
 			.withId("letterId")
-			.withStatus("SENT")
+			.withStatus("PENDING")
 			.withSigningInformation(signingInformation);
 
 		final var result = letterMapper.toLetterStatus(letter);
@@ -337,7 +337,7 @@ class LetterMapperTest {
 	void toLetterStatus_withoutSigningInformation() {
 		final var letter = LetterEntity.create()
 			.withId("letterId")
-			.withStatus("SENT");
+			.withStatus("PENDING");
 
 		final var result = letterMapper.toLetterStatus(letter);
 

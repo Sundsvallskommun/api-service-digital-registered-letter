@@ -50,6 +50,13 @@ class KivraIntegrationTest {
 	@InjectMocks
 	private KivraIntegration kivraIntegration;
 
+	private static Stream<Arguments> provideResponseProblems() {
+		return Stream.of(
+			Arguments.of(new ClientProblem(BAD_REQUEST, "Damn you Salazar"), "FAILED - Client Error"),
+			Arguments.of(new ServerProblem(NOT_IMPLEMENTED, "You fool of a Took"), "FAILED - Server Error"),
+			Arguments.arguments(Problem.valueOf(SEE_OTHER, "Go ahead, make my day"), "FAILED - Unknown Error"));
+	}
+
 	@AfterEach
 	void ensureNoInteractionsWereMissed() {
 		verifyNoMoreInteractions(kivraMapperMock, kivraClientMock);
@@ -136,7 +143,7 @@ class KivraIntegrationTest {
 
 		final var result = assertDoesNotThrow(() -> kivraIntegration.sendContent(letterEntity, legalId));
 
-		assertThat(result).isEqualTo("SENT");
+		assertThat(result).isEqualTo("PENDING");
 
 		final var capturedRequest = requestCaptor.getValue();
 		assertThat(capturedRequest).isNotNull().isInstanceOf(ContentUserV2.class);
@@ -148,13 +155,6 @@ class KivraIntegrationTest {
 		verify(kivraMapperMock).toRegisteredLetter(letterEntity.getId());
 		verify(kivraMapperMock).toPartsResponsives(letterEntity.getAttachments());
 		verify(kivraClientMock).sendContent(capturedRequest);
-	}
-
-	private static Stream<Arguments> provideResponseProblems() {
-		return Stream.of(
-			Arguments.of(new ClientProblem(BAD_REQUEST, "Damn you Salazar"), "FAILED - Client Error"),
-			Arguments.of(new ServerProblem(NOT_IMPLEMENTED, "You fool of a Took"), "FAILED - Server Error"),
-			Arguments.arguments(Problem.valueOf(SEE_OTHER, "Go ahead, make my day"), "FAILED - Unknown Error"));
 	}
 
 	@ParameterizedTest

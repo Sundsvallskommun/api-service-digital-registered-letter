@@ -39,7 +39,7 @@
 			"id": "bd3d2128-0d5a-457c-8629-0da4ffea85d9",
 			"subject": "This is the subject",
 			"municipalityId": "2281",
-			"status": "SENT",
+			"status": "PENDING",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
 			"contentType": "text/plain",
 			"created": "2023-10-02T00:00:00+02:00",

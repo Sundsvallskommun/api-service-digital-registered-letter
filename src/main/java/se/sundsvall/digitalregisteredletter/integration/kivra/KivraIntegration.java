@@ -6,7 +6,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.zalando.problem.Status.BAD_GATEWAY;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_CLIENT_ERROR;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SERVER_ERROR;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_UNKNOWN_ERROR;
 
@@ -73,7 +73,7 @@ public class KivraIntegration {
 			kivraClient.sendContent(request);
 			LOG.info("Content sent successfully for legal id: {}", legalId);
 
-			return STATUS_SENT;
+			return STATUS_PENDING;
 
 		} catch (final ClientProblem e) {
 			LOG.error("Response indicates client error", e);
