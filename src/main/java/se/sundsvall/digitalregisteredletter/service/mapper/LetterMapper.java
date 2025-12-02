@@ -6,6 +6,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.allNull;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +148,7 @@ public class LetterMapper {
 				.withStatus(ofNullable(letter.getStatus()).orElse(STATUS_NOT_FOUND))
 				.withSigningInformation(ofNullable(letter.getSigningInformation())
 					.map(SigningInformationEntity::getStatus)
-					.orElse(STATUS_NOT_FOUND))
+					.orElse(STATUS_PENDING))
 				.build())
 			.orElse(null);
 	}
@@ -156,7 +157,7 @@ public class LetterMapper {
 		return LetterStatusBuilder.create()
 			.withLetterId(letterId)
 			.withStatus(ofNullable(status).orElse(STATUS_NOT_FOUND))
-			.withSigningInformation(ofNullable(signingInformation).orElse(STATUS_NOT_FOUND))
+			.withSigningInformation(ofNullable(signingInformation).orElse(STATUS_PENDING))
 			.build();
 	}
 

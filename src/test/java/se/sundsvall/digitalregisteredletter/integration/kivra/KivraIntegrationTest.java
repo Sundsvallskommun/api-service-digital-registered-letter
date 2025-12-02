@@ -12,6 +12,7 @@ import static org.zalando.problem.Status.BAD_REQUEST;
 import static org.zalando.problem.Status.NOT_IMPLEMENTED;
 import static org.zalando.problem.Status.SEE_OTHER;
 import static se.sundsvall.TestDataFactory.NOW;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -143,7 +144,7 @@ class KivraIntegrationTest {
 
 		final var result = assertDoesNotThrow(() -> kivraIntegration.sendContent(letterEntity, legalId));
 
-		assertThat(result).isEqualTo("PENDING");
+		assertThat(result).isEqualTo(STATUS_SENT);
 
 		final var capturedRequest = requestCaptor.getValue();
 		assertThat(capturedRequest).isNotNull().isInstanceOf(ContentUserV2.class);

@@ -9,6 +9,7 @@ import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 import static se.sundsvall.TestDataFactory.createSupportInformationEmbeddable;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -343,7 +344,7 @@ class LetterMapperTest {
 
 		assertThat(result.letterId()).isEqualTo(letter.getId());
 		assertThat(result.status()).isEqualTo(letter.getStatus());
-		assertThat(result.signingInformation()).isEqualTo(STATUS_NOT_FOUND);
+		assertThat(result.signingInformation()).isEqualTo(STATUS_PENDING);
 	}
 
 	@Test
@@ -352,7 +353,7 @@ class LetterMapperTest {
 
 		assertThat(result.letterId()).isEqualTo("letterId");
 		assertThat(result.status()).isEqualTo(STATUS_NOT_FOUND);
-		assertThat(result.signingInformation()).isEqualTo(STATUS_NOT_FOUND);
+		assertThat(result.signingInformation()).isEqualTo(STATUS_PENDING);
 	}
 
 	@Test
