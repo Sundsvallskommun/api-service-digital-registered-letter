@@ -20,7 +20,7 @@ public record Letter(
 	@Schema(description = "Municipality ID for the sender of the letter", example = "2281") String municipalityId,
 
 	@Schema(description = "Status of the letter", examples = {
-		"SENT", "SIGNED", "EXPIRED", "FAILED - Client Error", "FAILED - Server Error", "FAILED - Unknown Error"
+		"NEW", "SENT", "SIGNED", "EXPIRED", "FAILED - Client Error", "FAILED - Server Error", "FAILED - Unknown Error"
 	}) String status,
 
 	@Schema(description = "The letter body") String body,
