@@ -1,7 +1,7 @@
 [
 	{
 		"letterId": "5a70a27f-997e-431e-9155-cc50d01e80c5",
-		"status": "NOT_FOUND",
-		"signingInformation": "NOT_FOUND"
+		"signingInformation": "PENDING",
+		"status": "NOT_FOUND"
 	}
 ]
