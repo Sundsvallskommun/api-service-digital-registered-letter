@@ -11,11 +11,11 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Builder
 @Schema(description = "Optional filters to apply when retreiving sent letters")
 public record LetterFilter(
-	@Schema(description = "Optional filter for matching organization id", example = "44", requiredMode = NOT_REQUIRED) Integer orgId,
+	@Schema(description = "Optional filter for matching organization id", examples = "44", requiredMode = NOT_REQUIRED) Integer orgId,
 
-	@Schema(description = "Optional filter for matching username", example = "joe01doe", requiredMode = NOT_REQUIRED) String username,
+	@Schema(description = "Optional filter for matching username", examples = "joe01doe", requiredMode = NOT_REQUIRED) String username,
 
-	@Schema(description = "Optional filter with format YYYY-MM-DD for matching earliest date when letter was sent", example = "2025-08-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdEarliest,
+	@Schema(description = "Optional filter with format YYYY-MM-DD for matching earliest date when letter was sent", examples = "2025-08-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdEarliest,
 
-	@Schema(description = "Optional filter with format YYYY-MM-DD for matching latest date when letter was sent", example = "2025-09-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdLatest) {
+	@Schema(description = "Optional filter with format YYYY-MM-DD for matching latest date when letter was sent", examples = "2025-09-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdLatest) {
 }

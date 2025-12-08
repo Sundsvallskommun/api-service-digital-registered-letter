@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: digital-registered-letter
   contact: { }
@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.5"
 servers:
-  - url: http://localhost:59565
+  - url: http://localhost:64532
     description: Generated server url
 tags:
   - name: Scheduler Resource
@@ -110,10 +110,10 @@ paths:
           required: false
           schema:
             type: integer
-            description: Optional filter for matching organization id
             format: int32
-            example: 44
-          example: 44
+            description: Optional filter for matching organization id
+            examples:
+              - "44"
         - name: username
           in: query
           description: Optional filter for matching username
@@ -121,8 +121,8 @@ paths:
           schema:
             type: string
             description: Optional filter for matching username
-            example: joe01doe
-          example: joe01doe
+            examples:
+              - joe01doe
         - name: createdEarliest
           in: query
           description: Optional filter with format YYYY-MM-DD for matching earliest
@@ -130,10 +130,11 @@ paths:
           required: false
           schema:
             type: string
+            format: date-time
             description: Optional filter with format YYYY-MM-DD for matching earliest
               date when letter was sent
-            format: date-time
-          example: 2025-08-18
+            examples:
+              - 2025-08-18
         - name: createdLatest
           in: query
           description: Optional filter with format YYYY-MM-DD for matching latest date
@@ -141,26 +142,27 @@ paths:
           required: false
           schema:
             type: string
+            format: date-time
             description: Optional filter with format YYYY-MM-DD for matching latest
               date when letter was sent
-            format: date-time
-          example: 2025-09-18
+            examples:
+              - 2025-09-18
         - name: page
           in: query
           description: Zero-based page index (0..N)
           required: false
           schema:
-            minimum: 0
             type: integer
             default: 0
+            minimum: 0
         - name: size
           in: query
           description: The size of the page to be returned
           required: false
           schema:
-            minimum: 1
             type: integer
             default: 20
+            minimum: 1
         - name: sort
           in: query
           description: "Sorting criteria in the format: property,(asc|desc). Default\
@@ -212,9 +214,6 @@ paths:
         content:
           multipart/form-data:
             schema:
-              required:
-                - letter
-                - letterAttachments
               type: object
               properties:
                 letter:
@@ -224,6 +223,9 @@ paths:
                   items:
                     type: string
                     format: binary
+              required:
+                - letter
+                - letterAttachments
       responses:
         "201":
           description: Successful operation - Created
@@ -491,19 +493,24 @@ paths:
 components:
   schemas:
     LetterStatusRequest:
-      required:
-        - letterIds
       type: object
+      description: Request model for checking the statuses of given letters
       properties:
         letterIds:
-          minItems: 1
           type: array
           items:
             type: string
-      description: Request model for checking the statuses of given letters
+            description: List of letter IDs to check status for
+            examples:
+              - ac6ffd60-fffe-4fec-bf67-d5f18a62c458
+          minItems: 1
+      required:
+        - letterIds
     Problem:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
@@ -516,10 +523,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
+          additionalProperties: { }
     StatusType:
       type: object
       properties:
@@ -575,8 +579,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: { }
         suppressed:
           type: array
           items:
@@ -613,8 +616,7 @@ components:
     ThrowableProblem:
       type: object
       properties:
-        cause:
-          $ref: "#/components/schemas/ThrowableProblem"
+        cause: { }
         stackTrace:
           type: array
           items:
@@ -639,6 +641,8 @@ components:
                 type: boolean
         message:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
@@ -651,10 +655,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
+          additionalProperties: { }
         suppressed:
           type: array
           items:
@@ -697,21 +698,55 @@ components:
           type: string
     LetterStatus:
       type: object
+      description: Letter status
       properties:
         letterId:
           type: string
           description: Letter ID
-          example: 43a32404-28ee-480f-a095-00d48109afab
+          examples:
+            - 43a32404-28ee-480f-a095-00d48109afab
         status:
           type: string
           description: Delivery status of the letter
-          example: SENT
+          examples:
+            - SENT
         signingInformation:
           type: string
           description: Information about the signing process
-          example: PENDING
-      description: Letter status
+          examples:
+            - PENDING
     LetterRequest:
+      type: object
+      description: Request to send a digital registered letter
+      properties:
+        partyId:
+          type: string
+          description: Party ID of the recipient
+          examples:
+            - 7ca29702-a07f-4e13-a66a-4ebc27929cfd
+        subject:
+          type: string
+          description: Subject of the letter
+          examples:
+            - Important Notification
+          minLength: 1
+        supportInfo:
+          $ref: "#/components/schemas/SupportInfo"
+          description: Support information for the letter
+        organization:
+          $ref: "#/components/schemas/Organization"
+          description: Information regarding the organizational unit sending the letter
+        contentType:
+          type: string
+          description: "Content type of the letter body, e.g., 'text/plain' or 'text/html'"
+          examples:
+            - text/plain
+        body:
+          type: string
+          description: Body of the letter
+          examples:
+            - This is the content of the letter. Plain-text body
+          minLength: 1
       required:
         - body
         - contentType
@@ -719,76 +754,55 @@ components:
         - partyId
         - subject
         - supportInfo
-      type: object
-      properties:
-        partyId:
-          type: string
-          description: Party ID of the recipient
-          example: 7ca29702-a07f-4e13-a66a-4ebc27929cfd
-        subject:
-          minLength: 1
-          type: string
-          description: Subject of the letter
-          example: Important Notification
-        supportInfo:
-          $ref: "#/components/schemas/SupportInfo"
-        organization:
-          $ref: "#/components/schemas/Organization"
-        contentType:
-          type: string
-          description: "Content type of the letter body, e.g., 'text/plain' or 'text/html'"
-          example: text/plain
-        body:
-          minLength: 1
-          type: string
-          description: Body of the letter
-          example: This is the content of the letter. Plain-text body
-      description: Request to send a digital registered letter
     Organization:
-      required:
-        - name
-        - number
       type: object
       properties:
         number:
           type: integer
-          description: Unique id for the organization
           format: int32
-          example: 44
+          description: Unique id for the organization
+          examples:
+            - "44"
         name:
-          minLength: 1
           type: string
           description: Readable name for the organization
-          example: Department 44
-      description: Information regarding the organizational unit sending the letter
+          examples:
+            - Department 44
+          minLength: 1
+      required:
+        - name
+        - number
     SupportInfo:
+      type: object
+      properties:
+        supportText:
+          type: string
+          description: Support text for the letter
+          examples:
+            - "For support, please contact us at the information below."
+          minLength: 1
+        contactInformationUrl:
+          type: string
+          description: URL for contact
+          examples:
+            - https://example.com/support
+          minLength: 1
+        contactInformationPhoneNumber:
+          type: string
+          description: Phone number for contact
+          examples:
+            - "+46123456789"
+        contactInformationEmail:
+          type: string
+          format: email
+          description: Email address for contact
+          examples:
+            - support@email.com
       required:
         - contactInformationEmail
         - contactInformationPhoneNumber
         - contactInformationUrl
         - supportText
-      type: object
-      properties:
-        supportText:
-          minLength: 1
-          type: string
-          description: Support text for the letter
-          example: "For support, please contact us at the information below."
-        contactInformationUrl:
-          minLength: 1
-          type: string
-          description: URL for contact
-          example: https://example.com/support
-        contactInformationPhoneNumber:
-          type: string
-          description: Phone number for contact
-          example: "+46123456789"
-        contactInformationEmail:
-          type: string
-          description: Email address for contact
-          format: email
-          example: support@email.com
-      description: Support information for the letter
     Attachment:
       type: object
       properties:
@@ -796,130 +810,152 @@ components:
           type: string
           description: "Unique identifier for the attachment, used for fetching the\
             \ attachment content"
-          example: 123e4567-e89b-12d3-a456-426614174001
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174001
         fileName:
           type: string
           description: Name of the attachment file
-          example: document.pdf
+          examples:
+            - document.pdf
         contentType:
           type: string
           description: Content type of the attachment
-          example: application/pdf
-      description: List of attachments for the letter
+          examples:
+            - application/pdf
     Letter:
       type: object
+      description: Digital registered letter response
       properties:
         id:
           type: string
           description: Unique identifier for the letter
-          example: 123e4567-e89b-12d3-a456-426614174000
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
         subject:
           type: string
           description: Letter subject
-          example: Important Notification
+          examples:
+            - Important Notification
         municipalityId:
           type: string
           description: Municipality ID for the sender of the letter
-          example: "2281"
+          examples:
+            - "2281"
         status:
           type: string
           description: Status of the letter
+          examples:
+            - NEW
+            - SENT
+            - SIGNED
+            - EXPIRED
+            - FAILED - Client Error
+            - FAILED - Server Error
+            - FAILED - Unknown Error
         body:
           type: string
           description: The letter body
         contentType:
           type: string
           description: Content type of the letter body
-          example: text/html
+          examples:
+            - text/html
         created:
           type: string
-          description: When the letter was sent
           format: date-time
-          example: 2023-10-09T12:34:56Z
+          description: When the letter was sent
+          examples:
+            - 2023-10-09T12:34:56+00:00
         updated:
           type: string
-          description: When the letter was last updated
           format: date-time
-          example: 2023-10-09T12:34:56Z
+          description: When the letter was last updated
+          examples:
+            - 2023-10-09T12:34:56+00:00
         supportInfo:
           $ref: "#/components/schemas/SupportInfo"
+          description: Support information for the letter
         attachments:
           type: array
           items:
             $ref: "#/components/schemas/Attachment"
-      description: Digital registered letter response
+            description: List of attachments for the letter
       readOnly: true
     EligibilityRequest:
       type: object
+      description: Eligibility request model
       properties:
         partyIds:
           type: array
           items:
             type: string
-      description: Eligibility request model
+            description: List of party IDs to check for eligibility
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
     Direction:
       type: string
-      description: The sort order direction
-      example: ASC
       enum:
         - ASC
         - DESC
     Letters:
       type: object
+      description: Paginated response containing a list of letters
       properties:
         _meta:
           $ref: "#/components/schemas/PagingAndSortingMetaData"
+          readOnly: true
         letters:
           type: array
-          readOnly: true
           items:
             $ref: "#/components/schemas/Letter"
-      description: Paginated response containing a list of letters
+            readOnly: true
+          readOnly: true
     PagingAndSortingMetaData:
       type: object
+      description: PagingAndSortingMetaData model
       properties:
         page:
           type: integer
-          description: Current page
           format: int32
-          readOnly: true
+          description: Current page
           example: 5
+          readOnly: true
         limit:
           type: integer
-          description: Displayed objects per page
           format: int32
-          readOnly: true
+          description: Displayed objects per page
           example: 20
+          readOnly: true
         count:
           type: integer
-          description: Displayed objects on current page
           format: int32
-          readOnly: true
+          description: Displayed objects on current page
           example: 13
+          readOnly: true
         totalRecords:
           type: integer
-          description: Total amount of hits based on provided search parameters
           format: int64
-          readOnly: true
+          description: Total amount of hits based on provided search parameters
           example: 98
+          readOnly: true
         totalPages:
           type: integer
-          description: Total amount of pages based on provided search parameters
           format: int32
-          readOnly: true
+          description: Total amount of pages based on provided search parameters
           example: 23
+          readOnly: true
         sortBy:
           type: array
-          readOnly: true
           items:
             type: string
             description: The properties to sort by
-            readOnly: true
             example: property
+            readOnly: true
+          readOnly: true
         sortDirection:
           $ref: "#/components/schemas/Direction"
-      description: PagingAndSortingMetaData model
-      readOnly: true
+          description: The sort order direction
+          example: ASC
     Device:
       type: object
       properties:
@@ -927,8 +963,6 @@ components:
           type: string
           description: Ip address used when the letter was signed
           readOnly: true
-      description: Information regarding the device used for the signing order
-      readOnly: true
     SigningInfo:
       type: object
       properties:
@@ -938,8 +972,8 @@ components:
           readOnly: true
         signed:
           type: string
-          description: Timestamp when the letter was signed by receiving party
           format: date-time
+          description: Timestamp when the letter was signed by receiving party
           readOnly: true
         contentKey:
           type: string
@@ -959,10 +993,17 @@ components:
           readOnly: true
         user:
           $ref: "#/components/schemas/User"
+          description: Information regarding the signing party
+          readOnly: true
         device:
           $ref: "#/components/schemas/Device"
+          description: Information regarding the device used for the signing order
+          readOnly: true
         stepUp:
           $ref: "#/components/schemas/StepUp"
+          description: Information about possible additional verifications that were
+            part of the signing order
+          readOnly: true
     StepUp:
       type: object
       properties:
@@ -970,9 +1011,6 @@ components:
           type: boolean
           description: Whether an MRTD check was performed before the order was completed
           readOnly: true
-      description: Information about possible additional verifications that were part
-        of the signing order
-      readOnly: true
     User:
       type: object
       properties:
@@ -992,6 +1030,4 @@ components:
           type: string
           description: Last name of the signing party
           readOnly: true
-      description: Information regarding the signing party
-      readOnly: true
   securitySchemes: { }

@@ -7,7 +7,7 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Schema(description = "Letter status")
 public record LetterStatus(
 
-	@Schema(description = "Letter ID", example = "43a32404-28ee-480f-a095-00d48109afab") String letterId,
-	@Schema(description = "Delivery status of the letter", example = "SENT") String status,
-	@Schema(description = "Information about the signing process", example = "PENDING") String signingInformation) {
+	@Schema(description = "Letter ID", examples = "43a32404-28ee-480f-a095-00d48109afab") String letterId,
+	@Schema(description = "Delivery status of the letter", examples = "SENT") String status,
+	@Schema(description = "Information about the signing process", examples = "PENDING") String signingInformation) {
 }

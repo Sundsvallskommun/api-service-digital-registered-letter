@@ -11,11 +11,11 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Builder
 public record SupportInfo(
 
-	@NotBlank @Schema(description = "Support text for the letter", example = "For support, please contact us at the information below.", requiredMode = REQUIRED) String supportText,
+	@NotBlank @Schema(description = "Support text for the letter", examples = "For support, please contact us at the information below.", requiredMode = REQUIRED) String supportText,
 
-	@NotBlank @Schema(description = "URL for contact", example = "https://example.com/support", requiredMode = REQUIRED) String contactInformationUrl,
+	@NotBlank @Schema(description = "URL for contact", examples = "https://example.com/support", requiredMode = REQUIRED) String contactInformationUrl,
 
-	@Schema(description = "Phone number for contact", example = "+46123456789", requiredMode = REQUIRED) String contactInformationPhoneNumber,
+	@Schema(description = "Phone number for contact", examples = "+46123456789", requiredMode = REQUIRED) String contactInformationPhoneNumber,
 
-	@Email @NotNull @Schema(description = "Email address for contact", example = "support@email.com", requiredMode = REQUIRED) String contactInformationEmail) {
+	@Email @NotNull @Schema(description = "Email address for contact", examples = "support@email.com", requiredMode = REQUIRED) String contactInformationEmail) {
 }

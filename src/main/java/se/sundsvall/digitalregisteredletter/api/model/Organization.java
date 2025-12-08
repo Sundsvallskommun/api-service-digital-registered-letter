@@ -10,7 +10,7 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Builder
 public record Organization(
 
-	@NotNull @Schema(description = "Unique id for the organization", example = "44", requiredMode = REQUIRED) Integer number,
+	@NotNull @Schema(description = "Unique id for the organization", examples = "44", requiredMode = REQUIRED) Integer number,
 
-	@NotBlank @Schema(description = "Readable name for the organization", example = "Department 44", requiredMode = REQUIRED) String name) {
+	@NotBlank @Schema(description = "Readable name for the organization", examples = "Department 44", requiredMode = REQUIRED) String name) {
 }
