@@ -13,11 +13,11 @@ import se.sundsvall.digitalregisteredletter.support.Builder;
 @Schema(description = "Digital registered letter response", accessMode = Schema.AccessMode.READ_ONLY)
 public record Letter(
 
-	@Schema(description = "Unique identifier for the letter", example = "123e4567-e89b-12d3-a456-426614174000") String id,
+	@Schema(description = "Unique identifier for the letter", examples = "123e4567-e89b-12d3-a456-426614174000") String id,
 
-	@Schema(description = "Letter subject", example = "Important Notification") String subject,
+	@Schema(description = "Letter subject", examples = "Important Notification") String subject,
 
-	@Schema(description = "Municipality ID for the sender of the letter", example = "2281") String municipalityId,
+	@Schema(description = "Municipality ID for the sender of the letter", examples = "2281") String municipalityId,
 
 	@Schema(description = "Status of the letter", examples = {
 		"NEW", "SENT", "SIGNED", "EXPIRED", "FAILED - Client Error", "FAILED - Server Error", "FAILED - Unknown Error"
@@ -25,11 +25,11 @@ public record Letter(
 
 	@Schema(description = "The letter body") String body,
 
-	@Schema(description = "Content type of the letter body", example = "text/html") String contentType,
+	@Schema(description = "Content type of the letter body", examples = "text/html") String contentType,
 
-	@Schema(description = "When the letter was sent", example = "2023-10-09T12:34:56+00:00") @DateTimeFormat(iso = DATE_TIME) OffsetDateTime created,
+	@Schema(description = "When the letter was sent", examples = "2023-10-09T12:34:56+00:00") @DateTimeFormat(iso = DATE_TIME) OffsetDateTime created,
 
-	@Schema(description = "When the letter was last updated", example = "2023-10-09T12:34:56+00:00") @DateTimeFormat(iso = DATE_TIME) OffsetDateTime updated,
+	@Schema(description = "When the letter was last updated", examples = "2023-10-09T12:34:56+00:00") @DateTimeFormat(iso = DATE_TIME) OffsetDateTime updated,
 
 	@Schema(description = "Support information for the letter") SupportInfo supportInfo,
 
@@ -38,11 +38,11 @@ public record Letter(
 	@Builder
 	public record Attachment(
 
-		@Schema(description = "Unique identifier for the attachment, used for fetching the attachment content", example = "123e4567-e89b-12d3-a456-426614174001") String id,
+		@Schema(description = "Unique identifier for the attachment, used for fetching the attachment content", examples = "123e4567-e89b-12d3-a456-426614174001") String id,
 
-		@Schema(description = "Name of the attachment file", example = "document.pdf") String fileName,
+		@Schema(description = "Name of the attachment file", examples = "document.pdf") String fileName,
 
-		@Schema(description = "Content type of the attachment", example = "application/pdf") String contentType) {
+		@Schema(description = "Content type of the attachment", examples = "application/pdf") String contentType) {
 	}
 
 }
