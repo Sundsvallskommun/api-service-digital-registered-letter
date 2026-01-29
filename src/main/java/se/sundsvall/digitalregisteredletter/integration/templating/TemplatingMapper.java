@@ -24,6 +24,7 @@ public class TemplatingMapper {
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "No signing information found for letter with id '%s'".formatted(letterEntity.getId())));
 
 		final var parameters = new HashMap<String, Object>();
+		parameters.put("subject", letterEntity.getSubject());
 		parameters.put("personalNumber", signingInformation.getPersonalNumber());
 		parameters.put("name", signingInformation.getName());
 		parameters.put("signed", Optional.ofNullable(signingInformation.getSigned())
