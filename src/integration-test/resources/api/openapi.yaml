@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.5"
+  version: "2.6"
 servers:
-  - url: http://localhost:61169
+  - url: http://localhost:52417
     description: Generated server url
 tags:
   - name: Scheduler Resource
@@ -136,6 +136,134 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/{organizationNumber}/letters:
+    post:
+      tags:
+        - Letter Resource
+      summary: Send letter
+      description: Send a digital registered letter using Kivra
+      operationId: sendLetter
+      parameters:
+        - name: X-Sent-By
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: organizationNumber
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                letter:
+                  $ref: "#/components/schemas/LetterRequest"
+                letterAttachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+              required:
+                - letter
+                - letterAttachments
+      responses:
+        "201":
+          description: Successful operation - Created
+          headers:
+            Location:
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Letter"
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/{organizationNumber}/eligibility/kivra:
+    post:
+      tags:
+        - Eligibility Resource
+      summary: Check if the given partyIds are eligible for receiving digital registered
+        letters with Kivra
+      description: "Returns a list of party IDs that are eligible for Kivra based\
+        \ on the provided municipality ID, organization number and party IDs"
+      operationId: checkKivraEligibility
+      parameters:
+        - name: municipalityId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: organizationNumber
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityRequest"
+        required: true
+      responses:
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
         "400":
           description: Bad request
           content:
@@ -407,7 +535,7 @@ paths:
         - Letter Resource
       summary: Send letter
       description: Send a digital registered letter using Kivra
-      operationId: sendLetter
+      operationId: sendLetterLegacy
       parameters:
         - name: X-Sent-By
           in: header
@@ -461,6 +589,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+      deprecated: true
   /{municipalityId}/eligibility/kivra:
     post:
       tags:
@@ -469,7 +598,7 @@ paths:
         letters with Kivra
       description: Returns a list of party IDs that are eligible for Kivra based on
         the provided municipality ID and party IDs
-      operationId: checkKivraEligibility
+      operationId: checkKivraEligibilityLegacy
       parameters:
         - name: municipalityId
           in: path
@@ -505,6 +634,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+      deprecated: true
   /{municipalityId}/letters/{letterId}:
     get:
       tags:
@@ -917,39 +1047,6 @@ components:
           type: string
         message:
           type: string
-    LetterStatusRequest:
-      type: object
-      description: Request model for checking the statuses of given letters
-      properties:
-        letterIds:
-          type: array
-          items:
-            type: string
-            description: List of letter IDs to check status for
-            examples:
-              - ac6ffd60-fffe-4fec-bf67-d5f18a62c458
-          minItems: 1
-      required:
-        - letterIds
-    LetterStatus:
-      type: object
-      description: Letter status
-      properties:
-        letterId:
-          type: string
-          description: Letter ID
-          examples:
-            - 43a32404-28ee-480f-a095-00d48109afab
-        status:
-          type: string
-          description: Delivery status of the letter
-          examples:
-            - SENT
-        signingInformation:
-          type: string
-          description: Information about the signing process
-          examples:
-            - PENDING
     LetterRequest:
       type: object
       description: Request to send a digital registered letter
@@ -1127,6 +1224,39 @@ components:
             description: List of party IDs to check for eligibility
             examples:
               - 123e4567-e89b-12d3-a456-426614174000
+    LetterStatusRequest:
+      type: object
+      description: Request model for checking the statuses of given letters
+      properties:
+        letterIds:
+          type: array
+          items:
+            type: string
+            description: List of letter IDs to check status for
+            examples:
+              - ac6ffd60-fffe-4fec-bf67-d5f18a62c458
+          minItems: 1
+      required:
+        - letterIds
+    LetterStatus:
+      type: object
+      description: Letter status
+      properties:
+        letterId:
+          type: string
+          description: Letter ID
+          examples:
+            - 43a32404-28ee-480f-a095-00d48109afab
+        status:
+          type: string
+          description: Delivery status of the letter
+          examples:
+            - SENT
+        signingInformation:
+          type: string
+          description: Information about the signing process
+          examples:
+            - PENDING
     Direction:
       type: string
       enum:

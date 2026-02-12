@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,25 +29,48 @@ class EligibilityServiceTest {
 	@InjectMocks
 	private EligibilityService eligibilityService;
 
+	@AfterEach
+	void noMoreInteractions() {
+		verifyNoMoreInteractions(kivraIntegrationMock, partyIntegrationMock);
+	}
+
 	@Test
-	void checkEligibility() {
-		var municipalityId = "2281";
-		var partyId = "123e4567-e89b-12d3-a456-426614174000";
-		var request = new EligibilityRequest(List.of(partyId));
-		var legalId = "1234567890";
-		var legalIds = List.of(legalId);
+	void checkEligibilityWithOrganizationNumber() {
+		final var municipalityId = "2281";
+		final var organizationNumber = "5591628136";
+		final var partyId = "123e4567-e89b-12d3-a456-426614174000";
+		final var request = new EligibilityRequest(List.of(partyId));
+		final var legalId = "1234567890";
+		final var legalIds = List.of(legalId);
+
+		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, partyId)).thenReturn(Optional.of(legalId));
+		when(kivraIntegrationMock.checkEligibility(legalIds, municipalityId, organizationNumber)).thenReturn(legalIds);
+
+		final var result = eligibilityService.checkEligibility(municipalityId, organizationNumber, request);
+
+		assertThat(result).containsExactly(partyId);
+
+		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, partyId);
+		verify(kivraIntegrationMock).checkEligibility(legalIds, municipalityId, organizationNumber);
+	}
+
+	@Test
+	void checkEligibilityLegacy() {
+		final var municipalityId = "2281";
+		final var partyId = "123e4567-e89b-12d3-a456-426614174000";
+		final var request = new EligibilityRequest(List.of(partyId));
+		final var legalId = "1234567890";
+		final var legalIds = List.of(legalId);
 
 		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, partyId)).thenReturn(Optional.of(legalId));
 		when(kivraIntegrationMock.checkEligibility(legalIds)).thenReturn(legalIds);
 
-		var result = eligibilityService.checkEligibility(municipalityId, request);
+		final var result = eligibilityService.checkEligibility(municipalityId, request);
 
 		assertThat(result).containsExactly(partyId);
 
 		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, partyId);
 		verify(kivraIntegrationMock).checkEligibility(legalIds);
-		verifyNoMoreInteractions(partyIntegrationMock, kivraIntegrationMock);
-
 	}
 
 }

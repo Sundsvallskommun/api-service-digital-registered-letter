@@ -135,6 +135,36 @@ class LetterResourceTest {
 
 	@Test
 	void sendLetter_Created() {
+		final var organizationNumber = "5591628136";
+		final var createLetterRequest = createLetterRequest();
+		final var letterId = UUID.randomUUID().toString();
+		final var letterResponse = createLetter(letterId);
+
+		final var multipartBodyBuilder = new MultipartBodyBuilder();
+		multipartBodyBuilder.part("letterAttachments", "file-content").filename("test1.txt").contentType(APPLICATION_PDF);
+		multipartBodyBuilder.part("letterAttachments", "file-content").filename("tesst2.txt").contentType(APPLICATION_PDF);
+		multipartBodyBuilder.part("letter", createLetterRequest);
+
+		when(letterServiceMock.sendLetter(any(), any(), any(), any())).thenReturn(letterResponse);
+
+		final var response = webTestClient.post()
+			.uri("/%s/%s/letters".formatted(MUNICIPALITY_ID, organizationNumber))
+			.contentType(MULTIPART_FORM_DATA)
+			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
+			.body(fromMultipartData(multipartBodyBuilder.build()))
+			.exchange()
+			.expectStatus().isCreated()
+			.expectHeader().valueEquals("Location", "/%s/%s/letters/%s".formatted(MUNICIPALITY_ID, organizationNumber, letterId))
+			.expectBody(Letter.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).usingRecursiveComparison().isEqualTo(letterResponse);
+		verify(letterServiceMock).sendLetter(any(), any(), any(), any());
+	}
+
+	@Test
+	void sendLetterLegacy_Created() {
 		final var createLetterRequest = createLetterRequest();
 		final var letterId = UUID.randomUUID().toString();
 		final var letterResponse = createLetter(letterId);

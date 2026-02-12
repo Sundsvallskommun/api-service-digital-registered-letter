@@ -142,7 +142,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("sendLetter.municipalityId", "not a valid municipality ID"));
+			.containsExactly(tuple("sendLetterLegacy.municipalityId", "not a valid municipality ID"));
 	}
 
 	@Test
@@ -196,7 +196,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("sendLetter.attachments", "no duplicate file names allowed in the list of files"));
+			.containsExactly(tuple("sendLetterLegacy.attachments", "no duplicate file names allowed in the list of files"));
 	}
 
 	@Test
@@ -221,7 +221,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("sendLetter.attachments", "content type must be application/pdf"));
+			.containsExactly(tuple("sendLetterLegacy.attachments", "content type must be application/pdf"));
 	}
 
 	@Test
