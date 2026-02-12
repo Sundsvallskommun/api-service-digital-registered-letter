@@ -50,7 +50,6 @@ public class RepositoryIntegration {
 	 * Method for creating an entity matching provided data
 	 *
 	 * @param  municipalityId municipality "owning" the message
-	 * @param  username       name of user that sends the message
 	 * @param  letterRequest  request with data for the message
 	 * @param  attachments    attachments connected to the message
 	 * @return                a persisted entity representation of the data that has been provided to the function
@@ -69,41 +68,41 @@ public class RepositoryIntegration {
 	}
 
 	/**
-	 * Method fetches and uses existing entity for organization if found, otherwise it creates a new entity. The incoming
+	 * Method fetches and uses an existing entity for organization if found, otherwise it creates a new entity. The incoming
 	 * letter entity is then attached to the organization entity.
 	 *
 	 * @param  organization the organization to fetch or create a database entity for
 	 * @param  letterEntity the letter entity to add to the organization
 	 * @return              The entity representation of the incoming organization with the LetterEntity added to it.
 	 */
-	private OrganizationEntity retrieveOrganizationEntity(Organization organization, LetterEntity letterEntity) {
+	private OrganizationEntity retrieveOrganizationEntity(final Organization organization, final LetterEntity letterEntity) {
 		return organizationRepository.findByNumber(organization.number())
 			.map(organizationEntity -> letterMapper.addLetter(organizationEntity, letterEntity))
 			.orElse(letterMapper.toOrganizationEntity(organization, letterEntity));
 	}
 
 	/**
-	 * Method fetches and uses existing entity for user if found, otherwise it creates a new entity. The incoming letter
-	 * entity is then attached to the user entity.
+	 * Method fetches and uses an existing entity for the user if found, otherwise it creates a new entity. The incoming
+	 * letter entity is then attached to the user entity.
 	 *
 	 * @param  letterEntity the letter entity to add to the user
 	 * @return              The entity representation of the incoming username with the LetterEntity added to it.
 	 */
 	private UserEntity retrieveUserEntity(final LetterEntity letterEntity) {
-		var username = Identifier.get().getValue();
+		final var username = Identifier.get().getValue();
 		return userRepository.findByUsernameIgnoreCase(username)
 			.map(userEntity -> letterMapper.addLetter(userEntity, letterEntity))
 			.orElse(letterMapper.toUserEntity(username, letterEntity));
 	}
 
 	/**
-	 * Method updates the provided letter entity with provided status
+	 * Method updates the provided letter entity with the provided status
 	 *
 	 * @param letterEntity letter entity to update
 	 * @param status       value of status to update to
 	 */
 	@Transactional
-	public void updateStatus(LetterEntity letterEntity, String status) {
+	public void updateStatus(final LetterEntity letterEntity, final String status) {
 		letterEntity.setStatus(status);
 		letterRepository.save(letterEntity);
 	}
@@ -132,11 +131,11 @@ public class RepositoryIntegration {
 	}
 
 	/**
-	 * Method returns a page based result of letter entities matching provided municipality id and optionally provided
+	 * Method returns a page-based result of letter entities matching provided municipality id and optionally provided
 	 * filters
 	 *
 	 * @param  municipalityId municipality id to match against
-	 * @param  filter         filter object containing optional filters to use when retriving result
+	 * @param  filter         filter object containing optional filters to use when retrieving a result
 	 * @param  pageable       pageable object providing data regarding the page and size to retrieve
 	 * @return                a paged result matching provided parameters
 	 */
@@ -147,10 +146,10 @@ public class RepositoryIntegration {
 	/**
 	 * Method does a soft deletion of letter entity matching provided id if found, otherwise it does nothing
 	 *
-	 * @param id letter entity to be soft deleted
+	 * @param id letter entity to be soft-deleted
 	 */
 	@Transactional
-	public void softDeleteLetterEntity(String id) {
+	public void softDeleteLetterEntity(final String id) {
 		letterRepository.findById(id)
 			.ifPresent(letterEntity -> {
 				letterEntity.setDeleted(true);
@@ -159,7 +158,7 @@ public class RepositoryIntegration {
 	}
 
 	/**
-	 * Method returns an optional attachment entity matching municipality id, letter id and attachment id
+	 * Method returns an optional attachment entity matching municipality id, letter id, and attachment id
 	 *
 	 * @param  municipalityId municipality id to match against
 	 * @param  letterId       letter id to match against

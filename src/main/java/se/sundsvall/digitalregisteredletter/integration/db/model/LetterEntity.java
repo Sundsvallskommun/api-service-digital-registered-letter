@@ -99,6 +99,10 @@ public class LetterEntity {
 	@JoinColumn(name = "signing_information_id", foreignKey = @ForeignKey(name = "fk_letter_signing_information"))
 	private SigningInformationEntity signingInformation;
 
+	@ManyToOne
+	@JoinColumn(name = "tenant_id", foreignKey = @ForeignKey(name = "fk_letter_tenant"))
+	private TenantEntity tenant;
+
 	@PrePersist
 	void onPersist() {
 		this.created = now(systemDefault()).truncatedTo(MILLIS);
@@ -315,9 +319,22 @@ public class LetterEntity {
 		return this;
 	}
 
+	public TenantEntity getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(final TenantEntity tenant) {
+		this.tenant = tenant;
+	}
+
+	public LetterEntity withTenant(final TenantEntity tenant) {
+		this.tenant = tenant;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, requestId, signingInformation, status, subject, supportInformation, updated, user);
+		return Objects.hash(attachments, body, contentType, created, deleted, id, municipalityId, organization, partyId, requestId, signingInformation, status, subject, supportInformation, tenant, updated, user);
 	}
 
 	@Override
@@ -327,7 +344,8 @@ public class LetterEntity {
 		return Objects.equals(attachments, other.attachments) && Objects.equals(body, other.body) && Objects.equals(contentType, other.contentType) && Objects.equals(created, other.created) && deleted == other.deleted && Objects.equals(id, other.id)
 			&& Objects.equals(municipalityId, other.municipalityId) && Objects.equals(ofNullable(organization).map(OrganizationEntity::getId).orElse(null), ofNullable(other.organization).map(OrganizationEntity::getId).orElse(null))
 			&& Objects.equals(partyId, other.partyId) && Objects.equals(requestId, other.requestId) && Objects.equals(signingInformation, other.signingInformation) && Objects.equals(status, other.status) && Objects.equals(subject, other.subject)
-			&& Objects.equals(supportInformation, other.supportInformation) && Objects.equals(updated, other.updated) && Objects.equals(ofNullable(user).map(UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
+			&& Objects.equals(supportInformation, other.supportInformation) && Objects.equals(ofNullable(tenant).map(TenantEntity::getId).orElse(null), ofNullable(other.tenant).map(TenantEntity::getId).orElse(null))
+			&& Objects.equals(updated, other.updated) && Objects.equals(ofNullable(user).map(UserEntity::getId).orElse(null), ofNullable(other.user).map(UserEntity::getId).orElse(null));
 	}
 
 	@Override
@@ -336,7 +354,7 @@ public class LetterEntity {
 		builder.append("LetterEntity [id=").append(id).append(", municipalityId=").append(municipalityId).append(", body=").append(body).append(", contentType=").append(contentType).append(", status=").append(status).append(", requestId=").append(
 			requestId).append(", subject=").append(subject).append(", partyId=").append(partyId).append(", deleted=").append(deleted).append(", created=").append(created).append(", updated=").append(updated).append(", supportInformation=").append(
 				supportInformation).append(", attachments=").append(attachments).append(", user=").append(ofNullable(user).map(UserEntity::getId).orElse(null)).append(", organization=").append(ofNullable(organization).map(OrganizationEntity::getId)
-					.orElse(null)).append(", signingInformation=").append(signingInformation).append("]");
+					.orElse(null)).append(", signingInformation=").append(signingInformation).append(", tenant=").append(ofNullable(tenant).map(TenantEntity::getId).orElse(null)).append("]");
 		return builder.toString();
 	}
 
