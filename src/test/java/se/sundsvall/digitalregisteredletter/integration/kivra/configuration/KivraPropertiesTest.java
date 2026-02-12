@@ -20,6 +20,7 @@ class KivraPropertiesTest {
 	@Test
 	void testProperties() {
 		assertThat(properties.apiUrl()).isEqualTo("http://kivra-url.com");
+		assertThat(properties.baseUrl()).isEqualTo("http://kivra-url.com");
 		assertThat(properties.connectTimeout()).isEqualTo(Duration.of(5, SECONDS));
 		assertThat(properties.readTimeout()).isEqualTo(Duration.of(15, SECONDS));
 		assertThat(properties.oauth2()).isNotNull().satisfies(oauth2 -> {

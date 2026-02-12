@@ -10,6 +10,7 @@ import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SERVER_ERROR;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_UNKNOWN_ERROR;
 
+import java.net.URI;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +20,11 @@ import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.dept44.exception.ClientProblem;
 import se.sundsvall.dept44.exception.ServerProblem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.configuration.KivraProperties;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
+import se.sundsvall.digitalregisteredletter.service.TenantService;
 
 @Component
 public class KivraIntegration {
@@ -29,24 +32,41 @@ public class KivraIntegration {
 	private static final Logger LOG = LoggerFactory.getLogger(KivraIntegration.class);
 	private final KivraClient kivraClient;
 	private final KivraMapper kivraMapper;
+	private final KivraProperties kivraProperties;
+	private final TenantService tenantService;
 
 	public KivraIntegration(final KivraClient kivraClient,
-		final KivraMapper kivraMapper) {
+		final KivraMapper kivraMapper,
+		final KivraProperties kivraProperties,
+		final TenantService tenantService) {
 		this.kivraClient = kivraClient;
 		this.kivraMapper = kivraMapper;
+		this.kivraProperties = kivraProperties;
+		this.tenantService = tenantService;
+	}
+
+	private URI buildTenantUri(final String tenantKey) {
+		return URI.create(kivraProperties.baseUrl() + "/" + tenantKey);
+	}
+
+	private URI buildLegacyUri() {
+		return URI.create(kivraProperties.apiUrl());
 	}
 
 	/**
-	 * Checks if the provided legal IDs are eligible for Kivra.
+	 * Checks if the provided legal IDs are eligible for Kivra using a dynamically resolved tenant key.
 	 *
-	 * @param  legalIds List of legal IDs to check eligibility for.
-	 * @return          List of legal IDs that are eligible for Kivra.
+	 * @param  legalIds           List of legal IDs to check eligibility for.
+	 * @param  municipalityId     The municipality ID used to look up the tenant.
+	 * @param  organizationNumber The organization number used to look up the tenant.
+	 * @return                    List of legal IDs that are eligible for Kivra.
 	 */
-	public List<String> checkEligibility(final List<String> legalIds) {
+	public List<String> checkEligibility(final List<String> legalIds, final String municipalityId, final String organizationNumber) {
+		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
 		try {
 			final var request = kivraMapper.toCheckEligibilityRequest(legalIds);
 			LOG.info("Checking Kivra eligibility for legal ids: {}", legalIds);
-			final var response = kivraClient.checkEligibility(request);
+			final var response = kivraClient.checkEligibility(buildTenantUri(tenantKey), request);
 			LOG.info("Kivra eligibility check successful");
 			return ofNullable(response).map(UserMatchV2SSN::legalIds).orElse(emptyList());
 
@@ -60,17 +80,42 @@ public class KivraIntegration {
 	}
 
 	/**
-	 * Sends content to Kivra for the specified letter entity and legal ID.
-	 *
-	 * @param  letterEntity The letter entity containing the content to be sent.
-	 * @param  legalId      The legal ID of the recipient.
-	 * @return              The status that indicates whether the content was sent successfully or if there was an error.
+	 * @deprecated Use {@link #checkEligibility(List, String, String)} with municipalityId and organizationNumber instead.
 	 */
-	public String sendContent(final LetterEntity letterEntity, final String legalId) {
+	@Deprecated(forRemoval = true)
+	public List<String> checkEligibility(final List<String> legalIds) {
+		try {
+			final var request = kivraMapper.toCheckEligibilityRequest(legalIds);
+			LOG.info("Checking Kivra eligibility for legal ids: {}", legalIds);
+			final var response = kivraClient.checkEligibility(buildLegacyUri(), request);
+			LOG.info("Kivra eligibility check successful");
+			return ofNullable(response).map(UserMatchV2SSN::legalIds).orElse(emptyList());
+
+		} catch (final ServerProblem e) {
+			LOG.error("Server exception occurred when checking Kivra eligibility for legal ids: {}, exception message: {}", legalIds, e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while checking Kivra eligibility for legal ids: " + legalIds);
+		} catch (final Exception e) {
+			LOG.error("Exception occurred when checking Kivra eligibility for legal ids: {}, exception message: {}", legalIds, e.getMessage(), e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while checking Kivra eligibility for legal ids: " + legalIds);
+		}
+	}
+
+	/**
+	 * Sends content to Kivra for the specified letter entity and legal ID using a dynamically resolved tenant key.
+	 *
+	 * @param  letterEntity       The letter entity containing the content to be sent.
+	 * @param  legalId            The legal ID of the recipient.
+	 * @param  municipalityId     The municipality ID used to look up the tenant.
+	 * @param  organizationNumber The organization number used to look up the tenant.
+	 * @return                    The status that indicates whether the content was sent successfully or if there was an
+	 *                            error.
+	 */
+	public String sendContent(final LetterEntity letterEntity, final String legalId, final String municipalityId, final String organizationNumber) {
+		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
 		try {
 			final var request = kivraMapper.toSendContentRequest(letterEntity, legalId);
 			LOG.info("Sending content to Kivra for legal id: {}", legalId);
-			kivraClient.sendContent(request);
+			kivraClient.sendContent(buildTenantUri(tenantKey), request);
 			LOG.info("Content sent successfully for legal id: {}", legalId);
 
 			return STATUS_SENT;
@@ -91,15 +136,39 @@ public class KivraIntegration {
 	}
 
 	/**
-	 * Retrieves all responses from Kivra.
-	 *
-	 * @return List of KeyValue objects representing the responses.
+	 * @deprecated Use {@link #sendContent(LetterEntity, String, String, String)} with municipalityId and organizationNumber
+	 *             instead.
 	 */
+	@Deprecated(forRemoval = true)
+	public String sendContent(final LetterEntity letterEntity, final String legalId) {
+		try {
+			final var request = kivraMapper.toSendContentRequest(letterEntity, legalId);
+			LOG.info("Sending content to Kivra for legal id: {}", legalId);
+			kivraClient.sendContent(buildLegacyUri(), request);
+			LOG.info("Content sent successfully for legal id: {}", legalId);
+
+			return STATUS_SENT;
+
+		} catch (final ClientProblem e) {
+			LOG.error("Response indicates client error", e);
+			return STATUS_CLIENT_ERROR;
+		} catch (final ServerProblem e) {
+			LOG.error("Response indicates server error", e);
+			return STATUS_SERVER_ERROR;
+		} catch (final ThrowableProblem e) {
+			LOG.error("Response indicates unknown error", e);
+			return STATUS_UNKNOWN_ERROR;
+		} catch (final Exception e) {
+			LOG.error("{} occurred when sending content to Kivra for legal id: {}, exception message: {}", e.getClass().getSimpleName(), legalId, e.getMessage(), e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while sending content to Kivra for legal id: " + legalId);
+		}
+	}
+
 	public List<KeyValue> getAllResponses() {
 		try {
 			LOG.info("Retrieving all Kivra responses");
 
-			final var keyValues = ofNullable(kivraClient.getAllResponses()).orElse(emptyList());
+			final var keyValues = ofNullable(kivraClient.getAllResponses(buildLegacyUri())).orElse(emptyList());
 			if (isEmpty(keyValues)) {
 				LOG.info("No Kivra responses found");
 			} else {
@@ -117,16 +186,10 @@ public class KivraIntegration {
 		}
 	}
 
-	/**
-	 * Retrieves a specific registered letter response from Kivra using the provided response key.
-	 *
-	 * @param  responseKey The key of the response to retrieve.
-	 * @return             The RegisteredLetterResponse object containing the details of the response.
-	 */
 	public RegisteredLetterResponse getRegisteredLetterResponse(final String responseKey) {
 		try {
 			LOG.info("Retrieving Kivra registered letter response for responseKey: {}", responseKey);
-			return kivraClient.getResponseDetails(responseKey);
+			return kivraClient.getResponseDetails(buildLegacyUri(), responseKey);
 
 		} catch (final ServerProblem e) {
 			LOG.error("Server exception occurred when retrieving Kivra registered letter response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
@@ -137,15 +200,10 @@ public class KivraIntegration {
 		}
 	}
 
-	/**
-	 * Deletes a specific response from Kivra using the provided response key.
-	 *
-	 * @param responseKey The key of the response to delete.
-	 */
 	public void deleteResponse(final String responseKey) {
 		try {
 			LOG.info("Deleting Kivra response with key: {}", responseKey);
-			kivraClient.deleteResponse(responseKey);
+			kivraClient.deleteResponse(buildLegacyUri(), responseKey);
 			LOG.info("Kivra response with key {} deleted successfully", responseKey);
 
 		} catch (final ServerProblem e) {
@@ -158,7 +216,7 @@ public class KivraIntegration {
 	}
 
 	public void healthCheck() {
-		kivraClient.getTenantInformation();
+		kivraClient.getTenantInformation(buildLegacyUri());
 	}
 
 }

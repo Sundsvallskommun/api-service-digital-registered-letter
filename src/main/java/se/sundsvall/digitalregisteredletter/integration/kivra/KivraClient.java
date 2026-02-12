@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static se.sundsvall.digitalregisteredletter.integration.kivra.configuration.KivraConfiguration.CLIENT_ID;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.net.URI;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,12 +32,13 @@ public interface KivraClient {
 	 * This resource is used to send content to Kivra. The request body contains the content to be sent, and the response
 	 * will contain the content that was sent.
 	 *
+	 * @param  baseUrl the base URL including the tenant key
 	 * @param  content the content to be sent to Kivra, encapsulated in a ContentUserV2 object
-	 * @return         a ResponseEntity containing a ContentUser object, which includes the subject, type and generated_at
-	 *                 of the content sent by Kivra to the end user.
+	 * @return         a ContentUser object, which includes the subject, type and generated_at of the content sent by Kivra
+	 *                 to the end user.
 	 */
 	@PostMapping(value = "/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-	ContentUser sendContent(@RequestBody final ContentUserV2 content);
+	ContentUser sendContent(final URI baseUrl, @RequestBody final ContentUserV2 content);
 
 	/**
 	 * This resource is used to match a list of users to check that they are eligible for receiving Content from the
@@ -45,11 +47,12 @@ public interface KivraClient {
 	 * that are eligible to receive content from the tenant. If none of the provided SSNs are eligible to receive content
 	 * from this tenant, an empty list will be returned.
 	 *
+	 * @param  baseUrl        the base URL including the tenant key
 	 * @param  userMatchV2SSN the request body containing a list of SSNs to be matched
-	 * @return                a ResponseEntity containing a UserMatchV2SSN object with a list of matched SSNs
+	 * @return                a UserMatchV2SSN object with a list of matched SSNs
 	 */
 	@PostMapping(value = "/usermatch/ssn", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-	UserMatchV2SSN checkEligibility(@RequestBody final UserMatchV2SSN userMatchV2SSN);
+	UserMatchV2SSN checkEligibility(final URI baseUrl, @RequestBody final UserMatchV2SSN userMatchV2SSN);
 
 	/**
 	 * This resource is used to retrieve the responses of all registered letters sent by the tenant that have been signed or
@@ -57,36 +60,38 @@ public interface KivraClient {
 	 * returns a list of
 	 * key-value pairs where the key is the 'responseKey' and the value is the status (either 'signed' or 'expired').
 	 *
-	 * @return a list of KeyValue objects containing the response keys and their corresponding statuses
+	 * @param  baseUrl the base URL including the tenant key
+	 * @return         a list of KeyValue objects containing the response keys and their corresponding statuses
 	 */
 	@GetMapping(value = "/registered", produces = APPLICATION_JSON_VALUE)
-	List<KeyValue> getAllResponses();
+	List<KeyValue> getAllResponses(final URI baseUrl);
 
 	/**
 	 * This resource is used to retrieve details of a specific registered letter response using the response key.
 	 *
+	 * @param  baseUrl     the base URL including the tenant key
 	 * @param  responseKey the key of the response to be fetched
 	 * @return             a RegisteredLetterResponse object containing the details of the registered letter response
 	 */
 	@GetMapping(value = "/registered/{responseKey}", produces = APPLICATION_JSON_VALUE)
-	RegisteredLetterResponse getResponseDetails(@PathVariable("responseKey") final String responseKey);
+	RegisteredLetterResponse getResponseDetails(final URI baseUrl, @PathVariable final String responseKey);
 
 	/**
 	 * This resource is used to delete a specific registered letter response after we have updated the status of the letter
 	 * in our system.
 	 *
-	 * @param  responseKey the key of the response to be deleted
-	 * @return             a ResponseEntity with no content, indicating that the deletion was successful
+	 * @param baseUrl     the base URL including the tenant key
+	 * @param responseKey the key of the response to be deleted
 	 */
 	@DeleteMapping(value = "/registered/{responseKey}", produces = ALL_VALUE)
-	void deleteResponse(@PathVariable("responseKey") final String responseKey);
+	void deleteResponse(final URI baseUrl, @PathVariable final String responseKey);
 
 	/**
 	 * Method is used to verify that the certificate to Kivra is valid
 	 *
-	 * @return basic tenant information
+	 * @param baseUrl the base URL including the tenant key
 	 */
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	void getTenantInformation();
+	void getTenantInformation(final URI baseUrl);
 
 }

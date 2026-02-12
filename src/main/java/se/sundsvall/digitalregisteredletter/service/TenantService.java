@@ -18,6 +18,7 @@ import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
 public class TenantService {
 
 	private static final String TENANT_NOT_FOUND = "Tenant with id '%s' and municipalityId '%s' not found";
+	private static final String TENANT_NOT_FOUND_BY_ORG = "Tenant with municipalityId '%s' and organizationNumber '%s' not found";
 
 	private final TenantRepository tenantRepository;
 	private final EncryptionUtility encryptionUtility;
@@ -52,6 +53,12 @@ public class TenantService {
 	public void deleteTenant(final String municipalityId, final String id) {
 		final var entity = getTenantEntity(municipalityId, id);
 		tenantRepository.delete(entity);
+	}
+
+	public String getDecryptedTenantKey(final String municipalityId, final String organizationNumber) {
+		final var entity = tenantRepository.findByMunicipalityIdAndOrgNumber(municipalityId, organizationNumber)
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, TENANT_NOT_FOUND_BY_ORG.formatted(municipalityId, organizationNumber)));
+		return encryptionUtility.decrypt(entity.getTenantKey());
 	}
 
 	private TenantEntity getTenantEntity(final String municipalityId, final String id) {
