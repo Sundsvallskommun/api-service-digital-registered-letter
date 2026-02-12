@@ -37,9 +37,9 @@ class LetterEntityTest {
 		org.hamcrest.MatcherAssert.assertThat(LetterEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSettersExcluding("requestId"),
-			hasValidBeanHashCodeExcluding("organization", "user", "requestId"),
-			hasValidBeanEqualsExcluding("organization", "user", "requestId"),
-			hasValidBeanToStringExcluding("organization", "user", "requestId")));
+			hasValidBeanHashCodeExcluding("organization", "tenant", "user", "requestId"),
+			hasValidBeanEqualsExcluding("organization", "tenant", "user", "requestId"),
+			hasValidBeanToStringExcluding("organization", "tenant", "user", "requestId")));
 	}
 
 	@Test
@@ -56,6 +56,7 @@ class LetterEntityTest {
 		final var user = UserEntity.create();
 		final var organization = OrganizationEntity.create();
 		final var signingInformation = SigningInformationEntity.create();
+		final var tenant = TenantEntity.create();
 		final var contentType = "text/plain";
 		final var status = "status";
 		final var deleted = true;
@@ -80,6 +81,7 @@ class LetterEntityTest {
 			.withUser(user)
 			.withOrganization(organization)
 			.withSigningInformation(signingInformation)
+			.withTenant(tenant)
 			.withSubject(subject)
 			.withSupportInformation(supportInformation);
 
@@ -97,6 +99,7 @@ class LetterEntityTest {
 		assertThat(letterEntity.getUser()).isEqualTo(user);
 		assertThat(letterEntity.getOrganization()).isEqualTo(organization);
 		assertThat(letterEntity.getSigningInformation()).isEqualTo(signingInformation);
+		assertThat(letterEntity.getTenant()).isEqualTo(tenant);
 		assertThat(letterEntity.getSubject()).isEqualTo(subject);
 
 		assertThat(letterEntity).hasNoNullFieldsOrPropertiesExcept("requestId");

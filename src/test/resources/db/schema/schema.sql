@@ -18,6 +18,7 @@
         party_id varchar(36),
         request_id varchar(36),
         signing_information_id varchar(36),
+        tenant_id varchar(36),
         user_id varchar(36),
         status varchar(40),
         content_type varchar(50),
@@ -56,9 +57,11 @@
     ) engine=InnoDB;
 
     create table tenant (
+        municipality_id varchar(4) not null,
+        created datetime(6),
+        modified datetime(6),
+        org_number varchar(12) not null,
         id varchar(36) not null,
-        municipality_id varchar(255) not null,
-        org_number varchar(255) not null,
         tenant_key varchar(255) not null,
         primary key (id)
     ) engine=InnoDB;
@@ -105,7 +108,12 @@
        foreign key (signing_information_id) 
        references signing_information (id);
 
-    alter table if exists letter 
-       add constraint fk_letter_user 
-       foreign key (user_id) 
+    alter table if exists letter
+       add constraint fk_letter_tenant
+       foreign key (tenant_id)
+       references tenant (id);
+
+    alter table if exists letter
+       add constraint fk_letter_user
+       foreign key (user_id)
        references user (id);
