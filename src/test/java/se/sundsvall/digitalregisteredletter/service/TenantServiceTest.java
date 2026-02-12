@@ -205,4 +205,38 @@ class TenantServiceTest {
 			.hasFieldOrPropertyWithValue("status", NOT_FOUND);
 		verify(tenantRepositoryMock).findByIdAndMunicipalityId(ID, MUNICIPALITY_ID);
 	}
+
+	@Test
+	void getDecryptedTenantKey() {
+		// Setup
+		final var entity = TenantEntity.create()
+			.withId(ID)
+			.withOrgNumber(ORG_NUMBER)
+			.withTenantKey(ENCRYPTED_TENANT_KEY)
+			.withMunicipalityId(MUNICIPALITY_ID);
+
+		// Mock
+		when(tenantRepositoryMock.findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(Optional.of(entity));
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
+
+		// Act
+		final var result = tenantService.getDecryptedTenantKey(MUNICIPALITY_ID, ORG_NUMBER);
+
+		// Verify
+		assertThat(result).isEqualTo(TENANT_KEY);
+		verify(tenantRepositoryMock).findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, ORG_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
+	}
+
+	@Test
+	void getDecryptedTenantKeyNotFound() {
+		// Mock
+		when(tenantRepositoryMock.findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(Optional.empty());
+
+		// Act & Verify
+		assertThatThrownBy(() -> tenantService.getDecryptedTenantKey(MUNICIPALITY_ID, ORG_NUMBER))
+			.isInstanceOf(ThrowableProblem.class)
+			.hasFieldOrPropertyWithValue("status", NOT_FOUND);
+		verify(tenantRepositoryMock).findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, ORG_NUMBER);
+	}
 }
