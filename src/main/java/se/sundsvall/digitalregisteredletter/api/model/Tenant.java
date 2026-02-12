@@ -1,6 +1,7 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -14,5 +15,5 @@ public record Tenant(
 
 	@NotBlank @Schema(description = "Organization number", examples = "5591628136") String orgNumber,
 
-	@NotBlank @Schema(description = "Tenant key identifier", examples = "some-tenant-key") String tenantKey) {
+	@NotBlank @Schema(description = "Tenant key identifier", examples = "some-tenant-key", accessMode = WRITE_ONLY) String tenantKey) {
 }

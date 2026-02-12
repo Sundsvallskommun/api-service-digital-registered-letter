@@ -1,5 +1,7 @@
 package se.sundsvall.digitalregisteredletter.service.util;
 
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -7,6 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.stereotype.Component;
+import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.configuration.CredentialsProperties;
 
 @Component
@@ -43,7 +46,7 @@ public class EncryptionUtility {
 			cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
 			messageCipher = cipher.doFinal(input);
 		} catch (final GeneralSecurityException e) {
-			throw new EncryptionException("Something went wrong encrypting input", e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Something went wrong encrypting input");
 		}
 
 		final var cipherText = new byte[messageCipher.length + NONCE_LEN];
@@ -75,7 +78,7 @@ public class EncryptionUtility {
 			cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
 			return new String(cipher.doFinal(messageCipher));
 		} catch (final GeneralSecurityException e) {
-			throw new EncryptionException("Something went wrong decrypting input", e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Something went wrong decrypting input");
 		}
 
 	}

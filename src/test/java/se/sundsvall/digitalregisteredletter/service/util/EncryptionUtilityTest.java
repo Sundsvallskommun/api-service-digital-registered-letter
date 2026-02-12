@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
+import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.configuration.CredentialsProperties;
 
 class EncryptionUtilityTest {
@@ -50,7 +51,7 @@ class EncryptionUtilityTest {
 		final var invalidCipherText = getEncoder().encodeToString(new byte[32]);
 
 		assertThatThrownBy(() -> encryptionUtility.decrypt(invalidCipherText))
-			.isInstanceOf(EncryptionException.class)
+			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Something went wrong decrypting input");
 	}
 
@@ -60,7 +61,7 @@ class EncryptionUtilityTest {
 		final var badUtility = new EncryptionUtility(badCredentials);
 
 		assertThatThrownBy(() -> badUtility.encrypt("test".getBytes()))
-			.isInstanceOf(EncryptionException.class)
+			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Something went wrong encrypting input");
 	}
 }

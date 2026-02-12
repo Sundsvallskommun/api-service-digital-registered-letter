@@ -1,5 +1,6 @@
 package se.sundsvall.digitalregisteredletter.api;
 
+import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
@@ -70,7 +71,7 @@ class TenantResource {
 		return ok(tenantService.getTenant(municipalityId, id));
 	}
 
-	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+	@PostMapping(produces = ALL_VALUE, consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Create tenant",
 		description = "Creates a new tenant",
 		responses = @ApiResponse(responseCode = "201", headers = @Header(name = "Location", schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
