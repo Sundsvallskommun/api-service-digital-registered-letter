@@ -1,3 +1,4 @@
+
     create table attachment (
         id varchar(36) not null,
         letter_id varchar(36) not null,
@@ -54,6 +55,14 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table tenant (
+        id varchar(36) not null,
+        municipality_id varchar(255) not null,
+        org_number varchar(255) not null,
+        tenant_key varchar(255) not null,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table user (
         id varchar(36) not null,
         username varchar(255) not null,
@@ -68,6 +77,12 @@
 
     alter table if exists organization 
        add constraint uk_number unique (number);
+
+    create index idx_tenant_municipality_id 
+       on tenant (municipality_id);
+
+    alter table if exists tenant 
+       add constraint uk_tenant_org_municipality unique (org_number, municipality_id);
 
     create index idx_username 
        on user (username);

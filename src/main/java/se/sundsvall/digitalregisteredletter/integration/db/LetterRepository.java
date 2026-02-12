@@ -8,17 +8,17 @@ import static se.sundsvall.digitalregisteredletter.integration.db.specification.
 import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withMunicipalityId;
 import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withUsername;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 
-@Repository
+@CircuitBreaker(name = "letterRepository")
 public interface LetterRepository extends JpaRepository<LetterEntity, String>, JpaSpecificationExecutor<LetterEntity> {
 
 	Optional<LetterEntity> findByIdAndMunicipalityIdAndDeleted(final String id, final String municipalityId, boolean deleted);
