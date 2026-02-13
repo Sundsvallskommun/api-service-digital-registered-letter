@@ -15,6 +15,10 @@ import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
+import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
+import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
+import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
 
 @WireMockAppTestSuite(files = "classpath:/SchedulerIT/", classes = Application.class)
 @Sql({
@@ -32,19 +36,43 @@ class SchedulerIT extends AbstractAppTest {
 	@Autowired
 	private LetterRepository letterRepository;
 
+	@Autowired
+	private TenantRepository tenantRepository;
+
+	@Autowired
+	private EncryptionUtility encryptionUtility;
+
 	private TransactionTemplate transactionTemplate;
 
 	@BeforeEach
 	void setUp() {
 		transactionTemplate = new TransactionTemplate(transactionManager);
+
+		// Create a tenant with an encrypted key that decrypts to "some-tenant-key"
+		// and link it to the letter
+		transactionTemplate.executeWithoutResult(status -> {
+			final var tenant = tenantRepository.save(TenantEntity.create()
+				.withOrgNumber("5566778899")
+				.withMunicipalityId("2281")
+				.withTenantKey(encryptionUtility.encrypt("some-tenant-key".getBytes())));
+
+			final var letter = letterRepository.findById(LETTER_ID).orElseThrow();
+			letter.setStatus("SENT");
+			letter.setTenant(tenant);
+			letter.setSigningInformation(SigningInformationEntity.create().withStatus("PENDING"));
+			letterRepository.save(letter);
+		});
 	}
 
 	@Test
 	void test01_updateLetterStatuses() {
-		// Assert that the letter status is "NEW" and has no signing information before the update
-		final var letterBeforeUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
-		assertThat(letterBeforeUpdate.getStatus()).isEqualTo("NEW");
-		assertThat(letterBeforeUpdate.getSigningInformation()).isNull();
+		// Assert that the letter status is "SENT" and has signing information with status "PENDING" before the update
+		transactionTemplate.executeWithoutResult(status -> {
+			final var letterBeforeUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
+			assertThat(letterBeforeUpdate.getStatus()).isEqualTo("SENT");
+			assertThat(letterBeforeUpdate.getSigningInformation()).isNotNull();
+			assertThat(letterBeforeUpdate.getSigningInformation().getStatus()).isEqualTo("PENDING");
+		});
 
 		setupCall()
 			.withServicePath("/2281/scheduler")

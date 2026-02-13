@@ -30,16 +30,24 @@ public interface LetterRepository extends JpaRepository<LetterEntity, String>, J
 	Optional<LetterEntity> findByIdAndDeleted(final String id, final boolean deleted);
 
 	/**
+	 * Finds all LetterEntities with a specific signing information status, not deleted, and with a non-null tenant.
+	 *
+	 * @param  signingInformationStatus the signing information status to filter by
+	 * @return                          a list of LetterEntity objects that match the search parameters
+	 */
+	List<LetterEntity> findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(final String signingInformationStatus);
+
+	/**
 	 * Performs a search in LetterEntities.
 	 *
-	 * @param  municipalityId muncipality id for the letter entity
-	 * @param  filter         optional filters to match when retriving result
-	 * @param  deleted        filter that decides if only deleted, only non deleted or all entities shall be part of the
+	 * @param  municipalityId municipality id for the letter entity
+	 * @param  filter         optional filters to match when retrieving a result
+	 * @param  deleted        filter that decides if only deleted, only non-deleted or all entities shall be part of the
 	 *                        result
 	 * @param  pageable       the pageable object.
 	 * @return                a Page of LetterEntity objects that matches the search parameters
 	 */
-	default Page<LetterEntity> findAllByFilter(String municipalityId, LetterFilter filter, Boolean deleted, Pageable pageable) {
+	default Page<LetterEntity> findAllByFilter(final String municipalityId, final LetterFilter filter, final Boolean deleted, final Pageable pageable) {
 		return this.findAll(
 			allOf(withMunicipalityId(municipalityId)
 				.and(withDepartmentOrgId(filter.orgId()))

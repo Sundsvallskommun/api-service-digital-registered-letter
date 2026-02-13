@@ -44,9 +44,11 @@ import se.sundsvall.digitalregisteredletter.api.model.LetterStatus;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
+import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
 import se.sundsvall.digitalregisteredletter.integration.templating.TemplatingIntegration;
@@ -65,6 +67,9 @@ class LetterServiceTest {
 	private RepositoryIntegration repositoryIntegrationMock;
 
 	@Mock
+	private TenantRepository tenantRepositoryMock;
+
+	@Mock
 	private LetterMapper letterMapperMock;
 
 	@Mock
@@ -75,7 +80,7 @@ class LetterServiceTest {
 
 	@AfterEach
 	void ensureNoInteractionsWereMissed() {
-		verifyNoMoreInteractions(repositoryIntegrationMock, partyIntegrationMock, kivraIntegrationMock, letterMapperMock, templatingIntegrationMock);
+		verifyNoMoreInteractions(repositoryIntegrationMock, partyIntegrationMock, kivraIntegrationMock, tenantRepositoryMock, letterMapperMock, templatingIntegrationMock);
 	}
 
 	private HttpServletResponse mockHttpServletResponse(final ByteArrayOutputStream outputStream) throws IOException {
@@ -108,21 +113,25 @@ class LetterServiceTest {
 		final var letterRequest = createLetterRequest();
 		final var legalId = "legalId";
 		final var letterEntity = createLetterEntity();
+		final var tenant = TenantEntity.create().withMunicipalityId(municipalityId).withOrgNumber(organizationNumber);
 		final var letterMock = mock(Letter.class);
 		final var status = "status";
 		Identifier.set(Identifier.parse("type=adAccount; test01user"));
 
 		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(Optional.of(legalId));
 		when(repositoryIntegrationMock.persistLetter(any(), any(), any())).thenReturn(letterEntity);
+		when(tenantRepositoryMock.findByMunicipalityIdAndOrgNumber(municipalityId, organizationNumber)).thenReturn(Optional.of(tenant));
 		when(kivraIntegrationMock.sendContent(letterEntity, legalId, municipalityId, organizationNumber)).thenReturn(status);
 		when(letterMapperMock.toLetter(letterEntity)).thenReturn(letterMock);
 
 		final var response = letterService.sendLetter(municipalityId, organizationNumber, letterRequest, multipartFileList);
 
 		assertThat(response).isEqualTo(letterMock);
+		assertThat(letterEntity.getTenant()).isSameAs(tenant);
 
 		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
 		verify(repositoryIntegrationMock).persistLetter(municipalityId, letterRequest, multipartFileList);
+		verify(tenantRepositoryMock).findByMunicipalityIdAndOrgNumber(municipalityId, organizationNumber);
 		verify(kivraIntegrationMock).sendContent(letterEntity, legalId, municipalityId, organizationNumber);
 		verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
 		verifyNoInteractions(letterMock);
