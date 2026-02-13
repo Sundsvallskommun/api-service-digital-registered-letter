@@ -11,7 +11,6 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.core.AllOf.allOf;
-import static org.junit.Assert.assertTrue;
 import static se.sundsvall.TestDataFactory.createAttachmentEntity;
 import static se.sundsvall.TestUtil.isValidUUID;
 
@@ -123,7 +122,7 @@ class LetterEntityTest {
 
 		assertThat(letterEntity.getCreated()).isCloseTo(now(), within(2, SECONDS));
 		assertThat(letterEntity.getUpdated()).isEqualTo(letterEntity.getCreated());
-		assertTrue(isValidUUID(letterEntity.getRequestId()));
+		assertThat(isValidUUID(letterEntity.getRequestId())).isTrue();
 	}
 
 	@Test
@@ -138,6 +137,6 @@ class LetterEntityTest {
 
 		assertThat(letterEntity.getCreated()).isNull();
 		assertThat(letterEntity.getUpdated()).isCloseTo(now(), within(2, SECONDS));
-		assertTrue(isValidUUID(letterEntity.getRequestId()));
+		assertThat(isValidUUID(letterEntity.getRequestId())).isTrue();
 	}
 }
