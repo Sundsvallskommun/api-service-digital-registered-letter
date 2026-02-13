@@ -20,22 +20,41 @@ public class EligibilityService {
 		this.partyIntegration = partyIntegration;
 	}
 
-	public List<String> checkEligibility(final String municipalityId, final EligibilityRequest request) {
-		var partyIdAndLegalIdMap = new HashMap<String, String>();
-
-		request.partyIds().forEach(party -> {
-			var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, party);
-			legalId.ifPresent(legalId1 -> partyIdAndLegalIdMap.put(party, legalId1));
-		});
-
-		var legalIds = partyIdAndLegalIdMap.values().stream().toList();
-
-		var eligibleLegalIds = kivraIntegration.checkEligibility(legalIds);
+	public List<String> checkEligibility(final String municipalityId, final String organizationNumber, final EligibilityRequest request) {
+		final var partyIdAndLegalIdMap = resolvePartyIdToLegalIdMap(municipalityId, request);
+		final var legalIds = partyIdAndLegalIdMap.values().stream().toList();
+		final var eligibleLegalIds = kivraIntegration.checkEligibility(legalIds, municipalityId, organizationNumber);
 
 		return partyIdAndLegalIdMap.entrySet().stream()
 			.filter(entry -> eligibleLegalIds.contains(entry.getValue()))
 			.map(Map.Entry::getKey)
 			.toList();
+	}
+
+	/**
+	 * @deprecated Use {@link #checkEligibility(String, String, EligibilityRequest)} with organizationNumber instead.
+	 */
+	@Deprecated(forRemoval = true)
+	public List<String> checkEligibility(final String municipalityId, final EligibilityRequest request) {
+		final var partyIdAndLegalIdMap = resolvePartyIdToLegalIdMap(municipalityId, request);
+		final var legalIds = partyIdAndLegalIdMap.values().stream().toList();
+		final var eligibleLegalIds = kivraIntegration.checkEligibility(legalIds);
+
+		return partyIdAndLegalIdMap.entrySet().stream()
+			.filter(entry -> eligibleLegalIds.contains(entry.getValue()))
+			.map(Map.Entry::getKey)
+			.toList();
+	}
+
+	private Map<String, String> resolvePartyIdToLegalIdMap(final String municipalityId, final EligibilityRequest request) {
+		final var partyIdAndLegalIdMap = new HashMap<String, String>();
+
+		request.partyIds().forEach(party -> {
+			final var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, party);
+			legalId.ifPresent(value -> partyIdAndLegalIdMap.put(party, value));
+		});
+
+		return partyIdAndLegalIdMap;
 	}
 
 }

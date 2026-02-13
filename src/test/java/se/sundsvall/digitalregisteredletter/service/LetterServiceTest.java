@@ -100,7 +100,36 @@ class LetterServiceTest {
 	}
 
 	@Test
-	void sendLetter() {
+	void sendLetterWithOrganizationNumber() {
+		final var multipartFile = mock(MultipartFile.class);
+		final var multipartFileList = List.of(multipartFile);
+		final var municipalityId = "2281";
+		final var organizationNumber = "5591628136";
+		final var letterRequest = createLetterRequest();
+		final var legalId = "legalId";
+		final var letterEntity = createLetterEntity();
+		final var letterMock = mock(Letter.class);
+		final var status = "status";
+		Identifier.set(Identifier.parse("type=adAccount; test01user"));
+
+		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(Optional.of(legalId));
+		when(repositoryIntegrationMock.persistLetter(any(), any(), any())).thenReturn(letterEntity);
+		when(kivraIntegrationMock.sendContent(letterEntity, legalId, municipalityId, organizationNumber)).thenReturn(status);
+		when(letterMapperMock.toLetter(letterEntity)).thenReturn(letterMock);
+
+		final var response = letterService.sendLetter(municipalityId, organizationNumber, letterRequest, multipartFileList);
+
+		assertThat(response).isEqualTo(letterMock);
+
+		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
+		verify(repositoryIntegrationMock).persistLetter(municipalityId, letterRequest, multipartFileList);
+		verify(kivraIntegrationMock).sendContent(letterEntity, legalId, municipalityId, organizationNumber);
+		verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
+		verifyNoInteractions(letterMock);
+	}
+
+	@Test
+	void sendLetterLegacy() {
 		final var multipartFile = mock(MultipartFile.class);
 		final var multipartFileList = List.of(multipartFile);
 		final var municipalityId = "2281";
@@ -125,7 +154,6 @@ class LetterServiceTest {
 		verify(kivraIntegrationMock).sendContent(letterEntity, legalId);
 		verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
 		verifyNoInteractions(letterMock);
-
 	}
 
 	@Test

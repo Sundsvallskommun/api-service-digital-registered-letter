@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +48,7 @@ import se.sundsvall.digitalregisteredletter.service.LetterService;
 
 @RestController
 @Validated
-@RequestMapping("/{municipalityId}/letters")
+@RequestMapping("/{municipalityId}")
 @Tag(name = "Letter Resource", description = "Send and manage digital registered letters")
 @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(oneOf = {
 	Problem.class, ConstraintViolationProblem.class
@@ -61,7 +62,7 @@ class LetterResource {
 		this.letterService = letterService;
 	}
 
-	@GetMapping(produces = APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/letters", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Get all letters",
 		description = "Retrieves all letters for a municipality. Response is possible to filter by any combination of department id, username, earliest and latest created date.",
 		responses = @ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true))
@@ -72,7 +73,7 @@ class LetterResource {
 		return ok(letterService.getLetters(municipalityId, filter, pageable));
 	}
 
-	@GetMapping(value = "/{letterId}", produces = APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/letters/{letterId}", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Get letter", description = "Retrieves a letter by id", responses = {
 		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
@@ -84,7 +85,7 @@ class LetterResource {
 		return ok(letterService.getLetter(municipalityId, letterId));
 	}
 
-	@GetMapping(value = "/{letterId}/signinginfo", produces = APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/letters/{letterId}/signinginfo", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Get signing information", description = "Retrieves signing information connected to letter matching provided id", responses = {
 		@ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
@@ -96,7 +97,7 @@ class LetterResource {
 		return ok(letterService.getSigningInformation(municipalityId, letterId));
 	}
 
-	@GetMapping(value = "/{letterId}/attachments/{attachmentId}", produces = ALL_VALUE)
+	@GetMapping(value = "/letters/{letterId}/attachments/{attachmentId}", produces = ALL_VALUE)
 	@Operation(summary = "Downloads letter attachment content", description = "Retrieves attachment content by id", responses = {
 		@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
@@ -110,11 +111,38 @@ class LetterResource {
 		letterService.readLetterAttachment(municipalityId, letterId, attachmentId, response);
 	}
 
-	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/{organizationNumber}/letters", produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
 	@Operation(summary = "Send letter",
 		description = "Send a digital registered letter using Kivra",
-		responses = @ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
+		responses = {
+			@ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true),
+			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+		})
 	ResponseEntity<Letter> sendLetter(
+		@RequestHeader(value = Identifier.HEADER_NAME) @ValidIdentifier final String xSentBy,
+		@PathVariable @ValidMunicipalityId final String municipalityId,
+		@NotBlank @PathVariable final String organizationNumber,
+		@RequestPart(name = "letter") @Valid final LetterRequest request,
+		@RequestPart(name = "letterAttachments") @NoDuplicateFileNames @ValidPdf final List<MultipartFile> attachments) {
+		Identifier.set(Identifier.parse(xSentBy));
+
+		final var letter = letterService.sendLetter(municipalityId, organizationNumber, request, attachments);
+
+		return created(fromPath("/{municipalityId}/{organizationNumber}/letters/{letterId}")
+			.buildAndExpand(municipalityId, organizationNumber, letter.id()).toUri())
+			.body(letter);
+	}
+
+	/**
+	 * @deprecated Use {@link #sendLetter(String, String, String, LetterRequest, List)} with organizationNumber instead.
+	 */
+	@Deprecated(forRemoval = true)
+	@PostMapping(value = "/letters", produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
+	@Operation(summary = "Send letter",
+		description = "Send a digital registered letter using Kivra",
+		deprecated = true,
+		responses = @ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
+	ResponseEntity<Letter> sendLetterLegacy(
 		@RequestHeader(value = Identifier.HEADER_NAME) @ValidIdentifier final String xSentBy,
 		@PathVariable @ValidMunicipalityId final String municipalityId,
 		@RequestPart(name = "letter") @Valid final LetterRequest request,
@@ -128,7 +156,7 @@ class LetterResource {
 			.body(letter);
 	}
 
-	@GetMapping(value = "/{letterId}/receipt", produces = ALL_VALUE)
+	@GetMapping(value = "/letters/{letterId}/receipt", produces = ALL_VALUE)
 	@Operation(summary = "Read letter receipt with the complete letter", description = "Retrieves letter receipt combined with the letter", responses = {
 		@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))

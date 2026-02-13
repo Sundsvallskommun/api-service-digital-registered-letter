@@ -51,7 +51,8 @@ public class LetterService {
 		final KivraIntegration kivraIntegration,
 		final PartyIntegration partyIntegration,
 		final RepositoryIntegration repositoryIntegration,
-		final LetterMapper letterMapper, final TemplatingIntegration templatingIntegration) {
+		final LetterMapper letterMapper,
+		final TemplatingIntegration templatingIntegration) {
 
 		this.kivraIntegration = kivraIntegration;
 		this.partyIntegration = partyIntegration;
@@ -60,16 +61,32 @@ public class LetterService {
 		this.templatingIntegration = templatingIntegration;
 	}
 
-	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
-		final var legalId = partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId())
-			.orElseThrow(() -> Problem.valueOf(NOT_FOUND,
-				"No legalId found for partyId '%s' and municipalityId '%s'".formatted(letterRequest.partyId(), municipalityId))); // Verify that a match for a party in request exists as there is no point in persisting entity otherwise
-
-		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments); // Create a new entity in the database for the letter
-		final var status = kivraIntegration.sendContent(letterEntity, legalId); // Send a letter to Kivra
-		repositoryIntegration.updateStatus(letterEntity, status); // Update entity with status from Kivra response
+	public Letter sendLetter(final String municipalityId, final String organizationNumber, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
+		final var legalId = resolveLegalId(municipalityId, letterRequest);
+		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments);
+		final var status = kivraIntegration.sendContent(letterEntity, legalId, municipalityId, organizationNumber);
+		repositoryIntegration.updateStatus(letterEntity, status);
 
 		return letterMapper.toLetter(letterEntity);
+	}
+
+	/**
+	 * @deprecated Use {@link #sendLetter(String, String, LetterRequest, List)} with organizationNumber instead.
+	 */
+	@Deprecated(forRemoval = true)
+	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
+		final var legalId = resolveLegalId(municipalityId, letterRequest);
+		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments);
+		final var status = kivraIntegration.sendContent(letterEntity, legalId);
+		repositoryIntegration.updateStatus(letterEntity, status);
+
+		return letterMapper.toLetter(letterEntity);
+	}
+
+	private String resolveLegalId(final String municipalityId, final LetterRequest letterRequest) {
+		return partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId())
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND,
+				"No legalId found for partyId '%s' and municipalityId '%s'".formatted(letterRequest.partyId(), municipalityId)));
 	}
 
 	public Letter getLetter(final String municipalityId, final String letterId) {
