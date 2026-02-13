@@ -165,32 +165,34 @@ public class KivraIntegration {
 		}
 	}
 
-	public List<KeyValue> getAllResponses() {
+	public List<KeyValue> getAllResponses(final String municipalityId, final String organizationNumber) {
+		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
 		try {
-			LOG.info("Retrieving all Kivra responses");
+			LOG.info("Retrieving all Kivra responses for organizationNumber: {}", organizationNumber);
 
-			final var keyValues = ofNullable(kivraClient.getAllResponses(buildLegacyUri())).orElse(emptyList());
+			final var keyValues = ofNullable(kivraClient.getAllResponses(buildTenantUri(tenantKey))).orElse(emptyList());
 			if (isEmpty(keyValues)) {
-				LOG.info("No Kivra responses found");
+				LOG.info("No Kivra responses found for organizationNumber: {}", organizationNumber);
 			} else {
-				LOG.info("Successfully retrieved {} Kivra responses", keyValues.size());
+				LOG.info("Successfully retrieved {} Kivra responses for organizationNumber: {}", keyValues.size(), organizationNumber);
 			}
 
 			return keyValues;
 
 		} catch (final ServerProblem e) {
-			LOG.error("Server exception occurred when retrieving Kivra responses, exception message: {}", e.getMessage(), e);
+			LOG.error("Server exception occurred when retrieving Kivra responses for organizationNumber: {}, exception message: {}", organizationNumber, e.getMessage(), e);
 			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while retrieving Kivra responses");
 		} catch (final Exception e) {
-			LOG.error("Exception occurred when retrieving Kivra responses, exception message: {}", e.getMessage(), e);
+			LOG.error("Exception occurred when retrieving Kivra responses for organizationNumber: {}, exception message: {}", organizationNumber, e.getMessage(), e);
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while retrieving Kivra responses");
 		}
 	}
 
-	public RegisteredLetterResponse getRegisteredLetterResponse(final String responseKey) {
+	public RegisteredLetterResponse getRegisteredLetterResponse(final String responseKey, final String municipalityId, final String organizationNumber) {
+		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
 		try {
 			LOG.info("Retrieving Kivra registered letter response for responseKey: {}", responseKey);
-			return kivraClient.getResponseDetails(buildLegacyUri(), responseKey);
+			return kivraClient.getResponseDetails(buildTenantUri(tenantKey), responseKey);
 
 		} catch (final ServerProblem e) {
 			LOG.error("Server exception occurred when retrieving Kivra registered letter response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
@@ -201,10 +203,11 @@ public class KivraIntegration {
 		}
 	}
 
-	public void deleteResponse(final String responseKey) {
+	public void deleteResponse(final String responseKey, final String municipalityId, final String organizationNumber) {
+		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
 		try {
 			LOG.info("Deleting Kivra response with key: {}", responseKey);
-			kivraClient.deleteResponse(buildLegacyUri(), responseKey);
+			kivraClient.deleteResponse(buildTenantUri(tenantKey), responseKey);
 			LOG.info("Kivra response with key {} deleted successfully", responseKey);
 
 		} catch (final ServerProblem e) {

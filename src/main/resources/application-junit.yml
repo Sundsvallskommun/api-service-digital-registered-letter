@@ -66,6 +66,9 @@ integration:
     read-timeout: 30
     url: http://localhost:8080/templating
     receipt-template-identifier: some-receipt-identifier
+properties:
+  credentials:
+    secret-key: "01234567890123456789012345678901"
 scheduler:
   update-letter-statuses:
     name: update-letter-statuses

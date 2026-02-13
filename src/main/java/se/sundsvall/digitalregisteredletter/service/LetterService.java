@@ -31,6 +31,7 @@ import se.sundsvall.digitalregisteredletter.api.model.LetterStatus;
 import se.sundsvall.digitalregisteredletter.api.model.Letters;
 import se.sundsvall.digitalregisteredletter.api.model.SigningInfo;
 import se.sundsvall.digitalregisteredletter.integration.db.RepositoryIntegration;
+import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
@@ -44,6 +45,7 @@ public class LetterService {
 	private final KivraIntegration kivraIntegration;
 	private final PartyIntegration partyIntegration;
 	private final RepositoryIntegration repositoryIntegration;
+	private final TenantRepository tenantRepository;
 	private final LetterMapper letterMapper;
 	private final TemplatingIntegration templatingIntegration;
 
@@ -51,12 +53,14 @@ public class LetterService {
 		final KivraIntegration kivraIntegration,
 		final PartyIntegration partyIntegration,
 		final RepositoryIntegration repositoryIntegration,
+		final TenantRepository tenantRepository,
 		final LetterMapper letterMapper,
 		final TemplatingIntegration templatingIntegration) {
 
 		this.kivraIntegration = kivraIntegration;
 		this.partyIntegration = partyIntegration;
 		this.repositoryIntegration = repositoryIntegration;
+		this.tenantRepository = tenantRepository;
 		this.letterMapper = letterMapper;
 		this.templatingIntegration = templatingIntegration;
 	}
@@ -64,6 +68,9 @@ public class LetterService {
 	public Letter sendLetter(final String municipalityId, final String organizationNumber, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
 		final var legalId = resolveLegalId(municipalityId, letterRequest);
 		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments);
+		final var tenant = tenantRepository.findByMunicipalityIdAndOrgNumber(municipalityId, organizationNumber)
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "No tenant found for municipalityId '%s' and organizationNumber '%s'".formatted(municipalityId, organizationNumber)));
+		letterEntity.setTenant(tenant);
 		final var status = kivraIntegration.sendContent(letterEntity, legalId, municipalityId, organizationNumber);
 		repositoryIntegration.updateStatus(letterEntity, status);
 

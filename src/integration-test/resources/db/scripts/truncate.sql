@@ -5,4 +5,5 @@ TRUNCATE table attachment;
 TRUNCATE table organization;
 TRUNCATE table signing_information;
 TRUNCATE table `user`;
+TRUNCATE table tenant;
 SET FOREIGN_KEY_CHECKS = 1;
