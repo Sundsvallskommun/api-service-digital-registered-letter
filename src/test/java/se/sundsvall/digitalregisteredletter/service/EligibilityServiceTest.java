@@ -54,4 +54,20 @@ class EligibilityServiceTest {
 		verify(kivraIntegrationMock).checkEligibility(legalIds, municipalityId, organizationNumber);
 	}
 
+	@Test
+	void checkEligibilityWithOrganizationNumberNoLegalId() {
+		final var municipalityId = "2281";
+		final var organizationNumber = "5591628136";
+		final var partyId = "123e4567-e89b-12d3-a456-426614174000";
+		final var request = new EligibilityRequest(List.of(partyId));
+
+		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, partyId)).thenReturn(Optional.empty());
+
+		final var result = eligibilityService.checkEligibility(municipalityId, organizationNumber, request);
+
+		assertThat(result).isEmpty();
+
+		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, partyId);
+	}
+
 }

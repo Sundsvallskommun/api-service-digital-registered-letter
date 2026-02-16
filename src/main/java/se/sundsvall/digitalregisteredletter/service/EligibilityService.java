@@ -1,5 +1,7 @@
 package se.sundsvall.digitalregisteredletter.service;
 
+import static java.util.Collections.emptyList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,9 @@ public class EligibilityService {
 	public List<String> checkEligibility(final String municipalityId, final String organizationNumber, final EligibilityRequest request) {
 		final var partyIdAndLegalIdMap = resolvePartyIdToLegalIdMap(municipalityId, request);
 		final var legalIds = partyIdAndLegalIdMap.values().stream().toList();
+		if (legalIds.isEmpty()) {
+			return emptyList();
+		}
 		final var eligibleLegalIds = kivraIntegration.checkEligibility(legalIds, municipalityId, organizationNumber);
 
 		return partyIdAndLegalIdMap.entrySet().stream()
