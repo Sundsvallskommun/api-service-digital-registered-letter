@@ -53,19 +53,4 @@ class EligibilityResource {
 		return ok(eligibilityService.checkEligibility(municipalityId, organizationNumber, request));
 	}
 
-	/**
-	 * @deprecated Use {@link #checkKivraEligibility(String, String, EligibilityRequest)} with organizationNumber instead.
-	 */
-	@Deprecated(forRemoval = true)
-	@PostMapping("/eligibility/kivra")
-	@Operation(summary = "Check if the given partyIds are eligible for receiving digital registered letters with Kivra",
-		description = "Returns a list of party IDs that are eligible for Kivra based on the provided municipality ID and party IDs",
-		deprecated = true)
-	ResponseEntity<List<String>> checkKivraEligibilityLegacy(
-		@ValidMunicipalityId @PathVariable final String municipalityId,
-		@RequestBody @Valid final EligibilityRequest request) {
-
-		return ok(eligibilityService.checkEligibility(municipalityId, request));
-	}
-
 }

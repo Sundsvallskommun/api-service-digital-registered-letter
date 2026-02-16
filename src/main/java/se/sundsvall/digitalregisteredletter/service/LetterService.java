@@ -77,19 +77,6 @@ public class LetterService {
 		return letterMapper.toLetter(letterEntity);
 	}
 
-	/**
-	 * @deprecated Use {@link #sendLetter(String, String, LetterRequest, List)} with organizationNumber instead.
-	 */
-	@Deprecated(forRemoval = true)
-	public Letter sendLetter(final String municipalityId, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
-		final var legalId = resolveLegalId(municipalityId, letterRequest);
-		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments);
-		final var status = kivraIntegration.sendContent(letterEntity, legalId);
-		repositoryIntegration.updateStatus(letterEntity, status);
-
-		return letterMapper.toLetter(letterEntity);
-	}
-
 	private String resolveLegalId(final String municipalityId, final LetterRequest letterRequest) {
 		return partyIntegration.getLegalIdByPartyId(municipalityId, letterRequest.partyId())
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND,

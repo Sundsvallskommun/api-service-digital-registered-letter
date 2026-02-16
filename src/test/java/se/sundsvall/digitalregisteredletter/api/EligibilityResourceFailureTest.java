@@ -76,48 +76,4 @@ class EligibilityResourceFailureTest {
 		verifyNoInteractions(eligibilityServiceMock);
 	}
 
-	@Test
-	void checkKivraEligibilityLegacy_badMunicipalityId() {
-		final var request = new EligibilityRequest(List.of("123e4567-e89b-12d3-a456-426614174000"));
-
-		final var response = webTestClient.post()
-			.uri("/%s/eligibility/kivra".formatted(BAD_MUNICIPALITY_ID))
-			.contentType(APPLICATION_JSON)
-			.bodyValue(request)
-			.exchange()
-			.expectStatus().isBadRequest()
-			.expectBody(ConstraintViolationProblem.class)
-			.returnResult()
-			.getResponseBody();
-
-		assertThat(response).isNotNull();
-		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("checkKivraEligibilityLegacy.municipalityId", "not a valid municipality ID"));
-
-		verifyNoInteractions(eligibilityServiceMock);
-	}
-
-	@Test
-	void checkKivraEligibilityLegacy_badPartyId() {
-		final var request = new EligibilityRequest(List.of(BAD_PARTY_ID));
-
-		final var response = webTestClient.post()
-			.uri("/%s/eligibility/kivra".formatted("2281"))
-			.contentType(APPLICATION_JSON)
-			.bodyValue(request)
-			.exchange()
-			.expectStatus().isBadRequest()
-			.expectBody(ConstraintViolationProblem.class)
-			.returnResult()
-			.getResponseBody();
-
-		assertThat(response).isNotNull();
-		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("partyIds[0]", "not a valid UUID"));
-
-		verifyNoInteractions(eligibilityServiceMock);
-	}
-
 }

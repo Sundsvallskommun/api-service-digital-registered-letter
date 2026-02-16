@@ -31,21 +31,6 @@ public class EligibilityService {
 			.toList();
 	}
 
-	/**
-	 * @deprecated Use {@link #checkEligibility(String, String, EligibilityRequest)} with organizationNumber instead.
-	 */
-	@Deprecated(forRemoval = true)
-	public List<String> checkEligibility(final String municipalityId, final EligibilityRequest request) {
-		final var partyIdAndLegalIdMap = resolvePartyIdToLegalIdMap(municipalityId, request);
-		final var legalIds = partyIdAndLegalIdMap.values().stream().toList();
-		final var eligibleLegalIds = kivraIntegration.checkEligibility(legalIds);
-
-		return partyIdAndLegalIdMap.entrySet().stream()
-			.filter(entry -> eligibleLegalIds.contains(entry.getValue()))
-			.map(Map.Entry::getKey)
-			.toList();
-	}
-
 	private Map<String, String> resolvePartyIdToLegalIdMap(final String municipalityId, final EligibilityRequest request) {
 		final var partyIdAndLegalIdMap = new HashMap<String, String>();
 

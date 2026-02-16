@@ -48,7 +48,6 @@ integration:
     readTimeout: 30
     url: http://localhost:8080/party
   kivra:
-    api-url: http://kivra-url.com
     base-url: http://kivra-url.com
     connect-timeout: PT5S
     read-timeout: PT15S
