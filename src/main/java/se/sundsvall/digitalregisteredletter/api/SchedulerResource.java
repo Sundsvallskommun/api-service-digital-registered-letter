@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
+import se.sundsvall.digitalregisteredletter.service.scheduler.CertificateHealthScheduler;
 import se.sundsvall.digitalregisteredletter.service.scheduler.SchedulerWorker;
 
 @RestController
@@ -31,9 +32,11 @@ import se.sundsvall.digitalregisteredletter.service.scheduler.SchedulerWorker;
 class SchedulerResource {
 
 	private final SchedulerWorker schedulerWorker;
+	private final CertificateHealthScheduler certificateHealthScheduler;
 
-	SchedulerResource(final SchedulerWorker schedulerWorker) {
+	SchedulerResource(final SchedulerWorker schedulerWorker, final CertificateHealthScheduler certificateHealthScheduler) {
 		this.schedulerWorker = schedulerWorker;
+		this.certificateHealthScheduler = certificateHealthScheduler;
 	}
 
 	@PostMapping(produces = ALL_VALUE)
@@ -42,6 +45,15 @@ class SchedulerResource {
 		@PathVariable @ValidMunicipalityId final String municipalityId) {
 
 		schedulerWorker.updateLetterInformation();
+		return ok().build();
+	}
+
+	@PostMapping(value = "/certificate-health", produces = ALL_VALUE)
+	@Operation(summary = "Trigger certificate health check", description = "Triggers the task that checks the Kivra certificate health", responses = @ApiResponse(responseCode = "200", description = "Successful Operation - OK", useReturnTypeSchema = true))
+	ResponseEntity<Void> checkCertificateHealth(
+		@PathVariable @ValidMunicipalityId final String municipalityId) {
+
+		certificateHealthScheduler.execute();
 		return ok().build();
 	}
 

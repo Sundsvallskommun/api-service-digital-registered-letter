@@ -36,7 +36,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
 import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
@@ -135,52 +134,6 @@ class LetterServiceTest {
 		verify(kivraIntegrationMock).sendContent(letterEntity, legalId, municipalityId, organizationNumber);
 		verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
 		verifyNoInteractions(letterMock);
-	}
-
-	@Test
-	void sendLetterLegacy() {
-		final var multipartFile = mock(MultipartFile.class);
-		final var multipartFileList = List.of(multipartFile);
-		final var municipalityId = "2281";
-		final var letterRequest = createLetterRequest();
-		final var legalId = "legalId";
-		final var letterEntity = createLetterEntity();
-		final var letterMock = mock(Letter.class);
-		final var status = "status";
-		Identifier.set(Identifier.parse("type=adAccount; test01user"));
-
-		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId())).thenReturn(Optional.of(legalId));
-		when(repositoryIntegrationMock.persistLetter(any(), any(), any())).thenReturn(letterEntity);
-		when(kivraIntegrationMock.sendContent(letterEntity, legalId)).thenReturn(status);
-		when(letterMapperMock.toLetter(letterEntity)).thenReturn(letterMock);
-
-		final var response = letterService.sendLetter(municipalityId, letterRequest, multipartFileList);
-
-		assertThat(response).isEqualTo(letterMock);
-
-		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
-		verify(repositoryIntegrationMock).persistLetter(municipalityId, letterRequest, multipartFileList);
-		verify(kivraIntegrationMock).sendContent(letterEntity, legalId);
-		verify(repositoryIntegrationMock).updateStatus(letterEntity, status);
-		verifyNoInteractions(letterMock);
-	}
-
-	@Test
-	void sendLetterForNonExistingPartyId() {
-		final var municipalityId = "2281";
-		final var letterRequest = createLetterRequest();
-		final var multipartFile = mock(MultipartFile.class);
-		final var multipartFileList = List.of(multipartFile);
-		Identifier.set(Identifier.parse("type=adAccount; test01user"));
-
-		when(partyIntegrationMock.getLegalIdByPartyId(municipalityId, letterRequest.partyId()))
-			.thenThrow(Problem.valueOf(Status.BAD_REQUEST, "The given partyId [%s] does not exist in the Party API or is not of type PRIVATE".formatted(letterRequest.partyId())));
-
-		assertThatThrownBy(() -> letterService.sendLetter(municipalityId, letterRequest, multipartFileList))
-			.isInstanceOf(Problem.class)
-			.hasMessage("Bad Request: The given partyId [%s] does not exist in the Party API or is not of type PRIVATE".formatted(letterRequest.partyId()));
-
-		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
 	}
 
 	@Test

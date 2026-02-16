@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.digitalregisteredletter.Application;
+import se.sundsvall.digitalregisteredletter.service.scheduler.CertificateHealthScheduler;
 import se.sundsvall.digitalregisteredletter.service.scheduler.SchedulerWorker;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
@@ -20,6 +21,9 @@ class SchedulerResourceTest {
 
 	@MockitoBean
 	private SchedulerWorker schedulerWorker;
+
+	@MockitoBean
+	private CertificateHealthScheduler certificateHealthScheduler;
 
 	@Autowired
 	private WebTestClient webTestClient;
@@ -32,6 +36,16 @@ class SchedulerResourceTest {
 			.expectStatus().isOk();
 
 		verify(schedulerWorker).updateLetterInformation();
+	}
+
+	@Test
+	void checkCertificateHealth_OK() {
+		webTestClient.post()
+			.uri(uriBuilder -> uriBuilder.path("/%s/scheduler/certificate-health".formatted(MUNICIPALITY_ID)).build())
+			.exchange()
+			.expectStatus().isOk();
+
+		verify(certificateHealthScheduler).execute();
 	}
 
 }

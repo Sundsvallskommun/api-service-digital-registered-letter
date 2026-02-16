@@ -45,6 +45,7 @@ import se.sundsvall.digitalregisteredletter.service.LetterService;
 class LetterResourceFailureTest {
 
 	private static final String MUNICIPALITY_ID = "2281";
+	private static final String ORGANIZATION_NUMBER = "5591628136";
 
 	@MockitoBean
 	private LetterService letterServiceMock;
@@ -129,7 +130,7 @@ class LetterResourceFailureTest {
 		multipartBodyBuilder.part("letter", createLetterRequest);
 
 		final var response = webTestClient.post()
-			.uri("/%s/letters".formatted("bad-municipality-id"))
+			.uri("/%s/%s/letters".formatted("bad-municipality-id", ORGANIZATION_NUMBER))
 			.contentType(MULTIPART_FORM_DATA)
 			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
@@ -142,7 +143,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("sendLetterLegacy.municipalityId", "not a valid municipality ID"));
+			.containsExactly(tuple("sendLetter.municipalityId", "not a valid municipality ID"));
 	}
 
 	@Test
@@ -152,7 +153,7 @@ class LetterResourceFailureTest {
 		multipartBodyBuilder.part("letter", LetterRequestBuilder.create().build());
 
 		final var response = webTestClient.post()
-			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
+			.uri("/%s/%s/letters".formatted(MUNICIPALITY_ID, ORGANIZATION_NUMBER))
 			.contentType(MULTIPART_FORM_DATA)
 			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
@@ -183,7 +184,7 @@ class LetterResourceFailureTest {
 		multipartBodyBuilder.part("letter", createLetterRequest);
 
 		final var response = webTestClient.post()
-			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
+			.uri("/%s/%s/letters".formatted(MUNICIPALITY_ID, ORGANIZATION_NUMBER))
 			.contentType(MULTIPART_FORM_DATA)
 			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
@@ -196,7 +197,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("sendLetterLegacy.attachments", "no duplicate file names allowed in the list of files"));
+			.containsExactly(tuple("sendLetter.attachments", "no duplicate file names allowed in the list of files"));
 	}
 
 	@Test
@@ -208,7 +209,7 @@ class LetterResourceFailureTest {
 		multipartBodyBuilder.part("letter", createLetterRequest);
 
 		final var response = webTestClient.post()
-			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
+			.uri("/%s/%s/letters".formatted(MUNICIPALITY_ID, ORGANIZATION_NUMBER))
 			.contentType(MULTIPART_FORM_DATA)
 			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))
@@ -221,7 +222,7 @@ class LetterResourceFailureTest {
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
 			.extracting(Violation::getField, Violation::getMessage)
-			.containsExactly(tuple("sendLetterLegacy.attachments", "content type must be application/pdf"));
+			.containsExactly(tuple("sendLetter.attachments", "content type must be application/pdf"));
 	}
 
 	@Test
@@ -232,7 +233,7 @@ class LetterResourceFailureTest {
 		multipartBodyBuilder.part("letter", createLetterRequest);
 
 		final var response = webTestClient.post()
-			.uri("/%s/letters".formatted(MUNICIPALITY_ID))
+			.uri("/%s/%s/letters".formatted(MUNICIPALITY_ID, ORGANIZATION_NUMBER))
 			.contentType(MULTIPART_FORM_DATA)
 			.header(Identifier.HEADER_NAME, "type=adAccount; test01user")
 			.body(fromMultipartData(multipartBodyBuilder.build()))

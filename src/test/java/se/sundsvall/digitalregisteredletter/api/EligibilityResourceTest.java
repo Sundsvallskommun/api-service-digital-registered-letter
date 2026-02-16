@@ -66,32 +66,4 @@ class EligibilityResourceTest {
 		verify(eligibilityServiceMock).checkEligibility(MUNICIPALITY_ID, ORGANIZATION_NUMBER, request);
 	}
 
-	@Test
-	void checkKivraEligibilityLegacy() {
-		// Parameter values
-		final var partyId = "123e4567-e89b-12d3-a456-426614174000";
-		final var request = new EligibilityRequest(List.of(partyId));
-		final var eligiblePartyIds = List.of(partyId);
-
-		// Mock
-		when(eligibilityServiceMock.checkEligibility(MUNICIPALITY_ID, request)).thenReturn(eligiblePartyIds);
-
-		// Call
-		final var response = webTestClient.post()
-			.uri("/%s/eligibility/kivra".formatted(MUNICIPALITY_ID))
-			.contentType(APPLICATION_JSON)
-			.bodyValue(request)
-			.exchange()
-			.expectStatus().isOk()
-			.expectBody(new ParameterizedTypeReference<List<String>>() {
-
-			})
-			.returnResult()
-			.getResponseBody();
-
-		// Verification
-		assertThat(response).containsExactly(partyId);
-		verify(eligibilityServiceMock).checkEligibility(MUNICIPALITY_ID, request);
-	}
-
 }

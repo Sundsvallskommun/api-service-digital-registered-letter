@@ -133,29 +133,6 @@ class LetterResource {
 			.body(letter);
 	}
 
-	/**
-	 * @deprecated Use {@link #sendLetter(String, String, String, LetterRequest, List)} with organizationNumber instead.
-	 */
-	@Deprecated(forRemoval = true)
-	@PostMapping(value = "/letters", produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
-	@Operation(summary = "Send letter",
-		description = "Send a digital registered letter using Kivra",
-		deprecated = true,
-		responses = @ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation - Created", useReturnTypeSchema = true))
-	ResponseEntity<Letter> sendLetterLegacy(
-		@RequestHeader(value = Identifier.HEADER_NAME) @ValidIdentifier final String xSentBy,
-		@PathVariable @ValidMunicipalityId final String municipalityId,
-		@RequestPart(name = "letter") @Valid final LetterRequest request,
-		@RequestPart(name = "letterAttachments") @NoDuplicateFileNames @ValidPdf final List<MultipartFile> attachments) {
-		Identifier.set(Identifier.parse(xSentBy));
-
-		final var letter = letterService.sendLetter(municipalityId, request, attachments);
-
-		return created(fromPath("/{municipalityId}/letters/{letterId}")
-			.buildAndExpand(municipalityId, letter.id()).toUri())
-			.body(letter);
-	}
-
 	@GetMapping(value = "/letters/{letterId}/receipt", produces = ALL_VALUE)
 	@Operation(summary = "Read letter receipt with the complete letter", description = "Retrieves letter receipt combined with the letter", responses = {
 		@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
