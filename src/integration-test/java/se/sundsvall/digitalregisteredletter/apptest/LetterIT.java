@@ -24,7 +24,9 @@ import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.OrganizationRepository;
+import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.UserRepository;
+import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
 
 @WireMockAppTestSuite(files = "classpath:/LetterIT/", classes = Application.class)
 @Sql({
@@ -34,6 +36,8 @@ import se.sundsvall.digitalregisteredletter.integration.db.UserRepository;
 class LetterIT extends AbstractAppTest {
 
 	public static final String HEADER_X_SENT_BY = "X-Sent-By";
+	private static final String MUNICIPALITY_ID = "2281";
+	private static final String ORGANIZATION_NUMBER = "1234567890";
 	private static final String RESPONSE = "response.json";
 	private static final String REQUEST = "request.json";
 
@@ -51,9 +55,22 @@ class LetterIT extends AbstractAppTest {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private TenantRepository tenantRepository;
+
+	@Autowired
+	private EncryptionUtility encryptionUtility;
+
 	@BeforeEach
 	void setUp() {
 		transactionTemplate = new TransactionTemplate(transactionManager);
+
+		// Update the existing tenant's key to a properly encrypted value that decrypts to "some-tenant-key"
+		transactionTemplate.executeWithoutResult(_ -> {
+			final var tenant = tenantRepository.findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, ORGANIZATION_NUMBER).orElseThrow();
+			tenant.setTenantKey(encryptionUtility.encrypt("some-tenant-key".getBytes()));
+			tenantRepository.save(tenant);
+		});
 	}
 
 	@Test
@@ -78,28 +95,29 @@ class LetterIT extends AbstractAppTest {
 
 	@Test
 	void test03_sendLetter() throws FileNotFoundException {
-		final var initialLetterSize = transactionTemplate.execute(status -> {
+		final var initialLetterSize = transactionTemplate.execute(_ -> {
 			assertThat(organizationRepository.findByNumber(44)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(3));
 			assertThat(userRepository.findByUsernameIgnoreCase("joe01doe")).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(7));
 			return letterRepository.count();
 		});
 
 		final var headers = setupCall()
-			.withServicePath("/2281/letters")
+			.withServicePath("/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/letters")
 			.withHttpMethod(POST)
 			.withHeader(HEADER_X_SENT_BY, "joe01doe; type=adAccount")
 			.withContentType(MULTIPART_FORM_DATA)
 			.withRequestFile("letter", REQUEST)
 			.withRequestFile("letterAttachments", "test.pdf")
 			.withExpectedResponseStatus(CREATED)
-			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+			.withExpectedResponseHeader(LOCATION, List.of("/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
 			.withExpectedResponse(RESPONSE)
 			.sendRequestAndVerifyResponse()
 			.getResponseHeaders();
 
 		assertThat(headers.get(LOCATION)).isNotNull();
+		assertThat(initialLetterSize).isNotNull();
 
-		transactionTemplate.executeWithoutResult(status -> {
+		transactionTemplate.executeWithoutResult(_ -> {
 			assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly successfully sent letter)
 			assertThat(organizationRepository.findByNumber(44)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(4));
 			assertThat(userRepository.findByUsernameIgnoreCase("joe01doe")).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(8));
@@ -111,14 +129,14 @@ class LetterIT extends AbstractAppTest {
 		final var initialLetterSize = letterRepository.count();
 
 		final var headers = setupCall()
-			.withServicePath("/2281/letters")
+			.withServicePath("/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/letters")
 			.withHttpMethod(POST)
 			.withHeader(HEADER_X_SENT_BY, "joe01doe; type=adAccount")
 			.withContentType(MULTIPART_FORM_DATA)
 			.withRequestFile("letter", REQUEST)
 			.withRequestFile("letterAttachments", "test.pdf")
 			.withExpectedResponseStatus(CREATED)
-			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+			.withExpectedResponseHeader(LOCATION, List.of("/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
 			.withExpectedResponse(RESPONSE)
 			.sendRequestAndVerifyResponse()
 			.getResponseHeaders();
@@ -133,14 +151,14 @@ class LetterIT extends AbstractAppTest {
 		final var initialLetterSize = letterRepository.count();
 
 		final var headers = setupCall()
-			.withServicePath("/2281/letters")
+			.withServicePath("/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/letters")
 			.withHttpMethod(POST)
 			.withHeader(HEADER_X_SENT_BY, "joe01doe; type=adAccount")
 			.withContentType(MULTIPART_FORM_DATA)
 			.withRequestFile("letter", REQUEST)
 			.withRequestFile("letterAttachments", "test.pdf")
 			.withExpectedResponseStatus(CREATED)
-			.withExpectedResponseHeader(LOCATION, List.of("/2281/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+			.withExpectedResponseHeader(LOCATION, List.of("/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/letters/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
 			.withExpectedResponse(RESPONSE)
 			.sendRequestAndVerifyResponse()
 			.getResponseHeaders();
