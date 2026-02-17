@@ -32,17 +32,17 @@ class AttachmentMapperTest {
 
 	@Test
 	void toAttachmentEntities() {
-		var blob = Mockito.mock(Blob.class);
-		var multipartFile = Mockito.mock(MultipartFile.class);
+		final var blob = Mockito.mock(Blob.class);
+		final var multipartFile = Mockito.mock(MultipartFile.class);
 		when(multipartFile.getOriginalFilename()).thenReturn("file");
 		when(multipartFile.getContentType()).thenReturn("application/pdf");
 		when(blobUtil.convertToBlob(multipartFile)).thenReturn(blob);
 
-		var files = List.of(multipartFile, multipartFile);
+		final var files = List.of(multipartFile, multipartFile);
 
-		var attachmentEntities = attachmentMapper.toAttachmentEntities(files);
+		final var attachmentEntities = attachmentMapper.toAttachmentEntities(files);
 
-		assertThat(attachmentEntities).isNotNull().allSatisfy(attachment -> {
+		assertThat(attachmentEntities).isNotNull().isNotEmpty().allSatisfy(attachment -> {
 			assertThat(attachment.getFileName()).isEqualTo("file");
 			assertThat(attachment.getContentType()).isEqualTo("application/pdf");
 			assertThat(attachment.getContent()).isEqualTo(blob);
@@ -51,13 +51,13 @@ class AttachmentMapperTest {
 
 	@Test
 	void toAttachmentEntity() {
-		var blob = Mockito.mock(Blob.class);
-		var multipartFile = Mockito.mock(MultipartFile.class);
+		final var blob = Mockito.mock(Blob.class);
+		final var multipartFile = Mockito.mock(MultipartFile.class);
 		when(multipartFile.getOriginalFilename()).thenReturn("file");
 		when(multipartFile.getContentType()).thenReturn("application/pdf");
 		when(blobUtil.convertToBlob(multipartFile)).thenReturn(blob);
 
-		var attachmentEntity = attachmentMapper.toAttachmentEntity(multipartFile);
+		final var attachmentEntity = attachmentMapper.toAttachmentEntity(multipartFile);
 
 		assertThat(attachmentEntity).isNotNull();
 		assertThat(attachmentEntity.getFileName()).isEqualTo("file");

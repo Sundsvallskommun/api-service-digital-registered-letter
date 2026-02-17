@@ -41,31 +41,31 @@ class BlobUtilTest {
 	@Test
 	void getSessionTest() {
 
-		var session = Mockito.mock(Session.class);
+		final var session = Mockito.mock(Session.class);
 		when(entityManagerMock.unwrap(Session.class)).thenReturn(session);
 
-		var result = blobUtil.getSession();
+		final var result = blobUtil.getSession();
 
 		assertThat(result).isEqualTo(session);
 	}
 
 	@Test
 	void createBlob_OK() throws IOException {
-		var spy = Mockito.spy(blobUtil);
-		var multipartFile = Mockito.mock(MultipartFile.class);
+		final var spy = Mockito.spy(blobUtil);
+		final var multipartFile = Mockito.mock(MultipartFile.class);
 
 		when(multipartFile.getBytes()).thenReturn(new byte[123]);
 
-		var session = Mockito.mock(Session.class);
+		final var session = Mockito.mock(Session.class);
 		when(spy.getSession()).thenReturn(session);
 
-		var lobHelper = Mockito.mock(LobHelper.class);
+		final var lobHelper = Mockito.mock(LobHelper.class);
 		when(session.getLobHelper()).thenReturn(lobHelper);
 
-		var blob = Mockito.mock(Blob.class);
+		final var blob = Mockito.mock(Blob.class);
 		when(lobHelper.createBlob(any(), eq(123L))).thenReturn(blob);
 
-		var result = spy.createBlob(multipartFile);
+		final var result = spy.createBlob(multipartFile);
 
 		assertThat(result).isEqualTo(blob);
 		verify(entityManagerMock).unwrap(any());
@@ -73,8 +73,8 @@ class BlobUtilTest {
 
 	@Test
 	void createBlob_IOException() throws IOException {
-		var spy = Mockito.spy(blobUtil);
-		var multipartFile = Mockito.mock(MultipartFile.class);
+		final var spy = Mockito.spy(blobUtil);
+		final var multipartFile = Mockito.mock(MultipartFile.class);
 		when(multipartFile.getOriginalFilename()).thenReturn("TestFile.txt");
 
 		when(multipartFile.getBytes()).thenThrow(new IOException("Test exception"));
@@ -86,21 +86,21 @@ class BlobUtilTest {
 
 	@Test
 	void convertToBlobTest() throws IOException {
-		var spy = Mockito.spy(blobUtil);
-		var multipartFile = Mockito.mock(MultipartFile.class);
+		final var spy = Mockito.spy(blobUtil);
+		final var multipartFile = Mockito.mock(MultipartFile.class);
 
 		when(multipartFile.getBytes()).thenReturn(new byte[123]);
 
-		var session = Mockito.mock(Session.class);
+		final var session = Mockito.mock(Session.class);
 		when(spy.getSession()).thenReturn(session);
 
-		var lobHelper = Mockito.mock(LobHelper.class);
+		final var lobHelper = Mockito.mock(LobHelper.class);
 		when(session.getLobHelper()).thenReturn(lobHelper);
 
-		var blob = Mockito.mock(Blob.class);
+		final var blob = Mockito.mock(Blob.class);
 		when(spy.createBlob(multipartFile)).thenReturn(blob);
 
-		var result = spy.convertToBlob(multipartFile);
+		final var result = spy.convertToBlob(multipartFile);
 
 		assertThat(result).isEqualTo(blob);
 		verify(entityManagerMock).unwrap(any());
@@ -108,23 +108,23 @@ class BlobUtilTest {
 
 	@Test
 	void convertBlobToBase64StringTest() throws SQLException {
-		var blob = Mockito.mock(Blob.class);
+		final var blob = Mockito.mock(Blob.class);
 
 		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
 
-		var result = blobUtil.convertBlobToBase64String(blob);
+		final var result = blobUtil.convertBlobToBase64String(blob);
 
 		assertThat(result).isEqualTo("dGVzdA==");
 	}
 
 	@Test
 	void convertToBlob_SQLException() throws SQLException {
-		var blob = Mockito.mock(Blob.class);
+		final var blob = Mockito.mock(Blob.class);
 		when(blob.length()).thenThrow(new SQLException("Test exception"));
 
 		assertThatThrownBy(() -> blobUtil.convertBlobToBase64String(blob))
 			.isInstanceOf(Problem.class)
-			.hasMessage("Internal Server Error: Could not convert Blob to Base64 string: Test exception");
+			.hasMessage("Internal Server Error: Could not convert Blob to Base64 string");
 
 	}
 
