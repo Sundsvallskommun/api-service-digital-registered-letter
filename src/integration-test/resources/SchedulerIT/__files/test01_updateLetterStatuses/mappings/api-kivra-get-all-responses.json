@@ -6,7 +6,7 @@
 			}
 		},
 		"method": "GET",
-		"urlPath": "/kivra/some-tenant-key/registered"
+		"urlPath": "/kivra/v2/tenant/some-tenant-key/registered"
 	},
 	"response": {
 		"headers": {

@@ -33,11 +33,10 @@ public interface KivraClient {
 	 *
 	 * @param  tenantKey the tenant key identifying the Kivra tenant
 	 * @param  content   the content to be sent to Kivra, encapsulated in a ContentUserV2 object
-	 * @return           a ContentUser object, which includes the subject, type and generated_at of the content sent by
-	 *                   Kivra
-	 *                   to the end user.
+	 * @return           a ContentUser object, which includes the subject, type, and generated_at of the content sent by
+	 *                   Kivra to the end user.
 	 */
-	@PostMapping(value = "/{tenantKey}/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/v2/tenant/{tenantKey}/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 	ContentUser sendContent(@PathVariable final String tenantKey, @RequestBody final ContentUserV2 content);
 
 	/**
@@ -51,7 +50,7 @@ public interface KivraClient {
 	 * @param  userMatchV2SSN the request body containing a list of SSNs to be matched
 	 * @return                a UserMatchV2SSN object with a list of matched SSNs
 	 */
-	@PostMapping(value = "/{tenantKey}/usermatch/ssn", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/v2/tenant/{tenantKey}/usermatch/ssn", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 	UserMatchV2SSN checkEligibility(@PathVariable final String tenantKey, @RequestBody final UserMatchV2SSN userMatchV2SSN);
 
 	/**
@@ -63,7 +62,7 @@ public interface KivraClient {
 	 * @param  tenantKey the tenant key identifying the Kivra tenant
 	 * @return           a list of KeyValue objects containing the response keys and their corresponding statuses
 	 */
-	@GetMapping(value = "/{tenantKey}/registered", produces = APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/v2/tenant/{tenantKey}/registered", produces = APPLICATION_JSON_VALUE)
 	List<KeyValue> getAllResponses(@PathVariable final String tenantKey);
 
 	/**
@@ -73,7 +72,7 @@ public interface KivraClient {
 	 * @param  responseKey the key of the response to be fetched
 	 * @return             a RegisteredLetterResponse object containing the details of the registered letter response
 	 */
-	@GetMapping(value = "/{tenantKey}/registered/{responseKey}", produces = APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/v2/tenant/{tenantKey}/registered/{responseKey}", produces = APPLICATION_JSON_VALUE)
 	RegisteredLetterResponse getResponseDetails(@PathVariable final String tenantKey, @PathVariable final String responseKey);
 
 	/**
@@ -83,7 +82,7 @@ public interface KivraClient {
 	 * @param tenantKey   the tenant key identifying the Kivra tenant
 	 * @param responseKey the key of the response to be deleted
 	 */
-	@DeleteMapping(value = "/{tenantKey}/registered/{responseKey}", produces = ALL_VALUE)
+	@DeleteMapping(value = "/v2/tenant/{tenantKey}/registered/{responseKey}", produces = ALL_VALUE)
 	void deleteResponse(@PathVariable final String tenantKey, @PathVariable final String responseKey);
 
 	/**
