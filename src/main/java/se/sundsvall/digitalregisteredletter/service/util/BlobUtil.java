@@ -37,10 +37,10 @@ public class BlobUtil {
 
 	Blob createBlob(final MultipartFile multipartFile) {
 		try {
-			var fileBytes = multipartFile.getBytes();
-			var inputStream = new ByteArrayInputStream(fileBytes);
+			final var fileBytes = multipartFile.getBytes();
+			final var inputStream = new ByteArrayInputStream(fileBytes);
 			return getSession().getLobHelper().createBlob(inputStream, fileBytes.length);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.warn("Failed to create Blob from MultipartFile: {}", e.getMessage(), e);
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert file with name [ %s ] to database object".formatted(multipartFile.getOriginalFilename()));
 		}
@@ -54,11 +54,11 @@ public class BlobUtil {
 	 */
 	public String convertBlobToBase64String(final Blob blob) {
 		try {
-			var bytes = blob.getBytes(1, (int) blob.length());
+			final var bytes = blob.getBytes(1, (int) blob.length());
 			return Base64.getEncoder().encodeToString(bytes);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.warn("Failed to convert Blob to Base64 String: {}", e.getMessage(), e);
-			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert Blob to Base64 string: " + e.getMessage());
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert Blob to Base64 string");
 		}
 	}
 }
