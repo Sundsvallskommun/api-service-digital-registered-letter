@@ -35,7 +35,7 @@
 				"matchesJsonPath": "$[?(@.registered.sender_reference.sender_internal_id =~ /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)]"
 			}
 		],
-		"url": "/kivra/some-tenant-key/content"
+		"url": "/kivra/v2/tenant/some-tenant-key/content"
 	},
 	"response": {
 		"status": 200

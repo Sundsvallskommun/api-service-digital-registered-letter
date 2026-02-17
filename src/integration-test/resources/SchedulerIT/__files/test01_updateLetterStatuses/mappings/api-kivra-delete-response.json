@@ -6,7 +6,7 @@
 			}
 		},
 		"method": "DELETE",
-		"url": "/kivra/some-tenant-key/registered/responseKey1"
+		"url": "/kivra/v2/tenant/some-tenant-key/registered/responseKey1"
 	},
 	"response": {
 		"status": 200
