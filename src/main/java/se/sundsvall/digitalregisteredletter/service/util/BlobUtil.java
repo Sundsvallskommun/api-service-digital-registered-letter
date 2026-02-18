@@ -1,8 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.util;
 
-import static org.zalando.fauxpas.FauxPas.throwingFunction;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-
 import jakarta.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
 import java.sql.Blob;
@@ -14,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
+
+import static org.zalando.fauxpas.FauxPas.throwingFunction;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 @Component
 public class BlobUtil {

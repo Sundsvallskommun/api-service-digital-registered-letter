@@ -1,12 +1,12 @@
 package se.sundsvall.digitalregisteredletter.service.util;
 
-import static java.util.Base64.getEncoder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.configuration.CredentialsProperties;
+
+import static java.util.Base64.getEncoder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EncryptionUtilityTest {
 

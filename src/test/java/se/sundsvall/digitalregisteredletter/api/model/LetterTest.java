@@ -1,11 +1,11 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LetterTest {
 

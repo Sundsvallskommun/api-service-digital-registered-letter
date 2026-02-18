@@ -1,10 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.scheduler;
 
-import static java.util.Collections.emptyList;
-import static java.util.Objects.isNull;
-import static java.util.Optional.ofNullable;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,6 +11,11 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+
+import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
+import static java.util.Optional.ofNullable;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 
 @Component
 public class SchedulerWorker {

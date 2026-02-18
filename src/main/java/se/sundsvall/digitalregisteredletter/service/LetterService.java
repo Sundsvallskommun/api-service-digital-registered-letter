@@ -1,16 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.digitalregisteredletter.service.util.CustomPredicate.distinctById;
-import static se.sundsvall.digitalregisteredletter.service.util.InvoicePdfMerger.mergePdfs;
-
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,6 +27,17 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
 import se.sundsvall.digitalregisteredletter.integration.templating.TemplatingIntegration;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.service.util.CustomPredicate.distinctById;
+import static se.sundsvall.digitalregisteredletter.service.util.InvoicePdfMerger.mergePdfs;
 
 @Service
 public class LetterService {

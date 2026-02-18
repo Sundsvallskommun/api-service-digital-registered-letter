@@ -1,12 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.scheduler;
 
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.TestDataFactory.createLetterEntity;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
-
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -25,6 +18,13 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValueBuil
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponseBuilder;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.TestDataFactory.createLetterEntity;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 
 @ExtendWith(MockitoExtension.class)
 class SchedulerWorkerTest {

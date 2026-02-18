@@ -1,9 +1,9 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class SigningInfoTest {
 	private static final String STATUS = "status";

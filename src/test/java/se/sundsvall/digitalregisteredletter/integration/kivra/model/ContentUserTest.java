@@ -1,9 +1,9 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ContentUserTest {
 

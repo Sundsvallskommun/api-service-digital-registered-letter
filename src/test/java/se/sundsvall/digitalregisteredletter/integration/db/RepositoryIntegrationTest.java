@@ -1,15 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.db;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.TestDataFactory.createLetterRequest;
-
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +21,16 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEnt
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 import se.sundsvall.digitalregisteredletter.service.mapper.AttachmentMapper;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.TestDataFactory.createLetterRequest;
 
 @ExtendWith(MockitoExtension.class)
 class RepositoryIntegrationTest {

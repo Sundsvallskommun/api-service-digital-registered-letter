@@ -1,8 +1,8 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LetterRequestTest {
 	private static final String PARTY_ID = "partyId";

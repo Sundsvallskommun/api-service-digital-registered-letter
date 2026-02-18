@@ -1,8 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import generated.se.sundsvall.templating.RenderResponse;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
@@ -15,6 +12,9 @@ import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(ResourceLoaderExtension.class)
 class InvoicePdfMergerTest {

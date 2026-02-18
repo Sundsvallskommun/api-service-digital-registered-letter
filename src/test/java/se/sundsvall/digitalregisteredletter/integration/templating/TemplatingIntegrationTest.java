@@ -1,11 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.templating;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import generated.se.sundsvall.templating.RenderRequest;
 import generated.se.sundsvall.templating.RenderResponse;
 import java.time.OffsetDateTime;
@@ -17,6 +11,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TemplatingIntegrationTest {

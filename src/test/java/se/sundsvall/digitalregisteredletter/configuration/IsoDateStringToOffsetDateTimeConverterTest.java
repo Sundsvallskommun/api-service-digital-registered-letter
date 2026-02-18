@@ -1,12 +1,5 @@
 package se.sundsvall.digitalregisteredletter.configuration;
 
-import static java.time.OffsetTime.now;
-import static java.time.ZoneId.systemDefault;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import org.junit.jupiter.api.Test;
@@ -16,6 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import se.sundsvall.digitalregisteredletter.Application;
+
+import static java.time.OffsetTime.now;
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("junit")

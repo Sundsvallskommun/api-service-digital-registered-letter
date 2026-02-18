@@ -1,14 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.db.model;
 
-import static jakarta.persistence.CascadeType.ALL;
-import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.UUID;
-import static java.time.OffsetDateTime.now;
-import static java.time.ZoneId.systemDefault;
-import static java.time.temporal.ChronoUnit.MILLIS;
-import static java.util.Optional.ofNullable;
-import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -30,6 +21,15 @@ import java.util.List;
 import java.util.Objects;
 import org.hibernate.annotations.TimeZoneStorage;
 import se.sundsvall.dept44.requestid.RequestId;
+
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.UUID;
+import static java.time.OffsetDateTime.now;
+import static java.time.ZoneId.systemDefault;
+import static java.time.temporal.ChronoUnit.MILLIS;
+import static java.util.Optional.ofNullable;
+import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 @Entity
 @Table(name = "letter", uniqueConstraints = {

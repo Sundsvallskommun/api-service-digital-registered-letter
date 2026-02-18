@@ -1,8 +1,5 @@
 package se.sundsvall.digitalregisteredletter.api;
 
-import static org.mockito.Mockito.verify;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +9,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.service.scheduler.CertificateHealthScheduler;
 import se.sundsvall.digitalregisteredletter.service.scheduler.SchedulerWorker;
+
+import static org.mockito.Mockito.verify;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("junit")

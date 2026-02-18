@@ -1,11 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.db;
 
-import static java.time.OffsetDateTime.now;
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
-
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,6 +12,12 @@ import org.springframework.test.context.jdbc.Sql;
 import se.sundsvall.dept44.requestid.RequestId;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+
+import static java.time.OffsetDateTime.now;
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = NONE)

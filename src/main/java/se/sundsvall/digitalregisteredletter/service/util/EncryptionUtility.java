@@ -1,7 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.util;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -11,6 +9,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.configuration.CredentialsProperties;
+
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 @Component
 public class EncryptionUtility {

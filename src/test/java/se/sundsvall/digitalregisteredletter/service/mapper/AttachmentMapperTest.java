@@ -1,9 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import java.sql.Blob;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -15,6 +11,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AttachmentMapperTest {

@@ -1,16 +1,16 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenant;
-import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenantEntity;
-import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenantList;
-import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.updateEntity;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.digitalregisteredletter.api.model.Tenant;
 import se.sundsvall.digitalregisteredletter.api.model.TenantBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenant;
+import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenantEntity;
+import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenantList;
+import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.updateEntity;
 
 class TenantMapperTest {
 

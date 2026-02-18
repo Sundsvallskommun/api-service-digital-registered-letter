@@ -1,16 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static org.zalando.problem.Status.BAD_GATEWAY;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_CLIENT_ERROR;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_EXCEPTION_ERROR;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SERVER_ERROR;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_UNKNOWN_ERROR;
-
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +13,17 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.zalando.problem.Status.BAD_GATEWAY;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_CLIENT_ERROR;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_EXCEPTION_ERROR;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SERVER_ERROR;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_UNKNOWN_ERROR;
 
 @Component
 public class KivraIntegration {

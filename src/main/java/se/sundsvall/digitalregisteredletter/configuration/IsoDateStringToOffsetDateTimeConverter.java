@@ -1,14 +1,14 @@
 package se.sundsvall.digitalregisteredletter.configuration;
 
-import static java.time.OffsetTime.now;
-import static java.time.ZoneId.systemDefault;
-import static java.util.Optional.ofNullable;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+
+import static java.time.OffsetTime.now;
+import static java.time.ZoneId.systemDefault;
+import static java.util.Optional.ofNullable;
 
 /**
  * Component converts string with ISO local date format (YYYY-MM-DD, for example 2025-09-18) to a

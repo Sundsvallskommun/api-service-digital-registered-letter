@@ -1,13 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
-import static java.util.Collections.emptyList;
-import static java.util.Objects.isNull;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.ObjectUtils.allNull;
-import static org.apache.commons.lang3.ObjectUtils.anyNull;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +32,14 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformat
 import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
+
+import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.ObjectUtils.allNull;
+import static org.apache.commons.lang3.ObjectUtils.anyNull;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 
 @Component
 public class LetterMapper {

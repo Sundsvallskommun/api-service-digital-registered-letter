@@ -1,10 +1,10 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.dept44.models.api.paging.PagingAndSortingMetaData;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LettersTest {
 	private static final List<Letter> LETTER_LIST = List.of(LetterBuilder.create().build());

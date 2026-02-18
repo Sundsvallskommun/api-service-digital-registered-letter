@@ -1,8 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.templating;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.time.OffsetDateTime;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -17,6 +14,9 @@ import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 class TemplatingMapperTest {

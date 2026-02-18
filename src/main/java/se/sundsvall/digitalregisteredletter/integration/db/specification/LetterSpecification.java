@@ -1,14 +1,14 @@
 package se.sundsvall.digitalregisteredletter.integration.db.specification;
 
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Optional.ofNullable;
-
 import java.time.OffsetDateTime;
 import org.springframework.data.jpa.domain.Specification;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity_;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity_;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity_;
+
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Optional.ofNullable;
 
 public class LetterSpecification {
 
