@@ -1,7 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service;
 
-import static java.util.Collections.emptyList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +7,8 @@ import org.springframework.stereotype.Service;
 import se.sundsvall.digitalregisteredletter.api.model.EligibilityRequest;
 import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
+
+import static java.util.Collections.emptyList;
 
 @Service
 public class EligibilityService {

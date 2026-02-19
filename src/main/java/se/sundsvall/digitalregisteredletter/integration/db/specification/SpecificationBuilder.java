@@ -1,9 +1,9 @@
 package se.sundsvall.digitalregisteredletter.integration.db.specification;
 
-import static java.util.Objects.nonNull;
-
 import java.time.OffsetDateTime;
 import org.springframework.data.jpa.domain.Specification;
+
+import static java.util.Objects.nonNull;
 
 public class SpecificationBuilder<T> {
 

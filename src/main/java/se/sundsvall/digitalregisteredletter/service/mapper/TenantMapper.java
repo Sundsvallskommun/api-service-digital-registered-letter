@@ -1,12 +1,12 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-
 import java.util.List;
 import se.sundsvall.digitalregisteredletter.api.model.Tenant;
 import se.sundsvall.digitalregisteredletter.api.model.TenantBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 
 public final class TenantMapper {
 

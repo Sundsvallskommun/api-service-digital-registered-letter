@@ -1,18 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.zalando.problem.Status.NOT_IMPLEMENTED;
-import static se.sundsvall.TestDataFactory.NOW;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
-
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +18,19 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLe
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponseBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.zalando.problem.Status.NOT_IMPLEMENTED;
+import static se.sundsvall.TestDataFactory.NOW;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
 
 @ExtendWith(MockitoExtension.class)
 class KivraIntegrationTest {

@@ -1,5 +1,12 @@
 package se.sundsvall.digitalregisteredletter.integration.db.model;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Random;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import se.sundsvall.dept44.requestid.RequestId;
+
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
@@ -13,13 +20,6 @@ import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.core.AllOf.allOf;
 import static se.sundsvall.TestDataFactory.createAttachmentEntity;
 import static se.sundsvall.TestUtil.isValidUUID;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Random;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import se.sundsvall.dept44.requestid.RequestId;
 
 class LetterEntityTest {
 

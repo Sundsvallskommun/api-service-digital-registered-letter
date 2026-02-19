@@ -1,7 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
-import static java.util.Collections.emptyList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
+
+import static java.util.Collections.emptyList;
 
 @Component
 public final class AttachmentMapper {

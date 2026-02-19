@@ -1,13 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.db;
 
-import static org.springframework.data.jpa.domain.Specification.allOf;
-import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withCreatedEqualOrAfter;
-import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withCreatedEqualOrBefore;
-import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withDeleted;
-import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withDepartmentOrgId;
-import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withMunicipalityId;
-import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withUsername;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +9,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+
+import static org.springframework.data.jpa.domain.Specification.allOf;
+import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withCreatedEqualOrAfter;
+import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withCreatedEqualOrBefore;
+import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withDeleted;
+import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withDepartmentOrgId;
+import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withMunicipalityId;
+import static se.sundsvall.digitalregisteredletter.integration.db.specification.LetterSpecification.withUsername;
 
 @CircuitBreaker(name = "letterRepository")
 public interface LetterRepository extends JpaRepository<LetterEntity, String>, JpaSpecificationExecutor<LetterEntity> {

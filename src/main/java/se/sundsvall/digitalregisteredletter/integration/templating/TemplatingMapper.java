@@ -1,7 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.templating;
 
-import static org.zalando.problem.Status.NOT_FOUND;
-
 import generated.se.sundsvall.templating.RenderRequest;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -10,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+
+import static org.zalando.problem.Status.NOT_FOUND;
 
 @Component
 public class TemplatingMapper {

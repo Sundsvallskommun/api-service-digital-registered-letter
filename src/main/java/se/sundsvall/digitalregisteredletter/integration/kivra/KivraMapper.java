@@ -1,7 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra;
 
-import static java.util.Collections.emptyList;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +14,8 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLe
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterHiddenBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
+
+import static java.util.Collections.emptyList;
 
 @Component
 public class KivraMapper {

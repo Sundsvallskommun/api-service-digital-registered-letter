@@ -1,13 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.zalando.problem.Status.NOT_FOUND;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +14,14 @@ import se.sundsvall.digitalregisteredletter.api.model.TenantBuilder;
 import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
 import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.zalando.problem.Status.NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class TenantServiceTest {

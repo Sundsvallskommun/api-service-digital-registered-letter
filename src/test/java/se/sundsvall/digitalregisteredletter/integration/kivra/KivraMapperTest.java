@@ -1,9 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import static org.mockito.Mockito.when;
-
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -20,6 +16,10 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntit
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class KivraMapperTest {

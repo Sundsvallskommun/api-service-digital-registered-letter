@@ -1,13 +1,13 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME;
-
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import se.sundsvall.digitalregisteredletter.support.Builder;
+
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME;
 
 @Builder
 @Schema(description = "Digital registered letter response", accessMode = Schema.AccessMode.READ_ONLY)

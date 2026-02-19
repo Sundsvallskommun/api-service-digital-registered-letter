@@ -1,9 +1,9 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LetterFilterTest {
 	private static final OffsetDateTime CREATED_EARLIEST = OffsetDateTime.MIN;

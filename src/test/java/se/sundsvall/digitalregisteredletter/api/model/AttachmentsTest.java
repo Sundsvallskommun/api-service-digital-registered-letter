@@ -1,11 +1,11 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.web.multipart.MultipartFile;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AttachmentsTest {
 	private static final List<MultipartFile> MULTIPART_FILES = List.of(Mockito.mock(MultipartFile.class));

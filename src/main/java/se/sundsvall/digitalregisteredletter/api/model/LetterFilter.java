@@ -1,12 +1,12 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
-import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import se.sundsvall.digitalregisteredletter.support.Builder;
+
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 @Builder
 @Schema(description = "Optional filters to apply when retreiving sent letters")

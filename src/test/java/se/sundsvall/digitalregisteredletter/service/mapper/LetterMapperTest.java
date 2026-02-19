@@ -1,16 +1,5 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static se.sundsvall.TestDataFactory.createAttachmentEntity;
-import static se.sundsvall.TestDataFactory.createLetterEntity;
-import static se.sundsvall.TestDataFactory.createLetterRequest;
-import static se.sundsvall.TestDataFactory.createSupportInformationEmbeddable;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +28,17 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLe
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.SenderReferenceBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.StepUpBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserBuilder;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static se.sundsvall.TestDataFactory.createAttachmentEntity;
+import static se.sundsvall.TestDataFactory.createLetterEntity;
+import static se.sundsvall.TestDataFactory.createLetterRequest;
+import static se.sundsvall.TestDataFactory.createSupportInformationEmbeddable;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NOT_FOUND;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 
 class LetterMapperTest {
 

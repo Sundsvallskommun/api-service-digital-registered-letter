@@ -1,42 +1,42 @@
 openapi: 3.1.0
 info:
   title: digital-registered-letter
-  contact: { }
+  contact: {}
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "3.0"
 servers:
-  - url: http://localhost:63475
-    description: Generated server url
+- url: http://localhost:63188
+  description: Generated server url
 tags:
-  - name: Scheduler Resource
-    description: Manually trigger scheduled tasks
-  - name: Letter Resource
-    description: Send and manage digital registered letters
-  - name: Tenant Resource
-    description: Manage tenants
-  - name: Eligibility Resource
-    description: Check eligibility for sending digital registered letters
+- name: Scheduler Resource
+  description: Manually trigger scheduled tasks
+- name: Letter Resource
+  description: Send and manage digital registered letters
+- name: Tenant Resource
+  description: Manage tenants
+- name: Eligibility Resource
+  description: Check eligibility for sending digital registered letters
 paths:
   /{municipalityId}/tenants/{id}:
     get:
       tags:
-        - Tenant Resource
+      - Tenant Resource
       summary: Get tenant
       description: Returns a specific tenant
       operationId: getTenant
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful operation
@@ -56,8 +56,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -66,21 +66,21 @@ paths:
                 $ref: "#/components/schemas/Problem"
     put:
       tags:
-        - Tenant Resource
+      - Tenant Resource
       summary: Update tenant
       description: Updates an existing tenant
       operationId: updateTenant
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -102,8 +102,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -112,21 +112,21 @@ paths:
                 $ref: "#/components/schemas/Problem"
     delete:
       tags:
-        - Tenant Resource
+      - Tenant Resource
       summary: Delete tenant
       description: Deletes an existing tenant
       operationId: deleteTenant
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "204":
           description: Successful Operation - No Content
@@ -142,8 +142,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -153,27 +153,27 @@ paths:
   /{municipalityId}/{organizationNumber}/letters:
     post:
       tags:
-        - Letter Resource
+      - Letter Resource
       summary: Send letter
       description: Send a digital registered letter using Kivra
       operationId: sendLetter
       parameters:
-        - name: X-Sent-By
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: organizationNumber
-          in: path
-          required: true
-          schema:
-            type: string
-            minLength: 1
+      - name: X-Sent-By
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: organizationNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
       requestBody:
         content:
           multipart/form-data:
@@ -188,8 +188,8 @@ paths:
                     type: string
                     format: binary
               required:
-                - letter
-                - letterAttachments
+              - letter
+              - letterAttachments
       responses:
         "201":
           description: Successful operation - Created
@@ -214,8 +214,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -225,24 +225,24 @@ paths:
   /{municipalityId}/{organizationNumber}/eligibility/kivra:
     post:
       tags:
-        - Eligibility Resource
+      - Eligibility Resource
       summary: Check if the given partyIds are eligible for receiving digital registered
         letters with Kivra
       description: "Returns a list of party IDs that are eligible for Kivra based\
         \ on the provided municipality ID, organization number and party IDs"
       operationId: checkKivraEligibility
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: organizationNumber
-          in: path
-          required: true
-          schema:
-            type: string
-            minLength: 1
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: organizationNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
       requestBody:
         content:
           application/json:
@@ -270,8 +270,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -281,16 +281,16 @@ paths:
   /{municipalityId}/tenants:
     get:
       tags:
-        - Tenant Resource
+      - Tenant Resource
       summary: Get all tenants
       description: Returns all tenants for a municipality
       operationId: getTenants
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful operation
@@ -306,8 +306,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -316,16 +316,16 @@ paths:
                 $ref: "#/components/schemas/Problem"
     post:
       tags:
-        - Tenant Resource
+      - Tenant Resource
       summary: Create tenant
       description: Creates a new tenant
       operationId: createTenant
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -346,8 +346,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -357,16 +357,16 @@ paths:
   /{municipalityId}/status/letters:
     post:
       tags:
-        - Status Resource
+      - Status Resource
       summary: Get status of given letters
       description: Returns the current status for each provided letterId
       operationId: getLetterStatuses
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -388,8 +388,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -399,16 +399,16 @@ paths:
   /{municipalityId}/scheduler:
     post:
       tags:
-        - Scheduler Resource
+      - Scheduler Resource
       summary: Trigger update letter information task
       description: Triggers the task that updates letter information
       operationId: updateLetterInformation
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -418,8 +418,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -429,16 +429,16 @@ paths:
   /{municipalityId}/scheduler/certificate-health:
     post:
       tags:
-        - Scheduler Resource
+      - Scheduler Resource
       summary: Trigger certificate health check
       description: Triggers the task that checks the Kivra certificate health
       operationId: checkCertificateHealth
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -448,8 +448,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -459,86 +459,86 @@ paths:
   /{municipalityId}/letters:
     get:
       tags:
-        - Letter Resource
+      - Letter Resource
       summary: Get all letters
       description: "Retrieves all letters for a municipality. Response is possible\
         \ to filter by any combination of department id, username, earliest and latest\
         \ created date."
       operationId: getLetters
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: orgId
-          in: query
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: orgId
+        in: query
+        description: Optional filter for matching organization id
+        required: false
+        schema:
+          type: integer
+          format: int32
           description: Optional filter for matching organization id
-          required: false
-          schema:
-            type: integer
-            format: int32
-            description: Optional filter for matching organization id
-            examples:
-              - "44"
-        - name: username
-          in: query
+          examples:
+          - "44"
+      - name: username
+        in: query
+        description: Optional filter for matching username
+        required: false
+        schema:
+          type: string
           description: Optional filter for matching username
-          required: false
-          schema:
-            type: string
-            description: Optional filter for matching username
-            examples:
-              - joe01doe
-        - name: createdEarliest
-          in: query
+          examples:
+          - joe01doe
+      - name: createdEarliest
+        in: query
+        description: Optional filter with format YYYY-MM-DD for matching earliest
+          date when letter was sent
+        required: false
+        schema:
+          type: string
+          format: date-time
           description: Optional filter with format YYYY-MM-DD for matching earliest
             date when letter was sent
-          required: false
-          schema:
-            type: string
-            format: date-time
-            description: Optional filter with format YYYY-MM-DD for matching earliest
-              date when letter was sent
-            examples:
-              - 2025-08-18
-        - name: createdLatest
-          in: query
-          description: Optional filter with format YYYY-MM-DD for matching latest date
-            when letter was sent
-          required: false
-          schema:
-            type: string
-            format: date-time
-            description: Optional filter with format YYYY-MM-DD for matching latest
-              date when letter was sent
-            examples:
-              - 2025-09-18
-        - name: page
-          in: query
-          description: Zero-based page index (0..N)
-          required: false
-          schema:
-            type: integer
-            default: 0
-            minimum: 0
-        - name: size
-          in: query
-          description: The size of the page to be returned
-          required: false
-          schema:
-            type: integer
-            default: 20
-            minimum: 1
-        - name: sort
-          in: query
-          description: "Sorting criteria in the format: property,(asc|desc). Default\
+          examples:
+          - 2025-08-18
+      - name: createdLatest
+        in: query
+        description: Optional filter with format YYYY-MM-DD for matching latest date
+          when letter was sent
+        required: false
+        schema:
+          type: string
+          format: date-time
+          description: Optional filter with format YYYY-MM-DD for matching latest
+            date when letter was sent
+          examples:
+          - 2025-09-18
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
           \ sort order is ascending. Multiple sort criteria are supported."
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -552,8 +552,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -563,21 +563,21 @@ paths:
   /{municipalityId}/letters/{letterId}:
     get:
       tags:
-        - Letter Resource
+      - Letter Resource
       summary: Get letter
       description: Retrieves a letter by id
       operationId: getLetter
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: letterId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: letterId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -597,8 +597,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -608,22 +608,22 @@ paths:
   /{municipalityId}/letters/{letterId}/signinginfo:
     get:
       tags:
-        - Letter Resource
+      - Letter Resource
       summary: Get signing information
       description: Retrieves signing information connected to letter matching provided
         id
       operationId: getSigningInformation
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: letterId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: letterId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation - OK
@@ -643,8 +643,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -654,21 +654,21 @@ paths:
   /{municipalityId}/letters/{letterId}/receipt:
     get:
       tags:
-        - Letter Resource
+      - Letter Resource
       summary: Read letter receipt with the complete letter
       description: Retrieves letter receipt combined with the letter
       operationId: readLetterReceipt
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: letterId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: letterId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation
@@ -684,8 +684,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -695,26 +695,26 @@ paths:
   /{municipalityId}/letters/{letterId}/attachments/{attachmentId}:
     get:
       tags:
-        - Letter Resource
+      - Letter Resource
       summary: Downloads letter attachment content
       description: Retrieves attachment content by id
       operationId: downloadLetterAttachment
       parameters:
-        - name: municipalityId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: letterId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: attachmentId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: letterId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation
@@ -730,8 +730,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server error
           content:
@@ -741,7 +741,7 @@ paths:
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -773,7 +773,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties: { }
+          additionalProperties: {}
     StatusType:
       type: object
       properties:
@@ -790,24 +790,24 @@ components:
           type: string
           description: Unique identifier for the tenant
           examples:
-            - cb20c51f-fcf3-42c0-b613-de563634a8ec
+          - cb20c51f-fcf3-42c0-b613-de563634a8ec
           readOnly: true
         orgNumber:
           type: string
           description: Organization number
           examples:
-            - "5591628136"
+          - "5591628136"
           minLength: 1
         tenantKey:
           type: string
           description: Tenant key identifier
           examples:
-            - some-tenant-key
+          - some-tenant-key
           minLength: 1
           writeOnly: true
       required:
-        - orgNumber
-        - tenantKey
+      - orgNumber
+      - tenantKey
     ConstraintViolationProblem:
       type: object
       properties:
@@ -855,7 +855,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties: { }
+          additionalProperties: {}
         suppressed:
           type: array
           items:
@@ -892,7 +892,7 @@ components:
     ThrowableProblem:
       type: object
       properties:
-        cause: { }
+        cause: {}
         stackTrace:
           type: array
           items:
@@ -931,7 +931,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties: { }
+          additionalProperties: {}
         suppressed:
           type: array
           items:
@@ -980,12 +980,12 @@ components:
           type: string
           description: Party ID of the recipient
           examples:
-            - 7ca29702-a07f-4e13-a66a-4ebc27929cfd
+          - 7ca29702-a07f-4e13-a66a-4ebc27929cfd
         subject:
           type: string
           description: Subject of the letter
           examples:
-            - Important Notification
+          - Important Notification
           minLength: 1
         supportInfo:
           $ref: "#/components/schemas/SupportInfo"
@@ -997,20 +997,20 @@ components:
           type: string
           description: "Content type of the letter body, e.g., 'text/plain' or 'text/html'"
           examples:
-            - text/plain
+          - text/plain
         body:
           type: string
           description: Body of the letter
           examples:
-            - This is the content of the letter. Plain-text body
+          - This is the content of the letter. Plain-text body
           minLength: 1
       required:
-        - body
-        - contentType
-        - organization
-        - partyId
-        - subject
-        - supportInfo
+      - body
+      - contentType
+      - organization
+      - partyId
+      - subject
+      - supportInfo
     Organization:
       type: object
       properties:
@@ -1019,16 +1019,16 @@ components:
           format: int32
           description: Unique id for the organization
           examples:
-            - "44"
+          - "44"
         name:
           type: string
           description: Readable name for the organization
           examples:
-            - Department 44
+          - Department 44
           minLength: 1
       required:
-        - name
-        - number
+      - name
+      - number
     SupportInfo:
       type: object
       properties:
@@ -1036,30 +1036,30 @@ components:
           type: string
           description: Support text for the letter
           examples:
-            - "For support, please contact us at the information below."
+          - "For support, please contact us at the information below."
           minLength: 1
         contactInformationUrl:
           type: string
           description: URL for contact
           examples:
-            - https://example.com/support
+          - https://example.com/support
           minLength: 1
         contactInformationPhoneNumber:
           type: string
           description: Phone number for contact
           examples:
-            - "+46123456789"
+          - "+46123456789"
         contactInformationEmail:
           type: string
           format: email
           description: Email address for contact
           examples:
-            - support@email.com
+          - support@email.com
       required:
-        - contactInformationEmail
-        - contactInformationPhoneNumber
-        - contactInformationUrl
-        - supportText
+      - contactInformationEmail
+      - contactInformationPhoneNumber
+      - contactInformationUrl
+      - supportText
     Attachment:
       type: object
       properties:
@@ -1068,17 +1068,17 @@ components:
           description: "Unique identifier for the attachment, used for fetching the\
             \ attachment content"
           examples:
-            - 123e4567-e89b-12d3-a456-426614174001
+          - 123e4567-e89b-12d3-a456-426614174001
         fileName:
           type: string
           description: Name of the attachment file
           examples:
-            - document.pdf
+          - document.pdf
         contentType:
           type: string
           description: Content type of the attachment
           examples:
-            - application/pdf
+          - application/pdf
     Letter:
       type: object
       description: Digital registered letter response
@@ -1087,28 +1087,28 @@ components:
           type: string
           description: Unique identifier for the letter
           examples:
-            - 123e4567-e89b-12d3-a456-426614174000
+          - 123e4567-e89b-12d3-a456-426614174000
         subject:
           type: string
           description: Letter subject
           examples:
-            - Important Notification
+          - Important Notification
         municipalityId:
           type: string
           description: Municipality ID for the sender of the letter
           examples:
-            - "2281"
+          - "2281"
         status:
           type: string
           description: Status of the letter
           examples:
-            - NEW
-            - SENT
-            - SIGNED
-            - EXPIRED
-            - FAILED - Client Error
-            - FAILED - Server Error
-            - FAILED - Unknown Error
+          - NEW
+          - SENT
+          - SIGNED
+          - EXPIRED
+          - FAILED - Client Error
+          - FAILED - Server Error
+          - FAILED - Unknown Error
         body:
           type: string
           description: The letter body
@@ -1116,19 +1116,19 @@ components:
           type: string
           description: Content type of the letter body
           examples:
-            - text/html
+          - text/html
         created:
           type: string
           format: date-time
           description: When the letter was sent
           examples:
-            - 2023-10-09T12:34:56+00:00
+          - 2023-10-09T12:34:56+00:00
         updated:
           type: string
           format: date-time
           description: When the letter was last updated
           examples:
-            - 2023-10-09T12:34:56+00:00
+          - 2023-10-09T12:34:56+00:00
         supportInfo:
           $ref: "#/components/schemas/SupportInfo"
           description: Support information for the letter
@@ -1148,7 +1148,7 @@ components:
             type: string
             description: List of party IDs to check for eligibility
             examples:
-              - 123e4567-e89b-12d3-a456-426614174000
+            - 123e4567-e89b-12d3-a456-426614174000
     LetterStatusRequest:
       type: object
       description: Request model for checking the statuses of given letters
@@ -1159,10 +1159,10 @@ components:
             type: string
             description: List of letter IDs to check status for
             examples:
-              - ac6ffd60-fffe-4fec-bf67-d5f18a62c458
+            - ac6ffd60-fffe-4fec-bf67-d5f18a62c458
           minItems: 1
       required:
-        - letterIds
+      - letterIds
     LetterStatus:
       type: object
       description: Letter status
@@ -1171,22 +1171,22 @@ components:
           type: string
           description: Letter ID
           examples:
-            - 43a32404-28ee-480f-a095-00d48109afab
+          - 43a32404-28ee-480f-a095-00d48109afab
         status:
           type: string
           description: Delivery status of the letter
           examples:
-            - SENT
+          - SENT
         signingInformation:
           type: string
           description: Information about the signing process
           examples:
-            - PENDING
+          - PENDING
     Direction:
       type: string
       enum:
-        - ASC
-        - DESC
+      - ASC
+      - DESC
     Letters:
       type: object
       description: Paginated response containing a list of letters
@@ -1208,44 +1208,51 @@ components:
           type: integer
           format: int32
           description: Current page
-          example: 5
+          examples:
+          - "5"
           readOnly: true
         limit:
           type: integer
           format: int32
           description: Displayed objects per page
-          example: 20
+          examples:
+          - "20"
           readOnly: true
         count:
           type: integer
           format: int32
           description: Displayed objects on current page
-          example: 13
+          examples:
+          - "13"
           readOnly: true
         totalRecords:
           type: integer
           format: int64
           description: Total amount of hits based on provided search parameters
-          example: 98
+          examples:
+          - "98"
           readOnly: true
         totalPages:
           type: integer
           format: int32
           description: Total amount of pages based on provided search parameters
-          example: 23
+          examples:
+          - "23"
           readOnly: true
         sortBy:
           type: array
           items:
             type: string
             description: The properties to sort by
-            example: property
+            examples:
+            - property
             readOnly: true
           readOnly: true
         sortDirection:
           $ref: "#/components/schemas/Direction"
           description: The sort order direction
-          example: ASC
+          examples:
+          - ASC
     Device:
       type: object
       properties:
@@ -1320,4 +1327,4 @@ components:
           type: string
           description: Last name of the signing party
           readOnly: true
-  securitySchemes: { }
+  securitySchemes: {}

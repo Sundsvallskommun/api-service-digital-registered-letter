@@ -1,8 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra.configuration;
 
-import static java.util.Collections.emptySet;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import feign.Request;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
@@ -14,6 +11,9 @@ import se.sundsvall.dept44.configuration.feign.FeignConfiguration;
 import se.sundsvall.dept44.configuration.feign.decoder.JsonPathErrorDecoder;
 import se.sundsvall.dept44.configuration.feign.interceptor.OAuth2RequestInterceptor;
 import se.sundsvall.dept44.configuration.feign.retryer.ActionRetryer;
+
+import static java.util.Collections.emptySet;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Import(FeignConfiguration.class)
 @EnableConfigurationProperties(KivraProperties.class)

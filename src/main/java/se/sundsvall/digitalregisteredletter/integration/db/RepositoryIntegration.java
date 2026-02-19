@@ -1,7 +1,5 @@
 package se.sundsvall.digitalregisteredletter.integration.db;
 
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NEW;
-
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -19,6 +17,8 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEnt
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 import se.sundsvall.digitalregisteredletter.service.mapper.AttachmentMapper;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NEW;
 
 @Component
 public class RepositoryIntegration {
