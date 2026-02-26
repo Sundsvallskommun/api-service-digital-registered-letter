@@ -8,8 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.LetterRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
@@ -23,6 +22,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.I_AM_A_TEAPOT;
 import static se.sundsvall.TestDataFactory.createLetterEntity;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
 
@@ -145,7 +145,7 @@ class SchedulerWorkerTest {
 		final var response = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter.getId())).build();
 
 		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_PENDING)).thenReturn(List.of(sentLetter1, sentLetter2));
-		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenThrow(Problem.valueOf(Status.I_AM_A_TEAPOT, "Test exception"));
+		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenThrow(Problem.valueOf(I_AM_A_TEAPOT, "Test exception"));
 		when(kivraIntegrationMock.getAllResponses("2262", "1234567890")).thenReturn(List.of(keyValue));
 		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", "2262", "1234567890")).thenReturn(response);
 		when(letterRepositoryMock.findByIdAndDeleted(letter.getId(), false)).thenReturn(Optional.of(letter));
@@ -176,7 +176,7 @@ class SchedulerWorkerTest {
 
 		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_PENDING)).thenReturn(List.of(sentLetter));
 		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(keyValues);
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER)).thenThrow(Problem.valueOf(Status.I_AM_A_TEAPOT, "Test exception"));
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER)).thenThrow(Problem.valueOf(I_AM_A_TEAPOT, "Test exception"));
 		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse);
 		when(letterRepositoryMock.findByIdAndDeleted(letter.getId(), false)).thenReturn(Optional.of(letter));
 
@@ -212,7 +212,7 @@ class SchedulerWorkerTest {
 		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse2);
 		when(letterRepositoryMock.findByIdAndDeleted(letter1.getId(), false)).thenReturn(Optional.of(letter1));
 		when(letterRepositoryMock.findByIdAndDeleted(letter2.getId(), false)).thenReturn(Optional.of(letter2));
-		when(letterRepositoryMock.save(letter1)).thenThrow(Problem.valueOf(Status.I_AM_A_TEAPOT, "Test exception"));
+		when(letterRepositoryMock.save(letter1)).thenThrow(Problem.valueOf(I_AM_A_TEAPOT, "Test exception"));
 		when(letterRepositoryMock.save(letter2)).thenReturn(letter2);
 
 		schedulerWorker.updateLetterInformation();
@@ -253,7 +253,7 @@ class SchedulerWorkerTest {
 		when(letterRepositoryMock.findByIdAndDeleted(letter2.getId(), false)).thenReturn(Optional.of(letter2));
 		when(letterRepositoryMock.save(letter1)).thenReturn(letter2);
 		when(letterRepositoryMock.save(letter2)).thenReturn(letter2);
-		doThrow(Problem.valueOf(Status.I_AM_A_TEAPOT, "Test exception")).when(kivraIntegrationMock).deleteResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		doThrow(Problem.valueOf(I_AM_A_TEAPOT, "Test exception")).when(kivraIntegrationMock).deleteResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
 
 		schedulerWorker.updateLetterInformation();
 
