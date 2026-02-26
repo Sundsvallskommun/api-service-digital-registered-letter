@@ -9,14 +9,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.zalando.problem.Problem;
-import org.zalando.problem.ThrowableProblem;
-import org.zalando.problem.violations.ConstraintViolationProblem;
-import org.zalando.problem.violations.Violation;
+import se.sundsvall.dept44.problem.Problem;
+import se.sundsvall.dept44.problem.ProblemResponse;
+import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
+import se.sundsvall.dept44.problem.violations.Violation;
 import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequestBuilder;
@@ -32,14 +33,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.TestDataFactory.createLetterRequest;
 
+@AutoConfigureWebTestClient
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("junit")
 class LetterResourceFailureTest {
@@ -78,7 +80,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
 				tuple("getLetter.municipalityId", "not a valid municipality ID"),
 				tuple("getLetter.letterId", "not a valid UUID"));
@@ -96,7 +98,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactly(tuple("getLetters.municipalityId", "not a valid municipality ID"));
 	}
 
@@ -114,7 +116,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
 				tuple("getSigningInformation.municipalityId", "not a valid municipality ID"),
 				tuple("getSigningInformation.letterId", "not a valid UUID"));
@@ -142,7 +144,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactly(tuple("sendLetter.municipalityId", "not a valid municipality ID"));
 	}
 
@@ -165,7 +167,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
 				tuple("body", "must not be blank"),
 				tuple("contentType", "must be one of: [text/plain, text/html]"),
@@ -196,7 +198,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactly(tuple("sendLetter.attachments", "no duplicate file names allowed in the list of files"));
 	}
 
@@ -221,7 +223,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactly(tuple("sendLetter.attachments", "content type must be application/pdf"));
 	}
 
@@ -245,7 +247,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
 				tuple("organization.name", "must not be blank"),
 				tuple("organization.number", "must not be null"));
@@ -264,7 +266,7 @@ class LetterResourceFailureTest {
 			.uri("/%s/letters/%s/attachments/%s".formatted(MUNICIPALITY_ID, letterId, attachmentId))
 			.exchange()
 			.expectStatus().isNotFound()
-			.expectBody(ThrowableProblem.class)
+			.expectBody(ProblemResponse.class)
 			.returnResult()
 			.getResponseBody();
 
@@ -287,7 +289,7 @@ class LetterResourceFailureTest {
 			.accept(APPLICATION_PDF)
 			.exchange()
 			.expectStatus().is5xxServerError()
-			.expectBody(ThrowableProblem.class)
+			.expectBody(ProblemResponse.class)
 			.returnResult()
 			.getResponseBody();
 
@@ -326,7 +328,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactly(tuple("readLetterReceipt.municipalityId", "not a valid municipality ID"));
 	}
 
@@ -343,7 +345,7 @@ class LetterResourceFailureTest {
 
 		assertThat(response).isNotNull();
 		assertThat(response.getViolations())
-			.extracting(Violation::getField, Violation::getMessage)
+			.extracting(Violation::field, Violation::message)
 			.containsExactly(tuple("readLetterReceipt.letterId", "not a valid UUID"));
 	}
 
@@ -358,7 +360,7 @@ class LetterResourceFailureTest {
 			.uri("/%s/letters/%s/receipt".formatted(MUNICIPALITY_ID, letterId))
 			.exchange()
 			.expectStatus().isNotFound()
-			.expectBody(ThrowableProblem.class)
+			.expectBody(ProblemResponse.class)
 			.returnResult()
 			.getResponseBody();
 

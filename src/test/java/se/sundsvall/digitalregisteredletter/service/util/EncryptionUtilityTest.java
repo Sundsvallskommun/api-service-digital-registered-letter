@@ -1,7 +1,7 @@
 package se.sundsvall.digitalregisteredletter.service.util;
 
 import org.junit.jupiter.api.Test;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.configuration.CredentialsProperties;
 
 import static java.util.Base64.getEncoder;

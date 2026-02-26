@@ -2,13 +2,13 @@ package se.sundsvall.digitalregisteredletter.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.api.model.Tenant;
 import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
 import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
 
-import static org.zalando.problem.Status.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenant;
 import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenantEntity;
 import static se.sundsvall.digitalregisteredletter.service.mapper.TenantMapper.toTenantList;
