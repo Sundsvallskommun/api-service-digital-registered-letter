@@ -17,13 +17,13 @@ import org.openpdf.text.pdf.PdfReader;
 import org.openpdf.text.pdf.PdfSmartCopy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.apache.pdfbox.io.RandomAccessReadBuffer.createBufferFromStream;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public final class InvoicePdfMerger {
 

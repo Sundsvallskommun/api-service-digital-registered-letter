@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.zalando.problem.Problem;
-import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
+import se.sundsvall.dept44.problem.Problem;
+import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.digitalregisteredletter.api.model.EligibilityRequest;
 import se.sundsvall.digitalregisteredletter.service.EligibilityService;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -41,7 +42,7 @@ class EligibilityResource {
 		this.eligibilityService = eligibilityService;
 	}
 
-	@PostMapping("/{organizationNumber}/eligibility/kivra")
+	@PostMapping(value = "/{organizationNumber}/eligibility/kivra", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Check if the given partyIds are eligible for receiving digital registered letters with Kivra",
 		description = "Returns a list of party IDs that are eligible for Kivra based on the provided municipality ID, organization number and party IDs",
 		responses = @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class))))

@@ -8,13 +8,13 @@ import javax.sql.rowset.serial.SerialBlob;
 import org.apache.pdfbox.Loader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.zalando.problem.Status;
-import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @ExtendWith(ResourceLoaderExtension.class)
 class InvoicePdfMergerTest {
@@ -53,7 +53,7 @@ class InvoicePdfMergerTest {
 		final var exception = assertThrows(ThrowableProblem.class, () -> InvoicePdfMerger.mergePdfs(attachments, renderResponse));
 
 		// Assert
-		assertThat(exception.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+		assertThat(exception.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR);
 		assertThat(exception.getMessage()).isEqualTo("Internal Server Error: A problem occurred during merge of PDF:s. Cannot invoke \"String.getBytes(java.nio.charset.Charset)\" because \"src\" is null.");
 	}
 }

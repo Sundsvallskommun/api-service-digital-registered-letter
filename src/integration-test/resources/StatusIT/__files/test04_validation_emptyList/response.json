@@ -1,7 +1,7 @@
 {
 	"status": 400,
 	"title": "Constraint Violation",
-	"type": "https://zalando.github.io/problem/constraint-violation",
+	"type": "about:blank",
 	"violations": [
 		{
 			"field": "letterIds",

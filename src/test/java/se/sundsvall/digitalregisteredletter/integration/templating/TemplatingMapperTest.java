@@ -10,13 +10,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class TemplatingMapperTest {
@@ -271,7 +271,7 @@ class TemplatingMapperTest {
 			.isInstanceOf(Problem.class)
 			.satisfies(thrown -> {
 				final var problem = (Problem) thrown;
-				assertThat(problem.getStatus()).isEqualTo(Status.NOT_FOUND);
+				assertThat(problem.getStatus()).isEqualTo(NOT_FOUND);
 				assertThat(problem.getDetail()).isEqualTo("No signing information found for letter with id '%s'".formatted(letterId));
 			});
 	}

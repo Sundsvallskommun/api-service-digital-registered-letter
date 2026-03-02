@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "3.0"
 servers:
-- url: http://localhost:63188
+- url: http://localhost:52334
   description: Generated server url
 tags:
 - name: Scheduler Resource
@@ -173,7 +173,6 @@ paths:
         required: true
         schema:
           type: string
-          minLength: 1
       requestBody:
         content:
           multipart/form-data:
@@ -242,7 +241,6 @@ paths:
         required: true
         schema:
           type: string
-          minLength: 1
       requestBody:
         content:
           application/json:
@@ -259,7 +257,7 @@ paths:
         "200":
           description: Successful operation
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -763,23 +761,13 @@ components:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
         type:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-    StatusType:
-      type: object
-      properties:
-        reasonPhrase:
-          type: string
-        statusCode:
+        status:
           type: integer
           format: int32
     Tenant:
@@ -811,160 +799,42 @@ components:
     ConstraintViolationProblem:
       type: object
       properties:
-        cause:
-          $ref: "#/components/schemas/ThrowableProblem"
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
         type:
           type: string
           format: uri
         status:
-          $ref: "#/components/schemas/StatusType"
+          type: integer
+          format: int32
         violations:
           type: array
           items:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        message:
-          type: string
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
         detail:
           type: string
         instance:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
     ThrowableProblem:
       type: object
       properties:
-        cause: {}
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
-        message:
-          type: string
-        title:
-          type: string
-        detail:
-          type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
-        instance:
-          type: string
-          format: uri
         type:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
+        title:
           type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        causeAsProblem: {}
     Violation:
       type: object
       properties:
@@ -986,7 +856,6 @@ components:
           description: Subject of the letter
           examples:
           - Important Notification
-          minLength: 1
         supportInfo:
           $ref: "#/components/schemas/SupportInfo"
           description: Support information for the letter
@@ -1003,7 +872,6 @@ components:
           description: Body of the letter
           examples:
           - This is the content of the letter. Plain-text body
-          minLength: 1
       required:
       - body
       - contentType
@@ -1025,7 +893,6 @@ components:
           description: Readable name for the organization
           examples:
           - Department 44
-          minLength: 1
       required:
       - name
       - number
@@ -1037,13 +904,11 @@ components:
           description: Support text for the letter
           examples:
           - "For support, please contact us at the information below."
-          minLength: 1
         contactInformationUrl:
           type: string
           description: URL for contact
           examples:
           - https://example.com/support
-          minLength: 1
         contactInformationPhoneNumber:
           type: string
           description: Phone number for contact
@@ -1199,7 +1064,6 @@ components:
           items:
             $ref: "#/components/schemas/Letter"
             readOnly: true
-          readOnly: true
     PagingAndSortingMetaData:
       type: object
       description: PagingAndSortingMetaData model
@@ -1247,7 +1111,6 @@ components:
             examples:
             - property
             readOnly: true
-          readOnly: true
         sortDirection:
           $ref: "#/components/schemas/Direction"
           description: The sort order direction

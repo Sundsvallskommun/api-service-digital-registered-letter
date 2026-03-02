@@ -8,8 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
 import se.sundsvall.dept44.exception.ServerProblem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.zalando.problem.Status.NOT_IMPLEMENTED;
+import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 import static se.sundsvall.TestDataFactory.NOW;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
 
