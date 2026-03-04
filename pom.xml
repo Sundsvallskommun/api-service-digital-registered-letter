@@ -106,7 +106,8 @@
 					<generateApis>false</generateApis>
 					<generateSupportingFiles>false</generateSupportingFiles>
 					<configOptions>
-						<useSpringBoot3>true</useSpringBoot3>
+						<useSpringBoot4>true</useSpringBoot4>
+						<useJackson3>true</useJackson3>
 						<sourceFolder>${generated-sources-java-path}</sourceFolder>
 						<dateLibrary>java8</dateLibrary>
 						<apiPackage>generated</apiPackage>
