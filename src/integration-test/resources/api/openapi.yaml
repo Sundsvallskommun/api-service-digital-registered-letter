@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "3.0"
 servers:
-- url: http://localhost:52334
+- url: http://localhost:52507
   description: Generated server url
 tags:
 - name: Scheduler Resource
@@ -173,6 +173,7 @@ paths:
         required: true
         schema:
           type: string
+          minLength: 1
       requestBody:
         content:
           multipart/form-data:
@@ -241,6 +242,7 @@ paths:
         required: true
         schema:
           type: string
+          minLength: 1
       requestBody:
         content:
           application/json:
@@ -811,10 +813,10 @@ components:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        causeAsProblem:
-          $ref: "#/components/schemas/ThrowableProblem"
         detail:
           type: string
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
         instance:
           type: string
           format: uri
@@ -856,6 +858,7 @@ components:
           description: Subject of the letter
           examples:
           - Important Notification
+          minLength: 1
         supportInfo:
           $ref: "#/components/schemas/SupportInfo"
           description: Support information for the letter
@@ -872,6 +875,7 @@ components:
           description: Body of the letter
           examples:
           - This is the content of the letter. Plain-text body
+          minLength: 1
       required:
       - body
       - contentType
@@ -893,6 +897,7 @@ components:
           description: Readable name for the organization
           examples:
           - Department 44
+          minLength: 1
       required:
       - name
       - number
@@ -904,11 +909,13 @@ components:
           description: Support text for the letter
           examples:
           - "For support, please contact us at the information below."
+          minLength: 1
         contactInformationUrl:
           type: string
           description: URL for contact
           examples:
           - https://example.com/support
+          minLength: 1
         contactInformationPhoneNumber:
           type: string
           description: Phone number for contact
