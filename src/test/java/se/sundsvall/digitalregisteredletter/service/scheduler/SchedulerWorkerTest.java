@@ -63,25 +63,25 @@ class SchedulerWorkerTest {
 		final var registeredLetterResponse1 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter1.getId())).build();
 		final var registeredLetterResponse2 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter2.getId())).build();
 
-		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
-		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(keyValues);
-		when(kivraIntegrationMock.getRegisteredLetterResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse1);
-		when(kivraIntegrationMock.getRegisteredLetterResponse(letter2.getId(), MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse2);
+		when(letterRepositoryMock.findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
+		when(kivraIntegrationMock.getAllResponses(tenant)).thenReturn(keyValues);
+		when(kivraIntegrationMock.getRegisteredLetterResponse(letter1.getId(), tenant)).thenReturn(registeredLetterResponse1);
+		when(kivraIntegrationMock.getRegisteredLetterResponse(letter2.getId(), tenant)).thenReturn(registeredLetterResponse2);
 		when(letterRepositoryMock.findByIdAndDeleted(letter1.getId(), false)).thenReturn(Optional.of(letter1));
 		when(letterRepositoryMock.findByIdAndDeleted(letter2.getId(), false)).thenReturn(Optional.of(letter2));
 
 		schedulerWorker.updateLetterInformation();
 
-		verify(letterRepositoryMock).findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
-		verify(kivraIntegrationMock).getAllResponses(MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter2.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		verify(letterRepositoryMock).findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
+		verify(kivraIntegrationMock).getAllResponses(tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter1.getId(), tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter2.getId(), tenant);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter1.getId(), false);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter2.getId(), false);
 		verify(letterRepositoryMock).save(letter1);
 		verify(letterRepositoryMock).save(letter2);
-		verify(kivraIntegrationMock).deleteResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).deleteResponse(letter2.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		verify(kivraIntegrationMock).deleteResponse(letter1.getId(), tenant);
+		verify(kivraIntegrationMock).deleteResponse(letter2.getId(), tenant);
 		verify(letterMapperMock).updateLetterStatus(letter1, status);
 		verify(letterMapperMock).updateLetterStatus(letter2, status);
 		verify(letterMapperMock).updateSigningInformation(letter1.getSigningInformation(), registeredLetterResponse1);
@@ -102,27 +102,27 @@ class SchedulerWorkerTest {
 		final var response1 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter1.getId())).build();
 		final var response2 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter2.getId())).build();
 
-		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter1, sentLetter2));
-		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(List.of(keyValue1));
-		when(kivraIntegrationMock.getAllResponses("2262", "1234567890")).thenReturn(List.of(keyValue2));
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(response1);
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", "2262", "1234567890")).thenReturn(response2);
+		when(letterRepositoryMock.findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter1, sentLetter2));
+		when(kivraIntegrationMock.getAllResponses(tenant1)).thenReturn(List.of(keyValue1));
+		when(kivraIntegrationMock.getAllResponses(tenant2)).thenReturn(List.of(keyValue2));
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", tenant1)).thenReturn(response1);
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", tenant2)).thenReturn(response2);
 		when(letterRepositoryMock.findByIdAndDeleted(letter1.getId(), false)).thenReturn(Optional.of(letter1));
 		when(letterRepositoryMock.findByIdAndDeleted(letter2.getId(), false)).thenReturn(Optional.of(letter2));
 
 		schedulerWorker.updateLetterInformation();
 
-		verify(letterRepositoryMock).findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
-		verify(kivraIntegrationMock).getAllResponses(MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getAllResponses("2262", "1234567890");
-		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId2", "2262", "1234567890");
+		verify(letterRepositoryMock).findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
+		verify(kivraIntegrationMock).getAllResponses(tenant1);
+		verify(kivraIntegrationMock).getAllResponses(tenant2);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId1", tenant1);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId2", tenant2);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter1.getId(), false);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter2.getId(), false);
 		verify(letterRepositoryMock).save(letter1);
 		verify(letterRepositoryMock).save(letter2);
-		verify(kivraIntegrationMock).deleteResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).deleteResponse("letterId2", "2262", "1234567890");
+		verify(kivraIntegrationMock).deleteResponse("letterId1", tenant1);
+		verify(kivraIntegrationMock).deleteResponse("letterId2", tenant2);
 		verify(letterMapperMock).updateLetterStatus(letter1, status);
 		verify(letterMapperMock).updateLetterStatus(letter2, status);
 		verify(letterMapperMock).updateSigningInformation(letter1.getSigningInformation(), response1);
@@ -144,21 +144,21 @@ class SchedulerWorkerTest {
 		final var status = "signed";
 		final var response = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter.getId())).build();
 
-		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter1, sentLetter2));
-		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Test exception"));
-		when(kivraIntegrationMock.getAllResponses("2262", "1234567890")).thenReturn(List.of(keyValue));
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", "2262", "1234567890")).thenReturn(response);
+		when(letterRepositoryMock.findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter1, sentLetter2));
+		when(kivraIntegrationMock.getAllResponses(tenant1)).thenThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Test exception"));
+		when(kivraIntegrationMock.getAllResponses(tenant2)).thenReturn(List.of(keyValue));
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", tenant2)).thenReturn(response);
 		when(letterRepositoryMock.findByIdAndDeleted(letter.getId(), false)).thenReturn(Optional.of(letter));
 
 		schedulerWorker.updateLetterInformation();
 
-		verify(letterRepositoryMock).findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
-		verify(kivraIntegrationMock).getAllResponses(MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getAllResponses("2262", "1234567890");
-		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId1", "2262", "1234567890");
+		verify(letterRepositoryMock).findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
+		verify(kivraIntegrationMock).getAllResponses(tenant1);
+		verify(kivraIntegrationMock).getAllResponses(tenant2);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId1", tenant2);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter.getId(), false);
 		verify(letterRepositoryMock).save(letter);
-		verify(kivraIntegrationMock).deleteResponse("letterId1", "2262", "1234567890");
+		verify(kivraIntegrationMock).deleteResponse("letterId1", tenant2);
 		verify(letterMapperMock).updateLetterStatus(letter, status);
 		verify(letterMapperMock).updateSigningInformation(letter.getSigningInformation(), response);
 	}
@@ -174,21 +174,21 @@ class SchedulerWorkerTest {
 		final var status = "signed";
 		final var registeredLetterResponse = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter.getId())).build();
 
-		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
-		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(keyValues);
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER)).thenThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Test exception"));
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse);
+		when(letterRepositoryMock.findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
+		when(kivraIntegrationMock.getAllResponses(tenant)).thenReturn(keyValues);
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", tenant)).thenThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Test exception"));
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", tenant)).thenReturn(registeredLetterResponse);
 		when(letterRepositoryMock.findByIdAndDeleted(letter.getId(), false)).thenReturn(Optional.of(letter));
 
 		schedulerWorker.updateLetterInformation();
 
-		verify(letterRepositoryMock).findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
-		verify(kivraIntegrationMock).getAllResponses(MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId2", MUNICIPALITY_ID, ORG_NUMBER);
+		verify(letterRepositoryMock).findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
+		verify(kivraIntegrationMock).getAllResponses(tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId1", tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse("letterId2", tenant);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter.getId(), false);
 		verify(letterRepositoryMock).save(letter);
-		verify(kivraIntegrationMock).deleteResponse("letterId2", MUNICIPALITY_ID, ORG_NUMBER);
+		verify(kivraIntegrationMock).deleteResponse("letterId2", tenant);
 		verify(letterMapperMock).updateLetterStatus(letter, status);
 		verify(letterMapperMock).updateSigningInformation(letter.getSigningInformation(), registeredLetterResponse);
 	}
@@ -206,10 +206,10 @@ class SchedulerWorkerTest {
 		final var registeredLetterResponse1 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter1.getId())).build();
 		final var registeredLetterResponse2 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter2.getId())).build();
 
-		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
-		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(keyValues);
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse1);
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse2);
+		when(letterRepositoryMock.findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
+		when(kivraIntegrationMock.getAllResponses(tenant)).thenReturn(keyValues);
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", tenant)).thenReturn(registeredLetterResponse1);
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", tenant)).thenReturn(registeredLetterResponse2);
 		when(letterRepositoryMock.findByIdAndDeleted(letter1.getId(), false)).thenReturn(Optional.of(letter1));
 		when(letterRepositoryMock.findByIdAndDeleted(letter2.getId(), false)).thenReturn(Optional.of(letter2));
 		when(letterRepositoryMock.save(letter1)).thenThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Test exception"));
@@ -217,15 +217,15 @@ class SchedulerWorkerTest {
 
 		schedulerWorker.updateLetterInformation();
 
-		verify(letterRepositoryMock).findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
-		verify(kivraIntegrationMock).getAllResponses(MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter2.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		verify(letterRepositoryMock).findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
+		verify(kivraIntegrationMock).getAllResponses(tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter1.getId(), tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter2.getId(), tenant);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter1.getId(), false);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter2.getId(), false);
 		verify(letterRepositoryMock).save(letter1);
 		verify(letterRepositoryMock).save(letter2);
-		verify(kivraIntegrationMock).deleteResponse(letter2.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		verify(kivraIntegrationMock).deleteResponse(letter2.getId(), tenant);
 		verify(letterMapperMock).updateLetterStatus(letter1, status);
 		verify(letterMapperMock).updateLetterStatus(letter2, status);
 		verify(letterMapperMock).updateSigningInformation(letter1.getSigningInformation(), registeredLetterResponse1);
@@ -245,28 +245,28 @@ class SchedulerWorkerTest {
 		final var registeredLetterResponse1 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter1.getId())).build();
 		final var registeredLetterResponse2 = RegisteredLetterResponseBuilder.create().withStatus(status).withSenderReference(new RegisteredLetterResponse.SenderReference(letter2.getId())).build();
 
-		when(letterRepositoryMock.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
-		when(kivraIntegrationMock.getAllResponses(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(keyValues);
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse1);
-		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(registeredLetterResponse2);
+		when(letterRepositoryMock.findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT)).thenReturn(List.of(sentLetter));
+		when(kivraIntegrationMock.getAllResponses(tenant)).thenReturn(keyValues);
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId1", tenant)).thenReturn(registeredLetterResponse1);
+		when(kivraIntegrationMock.getRegisteredLetterResponse("letterId2", tenant)).thenReturn(registeredLetterResponse2);
 		when(letterRepositoryMock.findByIdAndDeleted(letter1.getId(), false)).thenReturn(Optional.of(letter1));
 		when(letterRepositoryMock.findByIdAndDeleted(letter2.getId(), false)).thenReturn(Optional.of(letter2));
 		when(letterRepositoryMock.save(letter1)).thenReturn(letter2);
 		when(letterRepositoryMock.save(letter2)).thenReturn(letter2);
-		doThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Test exception")).when(kivraIntegrationMock).deleteResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		doThrow(Problem.valueOf(INTERNAL_SERVER_ERROR, "Test exception")).when(kivraIntegrationMock).deleteResponse(letter1.getId(), tenant);
 
 		schedulerWorker.updateLetterInformation();
 
-		verify(letterRepositoryMock).findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
-		verify(kivraIntegrationMock).getAllResponses(MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter2.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		verify(letterRepositoryMock).findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT);
+		verify(kivraIntegrationMock).getAllResponses(tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter1.getId(), tenant);
+		verify(kivraIntegrationMock).getRegisteredLetterResponse(letter2.getId(), tenant);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter1.getId(), false);
 		verify(letterRepositoryMock).findByIdAndDeleted(letter2.getId(), false);
 		verify(letterRepositoryMock).save(letter1);
 		verify(letterRepositoryMock).save(letter2);
-		verify(kivraIntegrationMock).deleteResponse(letter1.getId(), MUNICIPALITY_ID, ORG_NUMBER);
-		verify(kivraIntegrationMock).deleteResponse(letter2.getId(), MUNICIPALITY_ID, ORG_NUMBER);
+		verify(kivraIntegrationMock).deleteResponse(letter1.getId(), tenant);
+		verify(kivraIntegrationMock).deleteResponse(letter2.getId(), tenant);
 		verify(letterMapperMock).updateLetterStatus(letter1, status);
 		verify(letterMapperMock).updateLetterStatus(letter2, status);
 		verify(letterMapperMock).updateSigningInformation(letter1.getSigningInformation(), registeredLetterResponse1);

@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.dept44.exception.ServerProblem;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValueBuilder;
@@ -18,6 +19,7 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLe
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponseBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
+import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,8 +38,13 @@ import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
 class KivraIntegrationTest {
 
 	private static final String TENANT_KEY = "some-tenant-key";
+	private static final String ENCRYPTED_TENANT_KEY = "encrypted-tenant-key";
 	private static final String MUNICIPALITY_ID = "2281";
 	private static final String ORGANIZATION_NUMBER = "5591628136";
+	private static final TenantEntity TENANT_ENTITY = TenantEntity.create()
+		.withMunicipalityId(MUNICIPALITY_ID)
+		.withOrgNumber(ORGANIZATION_NUMBER)
+		.withTenantKey(ENCRYPTED_TENANT_KEY);
 
 	@Mock
 	private KivraMapper kivraMapperMock;
@@ -48,12 +55,15 @@ class KivraIntegrationTest {
 	@Mock
 	private TenantService tenantServiceMock;
 
+	@Mock
+	private EncryptionUtility encryptionUtilityMock;
+
 	@InjectMocks
 	private KivraIntegration kivraIntegration;
 
 	@AfterEach
 	void ensureNoInteractionsWereMissed() {
-		verifyNoMoreInteractions(kivraMapperMock, kivraClientMock, tenantServiceMock);
+		verifyNoMoreInteractions(kivraMapperMock, kivraClientMock, tenantServiceMock, encryptionUtilityMock);
 	}
 
 	@Test
@@ -126,54 +136,54 @@ class KivraIntegrationTest {
 			.build();
 		final var keyValues = List.of(keyValue);
 
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		when(kivraClientMock.getAllResponses(TENANT_KEY)).thenReturn(keyValues);
 
-		final var result = kivraIntegration.getAllResponses(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var result = kivraIntegration.getAllResponses(TENANT_ENTITY);
 
 		assertThat(result).isNotNull().hasSize(1).allSatisfy(pair -> {
 			assertThat(pair.status()).isEqualTo(status);
 			assertThat(pair.responseKey()).isEqualTo(responseKey);
 		});
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).getAllResponses(TENANT_KEY);
 	}
 
 	@Test
 	void getAllResponsesWithOrganizationNumberWhenKivraRespondsWithNull() {
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		when(kivraClientMock.getAllResponses(TENANT_KEY)).thenReturn(null);
 
-		assertThat(kivraIntegration.getAllResponses(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).isNotNull().isEmpty();
+		assertThat(kivraIntegration.getAllResponses(TENANT_ENTITY)).isNotNull().isEmpty();
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).getAllResponses(TENANT_KEY);
 	}
 
 	@Test
 	void getAllResponsesWithOrganizationNumberKivraThrowsServerProblem() {
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		when(kivraClientMock.getAllResponses(TENANT_KEY)).thenThrow(new ServerProblem(NOT_IMPLEMENTED, "Damn you Salazar"));
 
-		assertThatThrownBy(() -> kivraIntegration.getAllResponses(MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+		assertThatThrownBy(() -> kivraIntegration.getAllResponses(TENANT_ENTITY))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Server exception occurred while retrieving Kivra responses");
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).getAllResponses(TENANT_KEY);
 	}
 
 	@Test
 	void getAllResponsesWithOrganizationNumberThrowsException() {
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		when(kivraClientMock.getAllResponses(TENANT_KEY)).thenThrow(new RuntimeException("Fasten your seatbelts"));
 
-		assertThatThrownBy(() -> kivraIntegration.getAllResponses(MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+		assertThatThrownBy(() -> kivraIntegration.getAllResponses(TENANT_ENTITY))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Internal Server Error: Exception occurred while retrieving Kivra responses");
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).getAllResponses(TENANT_KEY);
 	}
 
@@ -186,17 +196,17 @@ class KivraIntegrationTest {
 			.withSenderReference(new RegisteredLetterResponse.SenderReference("internalId"))
 			.build();
 
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		when(kivraClientMock.getResponseDetails(TENANT_KEY, responseKey)).thenReturn(registeredLetterResponse);
 
-		final var result = kivraIntegration.getRegisteredLetterResponse(responseKey, MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var result = kivraIntegration.getRegisteredLetterResponse(responseKey, TENANT_ENTITY);
 
 		assertThat(result).isNotNull();
 		assertThat(result.status()).isEqualTo("signed");
 		assertThat(result.signedAt()).isEqualTo(NOW);
 		assertThat(result.senderReference().internalId()).isEqualTo("internalId");
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).getResponseDetails(TENANT_KEY, responseKey);
 	}
 
@@ -204,14 +214,14 @@ class KivraIntegrationTest {
 	void getRegisteredLetterResponseWithOrganizationNumberKivraThrowsServerProblem() {
 		final var responseKey = "responseKey";
 
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		when(kivraClientMock.getResponseDetails(TENANT_KEY, responseKey)).thenThrow(new ServerProblem(NOT_IMPLEMENTED, "Damn you Salazar"));
 
-		assertThatThrownBy(() -> kivraIntegration.getRegisteredLetterResponse(responseKey, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+		assertThatThrownBy(() -> kivraIntegration.getRegisteredLetterResponse(responseKey, TENANT_ENTITY))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Exception occurred while retrieving Kivra registered letter response for responseKey: %s", responseKey);
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).getResponseDetails(TENANT_KEY, responseKey);
 	}
 
@@ -219,14 +229,14 @@ class KivraIntegrationTest {
 	void getRegisteredLetterResponseWithOrganizationNumberThrowsException() {
 		final var responseKey = "responseKey";
 
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		when(kivraClientMock.getResponseDetails(TENANT_KEY, responseKey)).thenThrow(new RuntimeException("Fasten your seatbelts"));
 
-		assertThatThrownBy(() -> kivraIntegration.getRegisteredLetterResponse(responseKey, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+		assertThatThrownBy(() -> kivraIntegration.getRegisteredLetterResponse(responseKey, TENANT_ENTITY))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Internal Server Error: Exception occurred while retrieving Kivra registered letter response for responseKey: %s", responseKey);
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).getResponseDetails(TENANT_KEY, responseKey);
 	}
 
@@ -234,11 +244,11 @@ class KivraIntegrationTest {
 	void deleteResponseWithOrganizationNumber() {
 		final var responseKey = "responseKey";
 
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 
-		kivraIntegration.deleteResponse(responseKey, MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		kivraIntegration.deleteResponse(responseKey, TENANT_ENTITY);
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).deleteResponse(TENANT_KEY, responseKey);
 	}
 
@@ -246,14 +256,14 @@ class KivraIntegrationTest {
 	void deleteResponseWithOrganizationNumberKivraThrowsServerProblem() {
 		final var responseKey = "responseKey";
 
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		doThrow(new ServerProblem(NOT_IMPLEMENTED, "Damn you Salazar")).when(kivraClientMock).deleteResponse(TENANT_KEY, responseKey);
 
-		assertThatThrownBy(() -> kivraIntegration.deleteResponse(responseKey, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+		assertThatThrownBy(() -> kivraIntegration.deleteResponse(responseKey, TENANT_ENTITY))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Bad Gateway: Server exception occurred while deleting Kivra response for responseKey: %s", responseKey);
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).deleteResponse(TENANT_KEY, responseKey);
 	}
 
@@ -261,14 +271,14 @@ class KivraIntegrationTest {
 	void deleteResponseWithOrganizationNumberThrowsException() {
 		final var responseKey = "responseKey";
 
-		when(tenantServiceMock.getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(TENANT_KEY);
+		when(encryptionUtilityMock.decrypt(ENCRYPTED_TENANT_KEY)).thenReturn(TENANT_KEY);
 		doThrow(new RuntimeException("Fasten your seatbelts")).when(kivraClientMock).deleteResponse(TENANT_KEY, responseKey);
 
-		assertThatThrownBy(() -> kivraIntegration.deleteResponse(responseKey, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+		assertThatThrownBy(() -> kivraIntegration.deleteResponse(responseKey, TENANT_ENTITY))
 			.isInstanceOf(Problem.class)
 			.hasMessage("Internal Server Error: Exception occurred while deleting Kivra response for responseKey: %s", responseKey);
 
-		verify(tenantServiceMock).getDecryptedTenantKey(MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(encryptionUtilityMock).decrypt(ENCRYPTED_TENANT_KEY);
 		verify(kivraClientMock).deleteResponse(TENANT_KEY, responseKey);
 	}
 

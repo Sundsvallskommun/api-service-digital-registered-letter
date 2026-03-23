@@ -23,6 +23,8 @@ public interface LetterRepository extends JpaRepository<LetterEntity, String>, J
 
 	Optional<LetterEntity> findByIdAndMunicipalityIdAndDeleted(final String id, final String municipalityId, boolean deleted);
 
+	List<LetterEntity> findAllByStatusAndDeletedFalseAndTenantIsNotNull(final String status);
+
 	List<LetterEntity> findAllByMunicipalityIdAndIdInAndDeletedFalse(final String municipalityId, final List<String> ids);
 
 	List<LetterEntity> findAllByDeleted(final boolean deleted);
