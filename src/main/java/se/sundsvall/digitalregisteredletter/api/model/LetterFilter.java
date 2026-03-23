@@ -9,9 +9,9 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIR
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 @Builder
-@Schema(description = "Optional filters to apply when retreiving sent letters")
+@Schema(description = "Optional filters to apply when retrieving sent letters")
 public record LetterFilter(
-	@Schema(description = "Optional filter for matching organization id", examples = "44", requiredMode = NOT_REQUIRED) Integer orgId,
+	@Schema(description = "Optional filter for matching organization id", examples = "44", requiredMode = NOT_REQUIRED) Long orgId,
 
 	@Schema(description = "Optional filter for matching username", examples = "joe01doe", requiredMode = NOT_REQUIRED) String username,
 

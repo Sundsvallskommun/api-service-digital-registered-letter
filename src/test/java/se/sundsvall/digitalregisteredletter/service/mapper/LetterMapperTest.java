@@ -85,13 +85,13 @@ class LetterMapperTest {
 
 	@Test
 	void toSupportInformationEmbeddableFromNull() {
-		assertThat(letterMapper.toSupportInformation((se.sundsvall.digitalregisteredletter.api.model.SupportInfo) null)).isNull();
+		assertThat(letterMapper.toSupportInformation(null)).isNull();
 	}
 
 	@Test
 	void toOrganizationEntity() {
 		final var name = "name";
-		final var number = 911;
+		final var number = 911L;
 		final var letterEntity = LetterEntity.create();
 		final var organization = OrganizationBuilder.create()
 			.withName(name)
@@ -109,7 +109,7 @@ class LetterMapperTest {
 	@Test
 	void toOrganizationEntityWithNullLetter() {
 		final var name = "name";
-		final var number = 911;
+		final var number = 911L;
 		final var organization = OrganizationBuilder.create()
 			.withName(name)
 			.withNumber(number)

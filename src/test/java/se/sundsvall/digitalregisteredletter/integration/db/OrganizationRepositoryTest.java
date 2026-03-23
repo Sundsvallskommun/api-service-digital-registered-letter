@@ -25,7 +25,7 @@ class OrganizationRepositoryTest {
 
 	@Test
 	void findByNumber() {
-		final var result = organizationRepository.findByNumber(44);
+		final var result = organizationRepository.findByNumber(44L);
 
 		assertThat(result).isPresent().hasValueSatisfying(assertedOrganizationEntity -> {
 			assertThat(assertedOrganizationEntity.getId()).isEqualTo("a95aa330-7cad-4ce1-8bef-1e742fcac6e4");
@@ -43,6 +43,6 @@ class OrganizationRepositoryTest {
 
 	@Test
 	void findByNumberWithNoMatch() {
-		assertThat(organizationRepository.findByNumber(911)).isNotPresent();
+		assertThat(organizationRepository.findByNumber(911L)).isNotPresent();
 	}
 }

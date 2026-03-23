@@ -46,7 +46,7 @@ public class LetterSpecification {
 	 * @return       a specification that compares the connected departments org id to the provided value (or match all if
 	 *               value is not provided)
 	 */
-	public static Specification<LetterEntity> withDepartmentOrgId(final Integer value) {
+	public static Specification<LetterEntity> withDepartmentOrgId(final Long value) {
 		return BUILDER.buildEqualFilter(LetterEntity_.ORGANIZATION, OrganizationEntity_.NUMBER, value);
 	}
 

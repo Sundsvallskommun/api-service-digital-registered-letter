@@ -65,7 +65,7 @@ class LetterSpecificationTest {
 		final var deleted = true;
 		final var createdEarliest = OffsetDateTime.now().minusDays(7);
 		final var createdLatest = OffsetDateTime.now();
-		final var orgId = 123;
+		final var orgId = 123L;
 		final var username = "username";
 
 		final var letterFilter = LetterFilterBuilder.create()

@@ -32,7 +32,7 @@
     ) engine=InnoDB;
 
     create table organization (
-        number integer not null,
+        number bigint not null,
         id varchar(36) not null,
         name varchar(255) not null,
         primary key (id)
@@ -108,12 +108,12 @@
        foreign key (signing_information_id) 
        references signing_information (id);
 
-    alter table if exists letter
-       add constraint fk_letter_tenant
-       foreign key (tenant_id)
+    alter table if exists letter 
+       add constraint fk_letter_tenant 
+       foreign key (tenant_id) 
        references tenant (id);
 
-    alter table if exists letter
-       add constraint fk_letter_user
-       foreign key (user_id)
+    alter table if exists letter 
+       add constraint fk_letter_user 
+       foreign key (user_id) 
        references user (id);

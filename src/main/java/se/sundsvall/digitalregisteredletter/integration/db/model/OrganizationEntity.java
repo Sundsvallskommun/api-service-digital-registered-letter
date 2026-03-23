@@ -33,7 +33,7 @@ public class OrganizationEntity {
 	private List<LetterEntity> letters = new ArrayList<>();
 
 	@Column(name = "number", nullable = false)
-	private Integer number;
+	private Long number;
 
 	@Column(name = "name", nullable = false)
 	private String name;
@@ -55,15 +55,15 @@ public class OrganizationEntity {
 		return this;
 	}
 
-	public Integer getNumber() {
+	public Long getNumber() {
 		return number;
 	}
 
-	public void setNumber(Integer number) {
+	public void setNumber(Long number) {
 		this.number = number;
 	}
 
-	public OrganizationEntity withNumber(Integer number) {
+	public OrganizationEntity withNumber(Long number) {
 		this.number = number;
 		return this;
 	}
@@ -101,8 +101,12 @@ public class OrganizationEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (!(obj instanceof final OrganizationEntity other)) { return false; }
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof final OrganizationEntity other)) {
+			return false;
+		}
 		return Objects.equals(id, other.id) && Objects.equals(letters, other.letters) && Objects.equals(name, other.name) && Objects.equals(number, other.number);
 	}
 

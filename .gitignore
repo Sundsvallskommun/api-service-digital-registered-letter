@@ -57,3 +57,6 @@ application-default.*
 
 /.apt_generated/
 /.apt_generated_tests/
+
+# Claude
+.claude/
