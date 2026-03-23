@@ -1,10 +1,10 @@
 {
 	"_meta": {
-		"page": 1,
-		"limit": 10,
 		"count": 5,
-		"totalRecords": 5,
-		"totalPages": 1
+		"limit": 10,
+		"page": 1,
+		"totalPages": 1,
+		"totalRecords": 5
 	},
 	"letters": [
 		{
@@ -39,7 +39,7 @@
 			"id": "4ace2698-7dea-4d0b-9c5d-eeac32c1b49a",
 			"subject": "This is the subject",
 			"municipalityId": "2281",
-			"status": "PENDING",
+			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
 			"contentType": "text/plain",
 			"created": "2023-10-01T00:00:00+02:00",
@@ -62,7 +62,7 @@
 			"id": "5c8634f2-078e-4ef0-888b-63cb1aaa0b11",
 			"subject": "This is the subject",
 			"municipalityId": "2281",
-			"status": "PENDING",
+			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
 			"contentType": "text/plain",
 			"created": "2023-09-30T23:59:59+02:00",
@@ -85,7 +85,7 @@
 			"id": "bd3d2128-0d5a-457c-8629-0da4ffea85d9",
 			"subject": "This is the subject",
 			"municipalityId": "2281",
-			"status": "PENDING",
+			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
 			"contentType": "text/plain",
 			"created": "2023-10-02T00:00:00+02:00",

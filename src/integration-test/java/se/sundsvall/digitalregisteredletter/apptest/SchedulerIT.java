@@ -59,19 +59,19 @@ class SchedulerIT extends AbstractAppTest {
 			final var letter = letterRepository.findById(LETTER_ID).orElseThrow();
 			letter.setStatus("SENT");
 			letter.setTenant(tenant);
-			letter.setSigningInformation(SigningInformationEntity.create().withStatus("PENDING"));
+			letter.setSigningInformation(SigningInformationEntity.create().withStatus("SENT"));
 			letterRepository.save(letter);
 		});
 	}
 
 	@Test
 	void test01_updateLetterStatuses() {
-		// Assert that the letter status is "SENT" and has signing information with status "PENDING" before the update
+		// Assert that the letter status is "SENT" and has signing information with the status "SENT" before the update
 		transactionTemplate.executeWithoutResult(status -> {
 			final var letterBeforeUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
 			assertThat(letterBeforeUpdate.getStatus()).isEqualTo("SENT");
 			assertThat(letterBeforeUpdate.getSigningInformation()).isNotNull();
-			assertThat(letterBeforeUpdate.getSigningInformation().getStatus()).isEqualTo("PENDING");
+			assertThat(letterBeforeUpdate.getSigningInformation().getStatus()).isEqualTo("SENT");
 		});
 
 		setupCall()
@@ -81,7 +81,7 @@ class SchedulerIT extends AbstractAppTest {
 			.sendRequestAndVerifyResponse();
 
 		// Assert that the letter status is "SIGNED" and that it has signing information after the update
-		transactionTemplate.executeWithoutResult(status -> {
+		transactionTemplate.executeWithoutResult(_ -> {
 			final var letterAfterUpdate = letterRepository.findById(LETTER_ID).orElseThrow();
 			assertThat(letterAfterUpdate.getStatus()).isEqualTo("SIGNED");
 			assertThat(letterAfterUpdate.getSigningInformation()).isNotNull().satisfies(signingInformation -> {
