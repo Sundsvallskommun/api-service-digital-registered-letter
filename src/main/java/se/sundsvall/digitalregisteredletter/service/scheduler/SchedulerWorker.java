@@ -15,7 +15,7 @@ import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
-import static se.sundsvall.digitalregisteredletter.Constants.STATUS_PENDING;
+import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
 
 @Component
 public class SchedulerWorker {
@@ -37,7 +37,7 @@ public class SchedulerWorker {
 	}
 
 	public void updateLetterInformation() {
-		final var tenants = letterRepository.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_PENDING).stream()
+		final var tenants = letterRepository.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT).stream()
 			.map(LetterEntity::getTenant)
 			.distinct()
 			.toList();
