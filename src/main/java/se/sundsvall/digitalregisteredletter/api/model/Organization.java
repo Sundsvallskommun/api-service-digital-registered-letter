@@ -10,7 +10,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 @Builder
 public record Organization(
 
-	@NotNull @Schema(description = "Unique id for the organization", examples = "44", requiredMode = REQUIRED) Integer number,
+	@NotNull @Schema(description = "Unique id for the organization", examples = "44", requiredMode = REQUIRED) Long number,
 
 	@NotBlank @Schema(description = "Readable name for the organization", examples = "Department 44", requiredMode = REQUIRED) String name) {
 }

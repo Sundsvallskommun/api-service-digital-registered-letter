@@ -37,7 +37,7 @@ class OrganizationEntityTest {
 		final var id = UUID.randomUUID().toString();
 		final var letters = List.of(LetterEntity.create());
 		final var name = "name";
-		final var number = 123456;
+		final var number = 123456L;
 
 		final var bean = OrganizationEntity.create()
 			.withId(id)

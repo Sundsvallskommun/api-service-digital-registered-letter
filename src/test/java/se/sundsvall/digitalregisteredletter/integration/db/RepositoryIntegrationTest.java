@@ -24,7 +24,7 @@ import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -103,7 +103,7 @@ class RepositoryIntegrationTest {
 		when(letterMapperMock.addLetter(organizationEntityMock, letterEntityMock)).thenReturn(organizationEntityMock);
 		when(letterMapperMock.addLetter(userEntityMock, letterEntityMock)).thenReturn(userEntityMock);
 		when(attachmentMapperMock.toAttachmentEntities(multipartFileList)).thenReturn(List.of(attachmentEntityMock));
-		when(organizationRepositoryMock.findByNumber(anyInt())).thenReturn(Optional.of(organizationEntityMock));
+		when(organizationRepositoryMock.findByNumber(anyLong())).thenReturn(Optional.of(organizationEntityMock));
 		when(userRepositoryMock.findByUsernameIgnoreCase(any())).thenReturn(Optional.of(userEntityMock));
 		when(letterRepositoryMock.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 		when(letterEntityMock.withAttachments(List.of(attachmentEntityMock))).thenReturn(letterEntityMock);
@@ -118,7 +118,7 @@ class RepositoryIntegrationTest {
 		verify(letterMapperMock).toOrganizationEntity(letterRequest.organization(), letterEntityMock);
 		verify(letterMapperMock).toUserEntity(USERNAME, letterEntityMock);
 		verify(attachmentMapperMock).toAttachmentEntities(multipartFileList);
-		verify(organizationRepositoryMock).findByNumber(234);
+		verify(organizationRepositoryMock).findByNumber(234L);
 		verify(userRepositoryMock).findByUsernameIgnoreCase(USERNAME);
 		verify(letterRepositoryMock).save(letterEntityMock);
 		verify(letterEntityMock).withAttachments(List.of(attachmentEntityMock));
@@ -157,7 +157,7 @@ class RepositoryIntegrationTest {
 		verify(letterMapperMock, never()).addLetter(any(OrganizationEntity.class), any());
 		verify(letterMapperMock, never()).addLetter(any(UserEntity.class), any());
 		verify(attachmentMapperMock).toAttachmentEntities(multipartFileList);
-		verify(organizationRepositoryMock).findByNumber(234);
+		verify(organizationRepositoryMock).findByNumber(234L);
 		verify(userRepositoryMock).findByUsernameIgnoreCase(USERNAME);
 		verify(letterRepositoryMock).save(letterEntityMock);
 		verify(letterEntityMock).withAttachments(List.of(attachmentEntityMock));

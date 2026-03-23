@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OrganizationTest {
 	private static final String ORGANIZATION_NAME = "organizationName";
-	private static final Integer ORGANIZATION_NUMBER = 112;
+	private static final Long ORGANIZATION_NUMBER = 112L;
 
 	@Test
 	void constructorTest() {

@@ -96,7 +96,7 @@ class LetterIT extends AbstractAppTest {
 	@Test
 	void test03_sendLetter() throws FileNotFoundException {
 		final var initialLetterSize = transactionTemplate.execute(_ -> {
-			assertThat(organizationRepository.findByNumber(44)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(3));
+			assertThat(organizationRepository.findByNumber(44L)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(3));
 			assertThat(userRepository.findByUsernameIgnoreCase("joe01doe")).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(7));
 			return letterRepository.count();
 		});
@@ -119,7 +119,7 @@ class LetterIT extends AbstractAppTest {
 
 		transactionTemplate.executeWithoutResult(_ -> {
 			assertThat(letterRepository.count()).isEqualTo(initialLetterSize + 1); // Count should have grown with one (the newly successfully sent letter)
-			assertThat(organizationRepository.findByNumber(44)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(4));
+			assertThat(organizationRepository.findByNumber(44L)).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(4));
 			assertThat(userRepository.findByUsernameIgnoreCase("joe01doe")).isPresent().hasValueSatisfying(entity -> assertThat(entity.getLetters()).hasSize(8));
 		});
 	}

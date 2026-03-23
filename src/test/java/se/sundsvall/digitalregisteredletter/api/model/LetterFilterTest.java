@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LetterFilterTest {
 	private static final OffsetDateTime CREATED_EARLIEST = OffsetDateTime.MIN;
 	private static final OffsetDateTime CREATED_LATEST = OffsetDateTime.MAX;
-	private static final Integer ORG_ID = 44;
+	private static final Long ORG_ID = 44L;
 	private static final String USERNAME = "username";
 
 	@Test

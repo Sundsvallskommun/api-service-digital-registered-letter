@@ -8,5 +8,5 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEnt
 @CircuitBreaker(name = "organizationRepository")
 public interface OrganizationRepository extends JpaRepository<OrganizationEntity, String> {
 
-	Optional<OrganizationEntity> findByNumber(final Integer number);
+	Optional<OrganizationEntity> findByNumber(final Long number);
 }

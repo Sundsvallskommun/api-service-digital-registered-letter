@@ -17,7 +17,7 @@ class LetterRequestTest {
 		.build();
 	private static final Organization ORGANIZATION = OrganizationBuilder.create()
 		.withName("name")
-		.withNumber(12345)
+		.withNumber(12345L)
 		.build();
 
 	@Test

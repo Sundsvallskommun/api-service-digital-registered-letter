@@ -2,8 +2,6 @@ package se.sundsvall;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import se.sundsvall.digitalregisteredletter.api.model.Attachments;
-import se.sundsvall.digitalregisteredletter.api.model.AttachmentsBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.DeviceBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterBuilder;
@@ -23,10 +21,6 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntit
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SupportInformation;
-import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
-import se.sundsvall.digitalregisteredletter.integration.kivra.model.PartsResponsiveBuilder;
-import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterBuilder;
-import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterHiddenBuilder;
 
 public class TestDataFactory {
 
@@ -60,12 +54,6 @@ public class TestDataFactory {
 			.withPartyId("ce408061-9e38-4fca-a3e1-220b06f7bd23")
 			.withSupportInfo(createSupportInfo())
 			.withOrganization(organization)
-			.build();
-	}
-
-	public static Attachments createAttachments() {
-		return AttachmentsBuilder.create()
-			.withFiles(List.of())
 			.build();
 	}
 
@@ -132,41 +120,18 @@ public class TestDataFactory {
 			.withContent(null);
 	}
 
-	public static ContentUserV2.PartsResponsive createPartsResponsive() {
-		return PartsResponsiveBuilder.create()
-			.withData("data")
-			.withName("name")
-			.withContentType("text/plain")
-			.build();
-	}
-
 	public static OrganizationEntity createOrganizationEntity(LetterEntity letterEntity) {
 		return OrganizationEntity.create()
 			.withId("uuid")
 			.withLetters(List.of(letterEntity))
 			.withName("organization name")
-			.withNumber(234);
-	}
-
-	public static ContentUserV2.RegisteredLetter createRegisteredLetter() {
-		return RegisteredLetterBuilder.create()
-			.withSenderReference(new ContentUserV2.RegisteredLetter.SenderReference("senderReference"))
-			.withExpiresAt(OffsetDateTime.now())
-			.withHidden(createRegisteredLetterHidden())
-			.build();
-	}
-
-	public static ContentUserV2.RegisteredLetter.RegisteredLetterHidden createRegisteredLetterHidden() {
-		return RegisteredLetterHiddenBuilder.create()
-			.withSender(false)
-			.withSubject(false)
-			.build();
+			.withNumber(234L);
 	}
 
 	public static Organization createOrganization() {
 		return OrganizationBuilder.create()
 			.withName("organization-name")
-			.withNumber(234)
+			.withNumber(234L)
 			.build();
 	}
 }
