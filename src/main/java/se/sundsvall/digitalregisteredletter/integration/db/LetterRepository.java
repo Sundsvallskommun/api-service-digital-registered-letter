@@ -23,19 +23,13 @@ public interface LetterRepository extends JpaRepository<LetterEntity, String>, J
 
 	Optional<LetterEntity> findByIdAndMunicipalityIdAndDeleted(final String id, final String municipalityId, boolean deleted);
 
+	List<LetterEntity> findAllByStatusAndDeletedFalseAndTenantIsNotNull(final String status);
+
 	List<LetterEntity> findAllByMunicipalityIdAndIdInAndDeletedFalse(final String municipalityId, final List<String> ids);
 
 	List<LetterEntity> findAllByDeleted(final boolean deleted);
 
 	Optional<LetterEntity> findByIdAndDeleted(final String id, final boolean deleted);
-
-	/**
-	 * Finds all LetterEntities with a specific signing information status, not deleted, and with a non-null tenant.
-	 *
-	 * @param  signingInformationStatus the signing information status to filter by
-	 * @return                          a list of LetterEntity objects that match the search parameters
-	 */
-	List<LetterEntity> findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(final String signingInformationStatus);
 
 	/**
 	 * Performs a search in LetterEntities.

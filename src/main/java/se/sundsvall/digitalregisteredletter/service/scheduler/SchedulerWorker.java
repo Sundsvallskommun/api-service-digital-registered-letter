@@ -37,34 +37,34 @@ public class SchedulerWorker {
 	}
 
 	public void updateLetterInformation() {
-		final var tenants = letterRepository.findBySigningInformationStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT).stream()
+		final var tenants = letterRepository.findAllByStatusAndDeletedFalseAndTenantIsNotNull(STATUS_SENT).stream()
 			.map(LetterEntity::getTenant)
 			.distinct()
 			.toList();
 		tenants.forEach(this::processTenant);
 	}
 
-	private void processTenant(final TenantEntity tenant) {
+	private void processTenant(final TenantEntity tenantEntity) {
 		try {
-			LOG.info("Processing Kivra responses for tenant with orgNumber: {}", tenant.getOrgNumber());
-			ofNullable(kivraIntegration.getAllResponses(tenant.getMunicipalityId(), tenant.getOrgNumber()))
+			LOG.info("Processing Kivra responses for tenant with orgNumber: {}", tenantEntity.getOrgNumber());
+			ofNullable(kivraIntegration.getAllResponses(tenantEntity))
 				.orElse(emptyList())
-				.forEach(keyValue -> processResponse(keyValue, tenant));
+				.forEach(keyValue -> processResponse(keyValue, tenantEntity));
 		} catch (final Exception e) {
-			LOG.error("Error processing tenant with orgNumber '{}': {}", tenant.getOrgNumber(), e.getMessage(), e);
+			LOG.error("Error processing tenant with orgNumber '{}': {}", tenantEntity.getOrgNumber(), e.getMessage(), e);
 		}
 	}
 
-	private void processResponse(final KeyValue keyValue, final TenantEntity tenant) {
+	private void processResponse(final KeyValue keyValue, final TenantEntity tenantEntity) {
 		try {
-			final var kivraResponse = kivraIntegration.getRegisteredLetterResponse(keyValue.responseKey(), tenant.getMunicipalityId(), tenant.getOrgNumber());
+			final var kivraResponse = kivraIntegration.getRegisteredLetterResponse(keyValue.responseKey(), tenantEntity);
 
 			final boolean updated = letterRepository.findByIdAndDeleted(kivraResponse.senderReference().internalId(), false)
 				.map(letterEntity -> updateLetter(kivraResponse, letterEntity))
 				.orElse(false);
 
 			if (updated) {
-				removeFromKivra(keyValue, tenant);
+				removeFromKivra(keyValue, tenantEntity);
 			}
 		} catch (final Exception e) {
 			// Log and swallow exception to not break the execution
@@ -112,13 +112,13 @@ public class SchedulerWorker {
 	/**
 	 * Removes post in Kivra after a successful update of the letter entity.
 	 *
-	 * @param keyValue object containing id of post in Kivra
-	 * @param tenant   the tenant whose Kivra account the response belongs to
+	 * @param keyValue     object containing id of post in Kivra
+	 * @param tenantEntity the tenant whose Kivra account the response belongs to
 	 */
-	private void removeFromKivra(final KeyValue keyValue, final TenantEntity tenant) {
+	private void removeFromKivra(final KeyValue keyValue, final TenantEntity tenantEntity) {
 		LOG.info("Deleting kivra response with key '{}'", keyValue.responseKey());
 		try {
-			kivraIntegration.deleteResponse(keyValue.responseKey(), tenant.getMunicipalityId(), tenant.getOrgNumber());
+			kivraIntegration.deleteResponse(keyValue.responseKey(), tenantEntity);
 		} catch (final Exception e) {
 			// Log and swallow exception to not break the execution
 			LOG.error("Error deleting kivra response with key '{}'", keyValue.responseKey(), e);

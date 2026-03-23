@@ -9,10 +9,12 @@ import se.sundsvall.dept44.exception.ServerProblem;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
+import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -32,13 +34,16 @@ public class KivraIntegration {
 	private final KivraClient kivraClient;
 	private final KivraMapper kivraMapper;
 	private final TenantService tenantService;
+	private final EncryptionUtility encryptionUtility;
 
 	public KivraIntegration(final KivraClient kivraClient,
 		final KivraMapper kivraMapper,
-		final TenantService tenantService) {
+		final TenantService tenantService,
+		final EncryptionUtility encryptionUtility) {
 		this.kivraClient = kivraClient;
 		this.kivraMapper = kivraMapper;
 		this.tenantService = tenantService;
+		this.encryptionUtility = encryptionUtility;
 	}
 
 	/**
@@ -102,34 +107,32 @@ public class KivraIntegration {
 		}
 	}
 
-	public List<KeyValue> getAllResponses(final String municipalityId, final String organizationNumber) {
-		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
+	public List<KeyValue> getAllResponses(final TenantEntity tenantEntity) {
 		try {
-			LOG.info("Retrieving all Kivra responses for organizationNumber: {}", organizationNumber);
+			LOG.info("Retrieving all Kivra responses for organizationNumber: {}", tenantEntity.getOrgNumber());
 
-			final var keyValues = ofNullable(kivraClient.getAllResponses(tenantKey)).orElse(emptyList());
+			final var keyValues = ofNullable(kivraClient.getAllResponses(encryptionUtility.decrypt(tenantEntity.getTenantKey()))).orElse(emptyList());
 			if (isEmpty(keyValues)) {
-				LOG.info("No Kivra responses found for organizationNumber: {}", organizationNumber);
+				LOG.info("No Kivra responses found for organizationNumber: {}", tenantEntity.getOrgNumber());
 			} else {
-				LOG.info("Successfully retrieved {} Kivra responses for organizationNumber: {}", keyValues.size(), organizationNumber);
+				LOG.info("Successfully retrieved {} Kivra responses for organizationNumber: {}", keyValues.size(), tenantEntity.getOrgNumber());
 			}
 
 			return keyValues;
 
 		} catch (final ServerProblem e) {
-			LOG.error("Server exception occurred when retrieving Kivra responses for organizationNumber: {}, exception message: {}", organizationNumber, e.getMessage(), e);
+			LOG.error("Server exception occurred when retrieving Kivra responses for organizationNumber: {}, exception message: {}", tenantEntity.getOrgNumber(), e.getMessage(), e);
 			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while retrieving Kivra responses");
 		} catch (final Exception e) {
-			LOG.error("Exception occurred when retrieving Kivra responses for organizationNumber: {}, exception message: {}", organizationNumber, e.getMessage(), e);
+			LOG.error("Exception occurred when retrieving Kivra responses for organizationNumber: {}, exception message: {}", tenantEntity.getOrgNumber(), e.getMessage(), e);
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while retrieving Kivra responses");
 		}
 	}
 
-	public RegisteredLetterResponse getRegisteredLetterResponse(final String responseKey, final String municipalityId, final String organizationNumber) {
-		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
+	public RegisteredLetterResponse getRegisteredLetterResponse(final String responseKey, final TenantEntity tenantEntity) {
 		try {
 			LOG.info("Retrieving Kivra registered letter response for responseKey: {}", responseKey);
-			return kivraClient.getResponseDetails(tenantKey, responseKey);
+			return kivraClient.getResponseDetails(encryptionUtility.decrypt(tenantEntity.getTenantKey()), responseKey);
 
 		} catch (final ServerProblem e) {
 			LOG.error("Server exception occurred when retrieving Kivra registered letter response for responseKey: {}, exception message: {}", responseKey, e.getMessage(), e);
@@ -140,11 +143,10 @@ public class KivraIntegration {
 		}
 	}
 
-	public void deleteResponse(final String responseKey, final String municipalityId, final String organizationNumber) {
-		final var tenantKey = tenantService.getDecryptedTenantKey(municipalityId, organizationNumber);
+	public void deleteResponse(final String responseKey, final TenantEntity tenantEntity) {
 		try {
 			LOG.info("Deleting Kivra response with key: {}", responseKey);
-			kivraClient.deleteResponse(tenantKey, responseKey);
+			kivraClient.deleteResponse(encryptionUtility.decrypt(tenantEntity.getTenantKey()), responseKey);
 			LOG.info("Kivra response with key {} deleted successfully", responseKey);
 
 		} catch (final ServerProblem e) {
