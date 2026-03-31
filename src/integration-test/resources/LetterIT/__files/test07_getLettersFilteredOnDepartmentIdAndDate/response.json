@@ -36,14 +36,14 @@
 			]
 		},
 		{
-			"id": "bd3d2128-0d5a-457c-8629-0da4ffea85d9",
+			"id": "4ace2698-7dea-4d0b-9c5d-eeac32c1b49a",
 			"subject": "This is the subject",
 			"municipalityId": "2281",
 			"status": "SENT",
 			"body": "body of message for muncipality 2281 and Dept 45 issued by user joe01doe",
 			"contentType": "text/plain",
-			"created": "2023-10-02T00:00:00+02:00",
-			"updated": "2023-10-02T00:00:00+02:00",
+			"created": "2023-10-01T00:00:00+02:00",
+			"updated": "2023-10-01T00:00:00+02:00",
 			"supportInfo": {
 				"supportText": "support text",
 				"contactInformationUrl": "https://example.com/support",
@@ -52,8 +52,8 @@
 			},
 			"attachments": [
 				{
-					"id": "074e60e5-9c4b-465f-8bbf-5cf904eed648",
-					"fileName": "attachment8.txt",
+					"id": "6484b8c1-41e8-4519-8b5c-2868fff67d6b",
+					"fileName": "attachment9.txt",
 					"contentType": "text/plain"
 				}
 			]
