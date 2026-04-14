@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import se.sundsvall.dept44.requestid.RequestId;
+import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Organization;
@@ -31,16 +33,20 @@ public class DigitalRegisteredLetterSendListener {
 	private final PostportalserviceIntegration postportalserviceIntegration;
 	private final LetterService letterService;
 	private final Publisher publisher;
+	private final Dept44HealthUtility dept44HealthUtility;
 
 	public DigitalRegisteredLetterSendListener(final PostportalserviceIntegration postportalserviceIntegration,
 		final LetterService letterService,
-		final Publisher publisher) {
+		final Publisher publisher,
+		final Dept44HealthUtility dept44HealthUtility) {
 		this.postportalserviceIntegration = postportalserviceIntegration;
 		this.letterService = letterService;
 		this.publisher = publisher;
+		this.dept44HealthUtility = dept44HealthUtility;
 	}
 
 	@RabbitListener(queues = Constants.SEND_DIGITAL_REGISTERED_LETTER_QUEUE)
+	@Transactional
 	public void handleEvent(final DigitalRegisteredLetterSendEvent event) throws IOException {
 		RequestId.init(event.requestId());
 		Identifier.set(Identifier.parse(event.sender().identifier()));
@@ -57,11 +63,17 @@ public class DigitalRegisteredLetterSendListener {
 			final var letterRequest = toLetterRequest(event);
 			final var letter = letterService.sendLetter(municipalityId, event.sender().organizationNumber(), letterRequest, attachments);
 
-			publisher.publishEvent(Queue.STATUS_DIGITAL_REGISTERED_LETTER, new DigitalRegisteredLetterStatusEvent(
-				event.recipientId(),
-				letter.id(),
-				"SENT",
-				null));
+			try {
+				publisher.publishEvent(Queue.STATUS_DIGITAL_REGISTERED_LETTER, new DigitalRegisteredLetterStatusEvent(
+					event.recipientId(),
+					letter.id(),
+					"SENT",
+					null));
+			} catch (final Exception e) {
+				var recipientId = sanitizeForLogging(event.recipientId());
+				LOG.error("Letter with id: {} was sent successfully but failed to publish status event for recipientId: {}", letter.id(), recipientId, e);
+				dept44HealthUtility.setHealthIndicatorUnhealthy("handleEvent", "Failed to publish status event for recipientId: %s".formatted(sanitizeForLogging(event.recipientId())));
+			}
 		} finally {
 			RequestId.reset();
 			Identifier.remove();

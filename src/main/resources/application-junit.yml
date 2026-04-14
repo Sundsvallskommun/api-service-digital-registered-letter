@@ -9,7 +9,7 @@ spring:
           initial-interval: 1000
           multiplier: 1.0
           max-interval: 1000
-          max-attempts: 3
+          max-retries: 3
         default-requeue-rejected: false
         auto-startup: false
   datasource:

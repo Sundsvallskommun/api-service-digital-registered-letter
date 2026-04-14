@@ -67,9 +67,9 @@ public class LetterService {
 
 	public Letter sendLetter(final String municipalityId, final String organizationNumber, final LetterRequest letterRequest, final List<AttachmentData> attachmentDataList) {
 		final var legalId = resolveLegalId(municipalityId, letterRequest);
-		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachmentDataList);
 		final var tenant = tenantRepository.findByMunicipalityIdAndOrgNumber(municipalityId, organizationNumber)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "No tenant found for municipalityId '%s' and organizationNumber '%s'".formatted(municipalityId, organizationNumber)));
+		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachmentDataList);
 		letterEntity.setTenant(tenant);
 		final var status = kivraIntegration.sendContent(letterEntity, legalId, municipalityId, organizationNumber);
 		repositoryIntegration.updateStatus(letterEntity, status);
