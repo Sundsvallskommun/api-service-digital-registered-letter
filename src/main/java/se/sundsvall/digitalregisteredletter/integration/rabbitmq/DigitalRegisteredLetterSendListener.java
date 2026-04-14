@@ -49,7 +49,7 @@ public class DigitalRegisteredLetterSendListener {
 	@Transactional
 	public void handleEvent(final DigitalRegisteredLetterSendEvent event) throws IOException {
 		RequestId.init(event.requestId());
-		Identifier.set(Identifier.parse(event.sender().identifier()));
+		Identifier.set(Identifier.parse("%s; type=adAccount".formatted(event.sender().identifier())));
 		LOG.info("Consumed event to send digital registered letter with recipientId: {} and municipalityId: {}", sanitizeForLogging(event.recipientId()), sanitizeForLogging(event.municipalityId()));
 
 		try {
