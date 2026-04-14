@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
+import se.sundsvall.digitalregisteredletter.service.model.AttachmentData;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
 import static java.util.Collections.emptyList;
@@ -20,18 +20,18 @@ public final class AttachmentMapper {
 		this.blobUtil = blobUtil;
 	}
 
-	public List<AttachmentEntity> toAttachmentEntities(final List<MultipartFile> attachments) {
+	public List<AttachmentEntity> toAttachmentEntities(final List<AttachmentData> attachments) {
 		return Optional.ofNullable(attachments).orElse(emptyList()).stream()
 			.map(this::toAttachmentEntity)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
-	public AttachmentEntity toAttachmentEntity(final MultipartFile multipartFile) {
-		return Optional.ofNullable(multipartFile)
-			.map(file -> new AttachmentEntity()
-				.withFileName(file.getOriginalFilename())
-				.withContentType(file.getContentType())
-				.withContent(blobUtil.convertToBlob(file)))
+	public AttachmentEntity toAttachmentEntity(final AttachmentData attachmentData) {
+		return Optional.ofNullable(attachmentData)
+			.map(data -> new AttachmentEntity()
+				.withFileName(data.filename())
+				.withContentType(data.contentType())
+				.withContent(blobUtil.convertToBlob(data.inputStream())))
 			.orElse(null);
 	}
 

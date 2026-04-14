@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
 import se.sundsvall.digitalregisteredletter.api.model.Letter.Attachment;
@@ -27,6 +26,7 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
 import se.sundsvall.digitalregisteredletter.integration.templating.TemplatingIntegration;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+import se.sundsvall.digitalregisteredletter.service.model.AttachmentData;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -65,9 +65,9 @@ public class LetterService {
 		this.templatingIntegration = templatingIntegration;
 	}
 
-	public Letter sendLetter(final String municipalityId, final String organizationNumber, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
+	public Letter sendLetter(final String municipalityId, final String organizationNumber, final LetterRequest letterRequest, final List<AttachmentData> attachmentDataList) {
 		final var legalId = resolveLegalId(municipalityId, letterRequest);
-		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachments);
+		final var letterEntity = repositoryIntegration.persistLetter(municipalityId, letterRequest, attachmentDataList);
 		final var tenant = tenantRepository.findByMunicipalityIdAndOrgNumber(municipalityId, organizationNumber)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "No tenant found for municipalityId '%s' and organizationNumber '%s'".formatted(municipalityId, organizationNumber)));
 		letterEntity.setTenant(tenant);

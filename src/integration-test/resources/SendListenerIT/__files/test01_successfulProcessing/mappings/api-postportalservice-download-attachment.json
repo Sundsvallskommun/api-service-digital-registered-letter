@@ -1,0 +1,14 @@
+{
+	"request": {
+		"method": "GET",
+		"url": "/postportalservice/2281/attachments/att-1"
+	},
+	"response": {
+		"headers": {
+			"Content-Type": "application/pdf",
+			"Content-Disposition": "attachment; filename=\"test.pdf\""
+		},
+		"base64Body": "VGVzdGluZyEgOik=",
+		"status": 200
+	}
+}

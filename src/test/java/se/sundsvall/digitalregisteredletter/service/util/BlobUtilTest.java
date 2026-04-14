@@ -1,10 +1,11 @@
 package se.sundsvall.digitalregisteredletter.service.util;
 
 import jakarta.persistence.EntityManager;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
-import org.hibernate.LobHelper;
 import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -13,14 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.problem.Problem;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -50,60 +47,33 @@ class BlobUtilTest {
 	}
 
 	@Test
-	void createBlob_OK() throws IOException {
-		final var spy = Mockito.spy(blobUtil);
-		final var multipartFile = Mockito.mock(MultipartFile.class);
+	void createBlob_OK() {
+		final var inputStream = new ByteArrayInputStream(new byte[123]);
 
-		when(multipartFile.getBytes()).thenReturn(new byte[123]);
+		final var result = blobUtil.createBlob(inputStream);
 
-		final var session = Mockito.mock(Session.class);
-		when(spy.getSession()).thenReturn(session);
-
-		final var lobHelper = Mockito.mock(LobHelper.class);
-		when(session.getLobHelper()).thenReturn(lobHelper);
-
-		final var blob = Mockito.mock(Blob.class);
-		when(lobHelper.createBlob(any(), eq(123L))).thenReturn(blob);
-
-		final var result = spy.createBlob(multipartFile);
-
-		assertThat(result).isEqualTo(blob);
-		verify(entityManagerMock).unwrap(any());
+		assertThat(result).isNotNull();
 	}
 
 	@Test
 	void createBlob_IOException() throws IOException {
 		final var spy = Mockito.spy(blobUtil);
-		final var multipartFile = Mockito.mock(MultipartFile.class);
-		when(multipartFile.getOriginalFilename()).thenReturn("TestFile.txt");
+		final var inputStream = Mockito.mock(InputStream.class);
 
-		when(multipartFile.getBytes()).thenThrow(new IOException("Test exception"));
+		when(inputStream.readAllBytes()).thenThrow(new IOException("Test exception"));
 
-		assertThatThrownBy(() -> spy.createBlob(multipartFile))
+		assertThatThrownBy(() -> spy.createBlob(inputStream))
 			.isInstanceOf(Problem.class)
-			.hasMessage("Internal Server Error: Could not convert file with name [ TestFile.txt ] to database object");
+			.hasMessage("Internal Server Error: Could not convert input stream to database object");
 	}
 
 	@Test
-	void convertToBlobTest() throws IOException {
-		final var spy = Mockito.spy(blobUtil);
-		final var multipartFile = Mockito.mock(MultipartFile.class);
+	void convertToBlobTest() {
+		final var inputStream = new ByteArrayInputStream(new byte[123]);
 
-		when(multipartFile.getBytes()).thenReturn(new byte[123]);
+		final var result = blobUtil.convertToBlob(inputStream);
 
-		final var session = Mockito.mock(Session.class);
-		when(spy.getSession()).thenReturn(session);
-
-		final var lobHelper = Mockito.mock(LobHelper.class);
-		when(session.getLobHelper()).thenReturn(lobHelper);
-
-		final var blob = Mockito.mock(Blob.class);
-		when(spy.createBlob(multipartFile)).thenReturn(blob);
-
-		final var result = spy.convertToBlob(multipartFile);
-
-		assertThat(result).isEqualTo(blob);
-		verify(entityManagerMock).unwrap(any());
+		assertThat(result).isNotNull();
 	}
 
 	@Test

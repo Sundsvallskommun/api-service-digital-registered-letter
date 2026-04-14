@@ -2,18 +2,18 @@ package se.sundsvall.digitalregisteredletter.service.util;
 
 import jakarta.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.Blob;
 import java.util.Base64;
 import java.util.Optional;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.problem.Problem;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.zalando.fauxpas.FauxPas.throwingFunction;
 
 @Component
 public class BlobUtil {
@@ -25,9 +25,9 @@ public class BlobUtil {
 		this.entityManager = entityManager;
 	}
 
-	public Blob convertToBlob(final MultipartFile multipartFile) {
-		return Optional.ofNullable(multipartFile)
-			.map(throwingFunction(this::createBlob))
+	public Blob convertToBlob(final InputStream inputStream) {
+		return Optional.ofNullable(inputStream)
+			.map(this::createBlob)
 			.orElse(null);
 	}
 
@@ -35,14 +35,14 @@ public class BlobUtil {
 		return entityManager.unwrap(Session.class);
 	}
 
-	Blob createBlob(final MultipartFile multipartFile) {
+	Blob createBlob(final InputStream inputStream) {
 		try {
-			final var fileBytes = multipartFile.getBytes();
-			final var inputStream = new ByteArrayInputStream(fileBytes);
-			return getSession().getLobHelper().createBlob(inputStream, fileBytes.length);
+			final var bytes = inputStream.readAllBytes();
+
+			return Hibernate.getLobHelper().createBlob(new ByteArrayInputStream(bytes), bytes.length);
 		} catch (final Exception e) {
-			LOG.warn("Failed to create Blob from MultipartFile: {}", e.getMessage(), e);
-			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert file with name [ %s ] to database object".formatted(multipartFile.getOriginalFilename()));
+			LOG.warn("Failed to create Blob from InputStream: {}", e.getMessage(), e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Could not convert input stream to database object");
 		}
 	}
 

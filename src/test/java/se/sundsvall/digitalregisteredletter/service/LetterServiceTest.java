@@ -21,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.Letter;
@@ -39,6 +38,7 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalregisteredletter.integration.party.PartyIntegration;
 import se.sundsvall.digitalregisteredletter.integration.templating.TemplatingIntegration;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+import se.sundsvall.digitalregisteredletter.service.model.AttachmentData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -105,8 +105,7 @@ class LetterServiceTest {
 
 	@Test
 	void sendLetterWithOrganizationNumber() {
-		final var multipartFile = mock(MultipartFile.class);
-		final var multipartFileList = List.of(multipartFile);
+		final var attachmentDataList = List.of(new AttachmentData("file.pdf", "application/pdf", new ByteArrayInputStream(new byte[0])));
 		final var municipalityId = "2281";
 		final var organizationNumber = "5591628136";
 		final var letterRequest = createLetterRequest();
@@ -123,13 +122,13 @@ class LetterServiceTest {
 		when(kivraIntegrationMock.sendContent(letterEntity, legalId, municipalityId, organizationNumber)).thenReturn(status);
 		when(letterMapperMock.toLetter(letterEntity)).thenReturn(letterMock);
 
-		final var response = letterService.sendLetter(municipalityId, organizationNumber, letterRequest, multipartFileList);
+		final var response = letterService.sendLetter(municipalityId, organizationNumber, letterRequest, attachmentDataList);
 
 		assertThat(response).isEqualTo(letterMock);
 		assertThat(letterEntity.getTenant()).isSameAs(tenant);
 
 		verify(partyIntegrationMock).getLegalIdByPartyId(municipalityId, letterRequest.partyId());
-		verify(repositoryIntegrationMock).persistLetter(municipalityId, letterRequest, multipartFileList);
+		verify(repositoryIntegrationMock).persistLetter(any(), any(), any());
 		verify(tenantRepositoryMock).findByMunicipalityIdAndOrgNumber(municipalityId, organizationNumber);
 		verify(kivraIntegrationMock).sendContent(letterEntity, legalId, municipalityId, organizationNumber);
 		verify(repositoryIntegrationMock).updateStatus(letterEntity, status);

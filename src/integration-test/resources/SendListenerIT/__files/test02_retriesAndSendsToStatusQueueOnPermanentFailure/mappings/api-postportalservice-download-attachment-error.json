@@ -1,0 +1,17 @@
+{
+	"request": {
+		"method": "GET",
+		"url": "/postportalservice/2281/attachments/att-1"
+	},
+	"response": {
+		"status": 500,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"title": "Internal Server Error",
+			"status": 500,
+			"detail": "Service unavailable"
+		}
+	}
+}

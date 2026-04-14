@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.digitalregisteredletter.api.model.LetterFilter;
 import se.sundsvall.digitalregisteredletter.api.model.LetterRequest;
@@ -17,6 +16,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEnt
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity;
 import se.sundsvall.digitalregisteredletter.service.mapper.AttachmentMapper;
 import se.sundsvall.digitalregisteredletter.service.mapper.LetterMapper;
+import se.sundsvall.digitalregisteredletter.service.model.AttachmentData;
 
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_NEW;
 
@@ -55,7 +55,7 @@ public class RepositoryIntegration {
 	 * @return                a persisted entity representation of the data that has been provided to the function
 	 */
 	@Transactional
-	public LetterEntity persistLetter(final String municipalityId, final LetterRequest letterRequest, final List<MultipartFile> attachments) {
+	public LetterEntity persistLetter(final String municipalityId, final LetterRequest letterRequest, final List<AttachmentData> attachments) {
 		final var letterEntity = letterMapper.toLetterEntity(letterRequest)
 			.withAttachments(attachmentMapper.toAttachmentEntities(attachments))
 			.withMunicipalityId(municipalityId)

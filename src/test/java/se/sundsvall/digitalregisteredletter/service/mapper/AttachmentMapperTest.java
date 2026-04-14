@@ -1,5 +1,7 @@
 package se.sundsvall.digitalregisteredletter.service.mapper;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.Blob;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -9,10 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.multipart.MultipartFile;
+import se.sundsvall.digitalregisteredletter.service.model.AttachmentData;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -33,14 +36,11 @@ class AttachmentMapperTest {
 	@Test
 	void toAttachmentEntities() {
 		final var blob = Mockito.mock(Blob.class);
-		final var multipartFile = Mockito.mock(MultipartFile.class);
-		when(multipartFile.getOriginalFilename()).thenReturn("file");
-		when(multipartFile.getContentType()).thenReturn("application/pdf");
-		when(blobUtil.convertToBlob(multipartFile)).thenReturn(blob);
+		final var inputStream = new ByteArrayInputStream(new byte[0]);
+		final var attachmentData = new AttachmentData("file", "application/pdf", inputStream);
+		when(blobUtil.convertToBlob(any(InputStream.class))).thenReturn(blob);
 
-		final var files = List.of(multipartFile, multipartFile);
-
-		final var attachmentEntities = attachmentMapper.toAttachmentEntities(files);
+		final var attachmentEntities = attachmentMapper.toAttachmentEntities(List.of(attachmentData, attachmentData));
 
 		assertThat(attachmentEntities).isNotNull().isNotEmpty().allSatisfy(attachment -> {
 			assertThat(attachment.getFileName()).isEqualTo("file");
@@ -52,12 +52,11 @@ class AttachmentMapperTest {
 	@Test
 	void toAttachmentEntity() {
 		final var blob = Mockito.mock(Blob.class);
-		final var multipartFile = Mockito.mock(MultipartFile.class);
-		when(multipartFile.getOriginalFilename()).thenReturn("file");
-		when(multipartFile.getContentType()).thenReturn("application/pdf");
-		when(blobUtil.convertToBlob(multipartFile)).thenReturn(blob);
+		final var inputStream = new ByteArrayInputStream(new byte[0]);
+		final var attachmentData = new AttachmentData("file", "application/pdf", inputStream);
+		when(blobUtil.convertToBlob(any(InputStream.class))).thenReturn(blob);
 
-		final var attachmentEntity = attachmentMapper.toAttachmentEntity(multipartFile);
+		final var attachmentEntity = attachmentMapper.toAttachmentEntity(attachmentData);
 
 		assertThat(attachmentEntity).isNotNull();
 		assertThat(attachmentEntity.getFileName()).isEqualTo("file");

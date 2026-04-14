@@ -36,6 +36,7 @@ import se.sundsvall.digitalregisteredletter.api.validation.NoDuplicateFileNames;
 import se.sundsvall.digitalregisteredletter.api.validation.ValidIdentifier;
 import se.sundsvall.digitalregisteredletter.api.validation.ValidPdf;
 import se.sundsvall.digitalregisteredletter.service.LetterService;
+import se.sundsvall.digitalregisteredletter.service.model.AttachmentData;
 
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.ALL_VALUE;
@@ -126,7 +127,10 @@ class LetterResource {
 		@RequestPart(name = "letterAttachments") @NoDuplicateFileNames @ValidPdf final List<MultipartFile> attachments) {
 		Identifier.set(Identifier.parse(xSentBy));
 
-		final var letter = letterService.sendLetter(municipalityId, organizationNumber, request, attachments);
+		final var attachmentDataList = attachments.stream()
+			.map(AttachmentData::from)
+			.toList();
+		final var letter = letterService.sendLetter(municipalityId, organizationNumber, request, attachmentDataList);
 
 		return created(fromPath("/{municipalityId}/{organizationNumber}/letters/{letterId}")
 			.buildAndExpand(municipalityId, organizationNumber, letter.id()).toUri())
