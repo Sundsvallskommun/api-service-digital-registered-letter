@@ -33,7 +33,7 @@ public record Letter(
 
 	@Schema(description = "Support information for the letter") SupportInfo supportInfo,
 
-	@ArraySchema(schema = @Schema(implementation = Attachment.class, description = "List of attachments for the letter")) List<Attachment> attachments){
+	@ArraySchema(schema = @Schema(implementation = Attachment.class, description = "List of attachments for the letter")) List<Attachment> attachments) {
 
 	@Builder
 	public record Attachment(

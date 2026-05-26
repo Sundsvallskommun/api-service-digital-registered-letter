@@ -24,10 +24,10 @@ public record LetterRequest(
 
 	@Valid @NotNull @Schema(description = "Information regarding the organizational unit sending the letter", requiredMode = REQUIRED) Organization organization,
 
-	@OneOf( {
+	@OneOf({
 		TEXT_PLAIN_VALUE, TEXT_HTML_VALUE
 	}) @Schema(description = "Content type of the letter body, e.g., 'text/plain' or 'text/html'", examples = "text/plain", requiredMode = REQUIRED) String contentType,
 
-	@NotBlank @Schema(description = "Body of the letter", examples = "This is the content of the letter. Plain-text body", requiredMode = REQUIRED) String body){
+	@NotBlank @Schema(description = "Body of the letter", examples = "This is the content of the letter. Plain-text body", requiredMode = REQUIRED) String body) {
 
 }

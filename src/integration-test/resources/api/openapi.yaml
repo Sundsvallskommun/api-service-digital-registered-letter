@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "3.1"
 servers:
-  - url: http://localhost:59007
+  - url: http://localhost:64724
     description: Generated server url
 tags:
   - name: Scheduler Resource
@@ -480,7 +480,7 @@ paths:
             format: int64
             description: Optional filter for matching organization id
             examples:
-              - "44"
+              - 44
         - name: username
           in: query
           description: Optional filter for matching username
@@ -759,16 +759,16 @@ components:
     Problem:
       type: object
       properties:
+        title:
+          type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
         type:
           type: string
           format: uri
-        title:
-          type: string
-        detail:
-          type: string
         status:
           type: integer
           format: int32
@@ -813,13 +813,13 @@ components:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        instance:
-          type: string
-          format: uri
         detail:
           type: string
         causeAsProblem:
           $ref: "#/components/schemas/ThrowableProblem"
+        instance:
+          type: string
+          format: uri
     ThrowableProblem:
       type: object
       properties:
@@ -891,7 +891,7 @@ components:
           format: int64
           description: Unique id for the organization
           examples:
-            - "44"
+            - 44
         name:
           type: string
           description: Readable name for the organization
@@ -1080,35 +1080,35 @@ components:
           format: int32
           description: Current page
           examples:
-            - "5"
+            - 5
           readOnly: true
         limit:
           type: integer
           format: int32
           description: Displayed objects per page
           examples:
-            - "20"
+            - 20
           readOnly: true
         count:
           type: integer
           format: int32
           description: Displayed objects on current page
           examples:
-            - "13"
+            - 13
           readOnly: true
         totalRecords:
           type: integer
           format: int64
           description: Total amount of hits based on provided search parameters
           examples:
-            - "98"
+            - 98
           readOnly: true
         totalPages:
           type: integer
           format: int32
           description: Total amount of pages based on provided search parameters
           examples:
-            - "23"
+            - 23
           readOnly: true
         sortBy:
           type: array
