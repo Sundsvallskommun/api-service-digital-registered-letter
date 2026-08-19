@@ -1,6 +1,7 @@
 package se.sundsvall.digitalregisteredletter.integration.kivra;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class KivraMapper {
 	 */
 	ContentUserV2.RegisteredLetter toRegisteredLetter(final String reference) {
 		return RegisteredLetterBuilder.create()
-			.withExpiresAt(OffsetDateTime.now().plusDays(30))
+			.withExpiresAt(OffsetDateTime.now(ZoneId.systemDefault()).plusDays(30))
 			.withSenderReference(new ContentUserV2.RegisteredLetter.SenderReference(reference))
 			.withHidden(createRegisteredLetterHidden())
 			.build();
