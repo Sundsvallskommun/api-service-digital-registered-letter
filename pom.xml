@@ -17,7 +17,7 @@
 		<generated-sources-java-path>src/main/java</generated-sources-java-path>
 		<openpdf.version>3.0.5</openpdf.version>
 		<org-apache-pdfbox.version>3.0.8</org-apache-pdfbox.version>
-		<jilt.version>1.9.1</jilt.version>
+		<jilt.version>1.9.2</jilt.version>
 	</properties>
 	<dependencies>
 		<dependency>
