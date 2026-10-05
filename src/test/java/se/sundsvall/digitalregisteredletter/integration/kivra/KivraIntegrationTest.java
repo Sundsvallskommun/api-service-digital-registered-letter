@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+import se.sundsvall.dept44.exception.ClientProblem;
 import se.sundsvall.dept44.exception.ServerProblem;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
@@ -17,6 +19,7 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValueBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponseBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.TenantV2Builder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
 import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
@@ -30,6 +33,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 import static se.sundsvall.TestDataFactory.NOW;
 import static se.sundsvall.digitalregisteredletter.Constants.STATUS_SENT;
@@ -41,6 +46,9 @@ class KivraIntegrationTest {
 	private static final String ENCRYPTED_TENANT_KEY = "encrypted-tenant-key";
 	private static final String MUNICIPALITY_ID = "2281";
 	private static final String ORGANIZATION_NUMBER = "5591628136";
+	private static final String VAT_NUMBER = "SE559162813601";
+	private static final String TENANT_NAME = "tenantName";
+	private static final String LEGAL_NAME = "tenantName";
 	private static final TenantEntity TENANT_ENTITY = TenantEntity.create()
 		.withMunicipalityId(MUNICIPALITY_ID)
 		.withOrgNumber(ORGANIZATION_NUMBER)
@@ -288,4 +296,74 @@ class KivraIntegrationTest {
 
 		verify(kivraClientMock).getTenantInformation();
 	}
+
+	@Test
+	void createTenantCreated() {
+		final var request = TenantV2Builder.create().withName(TENANT_NAME).build();
+		when(kivraMapperMock.toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER)).thenReturn(request);
+		when(kivraClientMock.createTenant(request)).thenReturn(ResponseEntity.status(CREATED).header("kivra-objkey", TENANT_KEY).body(request));
+
+		final var result = kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER);
+
+		assertThat(result).isEqualTo(TENANT_KEY);
+		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
+		verify(kivraClientMock).createTenant(request);
+	}
+
+	@Test
+	void createTenantMissingKeyHeader() {
+		final var request = TenantV2Builder.create().withName(TENANT_NAME).build();
+		when(kivraMapperMock.toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER)).thenReturn(request);
+		when(kivraClientMock.createTenant(request)).thenReturn(ResponseEntity.status(CREATED).body(request));
+
+		assertThatThrownBy(() -> kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER))
+			.isInstanceOf(Problem.class)
+			.hasMessage("Bad Gateway: kivra did not return a key");
+
+		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
+		verify(kivraClientMock).createTenant(request);
+	}
+
+	@Test
+	void createTenantKivraThrowsClientProblem() {
+		final var request = TenantV2Builder.create().withName(TENANT_NAME).build();
+		when(kivraMapperMock.toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER)).thenReturn(request);
+		when(kivraClientMock.createTenant(request)).thenThrow(new ClientProblem(CONFLICT, "Orgnumber already exist"));
+
+		assertThatThrownBy(() -> kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER))
+			.isInstanceOf(Problem.class)
+			.hasMessage("Bad Gateway: Could not create Kivra tenant: Orgnumber already exist");
+
+		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
+		verify(kivraClientMock).createTenant(request);
+	}
+
+	@Test
+	void createTenantKivraThrowsServerProblem() {
+		final var request = TenantV2Builder.create().withName(TENANT_NAME).build();
+		when(kivraMapperMock.toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER)).thenReturn(request);
+		when(kivraClientMock.createTenant(request)).thenThrow(new ServerProblem(NOT_IMPLEMENTED, "Damn you Salazar"));
+
+		assertThatThrownBy(() -> kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER))
+			.isInstanceOf(Problem.class)
+			.hasMessageStartingWith("Bad Gateway: Server exception occurred while creating Kivra tenant");
+
+		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
+		verify(kivraClientMock).createTenant(request);
+	}
+
+	@Test
+	void createTenantThrowsUnexpectedException() {
+		final var request = TenantV2Builder.create().withName(TENANT_NAME).build();
+		when(kivraMapperMock.toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER)).thenReturn(request);
+		when(kivraClientMock.createTenant(request)).thenThrow(new RuntimeException("boom"));
+
+		assertThatThrownBy(() -> kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER))
+			.isInstanceOf(Problem.class)
+			.hasMessageStartingWith("Internal Server Error: Exception occurred while creating Kivra tenant");
+
+		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
+		verify(kivraClientMock).createTenant(request);
+	}
+
 }

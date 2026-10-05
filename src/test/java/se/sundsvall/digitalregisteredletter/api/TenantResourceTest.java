@@ -12,8 +12,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.digitalregisteredletter.Application;
+import se.sundsvall.digitalregisteredletter.api.model.KivraTenantRequestBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.Tenant;
 import se.sundsvall.digitalregisteredletter.api.model.TenantBuilder;
+import se.sundsvall.digitalregisteredletter.service.KivraTenantService;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +34,9 @@ class TenantResourceTest {
 
 	@MockitoBean
 	private TenantService tenantServiceMock;
+
+	@MockitoBean
+	private KivraTenantService kivraTenantService;
 
 	@Autowired
 	private WebTestClient webTestClient;
@@ -130,4 +135,27 @@ class TenantResourceTest {
 
 		verify(tenantServiceMock).deleteTenant(MUNICIPALITY_ID, id);
 	}
+
+	@Test
+	void createKivraTenant() {
+		final var id = UUID.randomUUID().toString();
+		final var request = KivraTenantRequestBuilder.create()
+			.withName("Department 44")
+			.withLegalName("Department 44 ab")
+			.withOrgNumber("5591628136")
+			.build();
+
+		when(kivraTenantService.createKivraTenant(MUNICIPALITY_ID, request)).thenReturn(id);
+
+		webTestClient.post()
+			.uri("/%s/tenants/kivra".formatted(MUNICIPALITY_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isCreated()
+			.expectHeader().valueEquals("Location", "/%s/tenants/%s".formatted(MUNICIPALITY_ID, id))
+			.expectBody().isEmpty();
+		verify(kivraTenantService).createKivraTenant(MUNICIPALITY_ID, request);
+	}
+
 }

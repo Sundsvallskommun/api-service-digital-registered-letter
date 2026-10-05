@@ -156,4 +156,24 @@ class KivraMapperTest {
 		});
 
 	}
+
+	@Test
+	void toCreateTenantRequestWithLegalName() {
+		final var result = kivraMapper.toCreateTenantRequest("Sundsvall Energi", "Sundsvall Energi AB", "SE559162813601");
+
+		assertThat(result).isNotNull();
+		assertThat(result.name()).isEqualTo("Sundsvall Energi");
+		assertThat(result.companyIds()).hasSize(1).first().satisfies(companyId -> {
+			assertThat(companyId.name()).isEqualTo("Sundsvall Energi AB");
+			assertThat(companyId.orgNr()).isEqualTo("SE559162813601");
+		});
+	}
+
+	@Test
+	void toCreateTenantRequestFallsBackToNameWhenLegalNameIsBlank() {
+		final var result = kivraMapper.toCreateTenantRequest("Sundsvalls kommun", "   ", "SE212000241101");
+
+		assertThat(result.companyIds()).hasSize(1).first()
+			.satisfies(companyId -> assertThat(companyId.name()).isEqualTo("Sundsvalls kommun"));
+	}
 }
