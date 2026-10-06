@@ -163,16 +163,18 @@ public class KivraIntegration {
 	public String createTenant(final String name, final String legalName, final String orgNumber) {
 		final ResponseEntity<TenantV2> response;
 		try {
+			LOG.info("Creating Kivra tenant for orgNumber: {}", orgNumber);
 			response = kivraClient.createTenant(kivraMapper.toCreateTenantRequest(name, legalName, convertToVAT(orgNumber)));
+			LOG.info("Kivra tenant created successfully for orgNumber: {}", orgNumber);
 		} catch (final ClientProblem e) {
-			LOG.error("Client error when creating Kivra tenant for orgNumber: {}", orgNumber, e);
-			throw Problem.valueOf(BAD_GATEWAY, "Could not create Kivra tenant: " + e.getDetail());
+			LOG.error("Client error when creating Kivra tenant for orgNumber: {}, exception message: {}", orgNumber, e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Could not create Kivra tenant: " + orgNumber);
 		} catch (final ServerProblem e) {
-			LOG.error("Server error when creating Kivra tenant for orgNumber: {}", orgNumber, e);
-			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while creating Kivra tenant: " + e.getMessage());
+			LOG.error("Server exception occurred when creating Kivra tenant for orgNumber: {}, exception message: {}", orgNumber, e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while creating Kivra tenant: " + orgNumber);
 		} catch (final Exception e) {
-			LOG.error("Exception error when creating Kivra tenant for orgNumber: {}", orgNumber, e);
-			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while creating Kivra tenant: " + e.getMessage());
+			LOG.error("Exception occurred when creating Kivra tenant for orgNumber: {}, exception message: {}", orgNumber, e.getMessage(), e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while creating Kivra tenant: " + orgNumber);
 		}
 
 		final var tenantKey = response.getHeaders().getFirst("kivra-objkey");

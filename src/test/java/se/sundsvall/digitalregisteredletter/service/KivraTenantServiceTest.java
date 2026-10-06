@@ -27,8 +27,6 @@ class KivraTenantServiceTest {
 	private static final String MUNICIPALITY_ID = "2281";
 	private static final String ORG_NUMBER = "5591628136";
 	private static final String NAME = "Department 44";
-//	private static final String LEGAL_NAME = "Department 44 AB";
-//	private static final String TENANT_KEY = "some-tenant-key";
 	private static final String ID = "cb20c51f-fcf3-42c0-b613-de563634a8ec";
 
 	@Mock
@@ -50,7 +48,6 @@ class KivraTenantServiceTest {
 
 	@Test
 	void createKivraTenantAlreadyExists() {
-		// Setup
 		final var request = KivraTenantRequestBuilder.create()
 			.withName(NAME)
 			.withOrgNumber(ORG_NUMBER)
@@ -60,10 +57,8 @@ class KivraTenantServiceTest {
 			.withOrgNumber(ORG_NUMBER)
 			.withMunicipalityId(MUNICIPALITY_ID);
 
-		// Mock
 		when(tenantRepositoryMock.findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, ORG_NUMBER)).thenReturn(Optional.of(existingEntity));
 
-		// Act & Verify
 		assertThatThrownBy(() -> kivraTenantService.createKivraTenant(MUNICIPALITY_ID, request))
 			.isInstanceOf(ThrowableProblem.class)
 			.hasFieldOrPropertyWithValue("status", CONFLICT)

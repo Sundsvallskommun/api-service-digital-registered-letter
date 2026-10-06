@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
@@ -19,6 +18,7 @@ import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +46,7 @@ class KivraMapperTest {
 		var subject = "Test Subject";
 		var letterId = "letterId";
 		var legalId = "1234567890";
-		var blob = Mockito.mock(Blob.class);
+		var blob = mock(Blob.class);
 		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
 		var attachment = new AttachmentEntity()
 			.withContentType("text/plain")
@@ -110,7 +110,7 @@ class KivraMapperTest {
 
 	@Test
 	void toPartsResponsivesTest() throws SQLException {
-		var blob = Mockito.mock(Blob.class);
+		var blob = mock(Blob.class);
 		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
 		var attachment1 = new AttachmentEntity()
 			.withContentType("text/plain")
@@ -138,7 +138,7 @@ class KivraMapperTest {
 
 	@Test
 	void toPartsResponsiveTest() throws SQLException {
-		var blob = Mockito.mock(Blob.class);
+		var blob = mock(Blob.class);
 		when(blob.getBytes(1, (int) blob.length())).thenReturn("test".getBytes());
 		var attachment = new AttachmentEntity()
 			.withContentType("text/plain")

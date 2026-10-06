@@ -332,7 +332,7 @@ class KivraIntegrationTest {
 
 		assertThatThrownBy(() -> kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER))
 			.isInstanceOf(Problem.class)
-			.hasMessage("Bad Gateway: Could not create Kivra tenant: Orgnumber already exist");
+			.hasMessage("Bad Gateway: Could not create Kivra tenant: %s", ORGANIZATION_NUMBER);
 
 		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
 		verify(kivraClientMock).createTenant(request);
@@ -346,7 +346,7 @@ class KivraIntegrationTest {
 
 		assertThatThrownBy(() -> kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER))
 			.isInstanceOf(Problem.class)
-			.hasMessageStartingWith("Bad Gateway: Server exception occurred while creating Kivra tenant");
+			.hasMessage("Bad Gateway: Server exception occurred while creating Kivra tenant: %s", ORGANIZATION_NUMBER);
 
 		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
 		verify(kivraClientMock).createTenant(request);
@@ -360,7 +360,7 @@ class KivraIntegrationTest {
 
 		assertThatThrownBy(() -> kivraIntegration.createTenant(TENANT_NAME, LEGAL_NAME, ORGANIZATION_NUMBER))
 			.isInstanceOf(Problem.class)
-			.hasMessageStartingWith("Internal Server Error: Exception occurred while creating Kivra tenant");
+			.hasMessage("Internal Server Error: Exception occurred while creating Kivra tenant: %s", ORGANIZATION_NUMBER);
 
 		verify(kivraMapperMock).toCreateTenantRequest(TENANT_NAME, LEGAL_NAME, VAT_NUMBER);
 		verify(kivraClientMock).createTenant(request);
