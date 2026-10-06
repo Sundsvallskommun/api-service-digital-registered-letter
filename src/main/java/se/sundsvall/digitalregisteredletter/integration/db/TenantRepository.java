@@ -14,4 +14,7 @@ public interface TenantRepository extends JpaRepository<TenantEntity, String> {
 	Optional<TenantEntity> findByMunicipalityIdAndOrgNumber(final String municipalityId, final String orgNumber);
 
 	List<TenantEntity> findAllByMunicipalityId(final String municipalityId);
+
+	boolean existsByMunicipalityIdAndOrgNumber(final String municipalityId, final String orgNumber);
+
 }

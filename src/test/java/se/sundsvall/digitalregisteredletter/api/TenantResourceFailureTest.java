@@ -11,6 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.problem.violations.Violation;
 import se.sundsvall.digitalregisteredletter.Application;
+import se.sundsvall.digitalregisteredletter.api.model.KivraTenantRequestBuilder;
 import se.sundsvall.digitalregisteredletter.api.model.TenantBuilder;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
 
@@ -214,5 +215,70 @@ class TenantResourceFailureTest {
 		assertThat(response.getViolations())
 			.extracting(Violation::field, Violation::message)
 			.containsExactly(tuple("deleteTenant.id", "not a valid UUID"));
+	}
+
+	@Test
+	void createKivraTenantInvalidMunicipalityId() {
+		final var request = KivraTenantRequestBuilder.create()
+			.withName("Department 44")
+			.withOrgNumber("5591628136")
+			.build();
+
+		final var response = webTestClient.post()
+			.uri("/%s/tenants/kivra".formatted(INVALID_MUNICIPALITY_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::field, Violation::message)
+			.containsExactly(tuple("createKivraTenant.municipalityId", "not a valid municipality ID"));
+	}
+
+	@Test
+	void createKivraTenantInvalidOrgNumber() {
+		final var request = KivraTenantRequestBuilder.create()
+			.withName("Department 44")
+			.withLegalName("Department 44 av")
+			.withOrgNumber("invalidOrgNumber")
+			.build();
+
+		final var response = webTestClient.post()
+			.uri("/%s/tenants/kivra".formatted(MUNICIPALITY_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::field)
+			.containsExactly("orgNumber");
+	}
+
+	@Test
+	void createKivraTenantEmptyBody() {
+		final var response = webTestClient.post()
+			.uri("/%s/tenants/kivra".formatted(MUNICIPALITY_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(KivraTenantRequestBuilder.create().build())
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::field)
+			.contains("name", "orgNumber");
 	}
 }

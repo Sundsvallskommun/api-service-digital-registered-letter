@@ -1,5 +1,6 @@
 package se.sundsvall.digitalregisteredletter.api;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,7 +23,9 @@ import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
+import se.sundsvall.digitalregisteredletter.api.model.KivraTenantRequest;
 import se.sundsvall.digitalregisteredletter.api.model.Tenant;
+import se.sundsvall.digitalregisteredletter.service.KivraTenantService;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
 
 import static org.springframework.http.MediaType.ALL_VALUE;
@@ -44,9 +47,11 @@ import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 class TenantResource {
 
 	private final TenantService tenantService;
+	private final KivraTenantService kivraTenantService;
 
-	TenantResource(final TenantService tenantService) {
+	TenantResource(final TenantService tenantService, final KivraTenantService kivraTenantService) {
 		this.tenantService = tenantService;
+		this.kivraTenantService = kivraTenantService;
 	}
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
@@ -111,5 +116,17 @@ class TenantResource {
 
 		tenantService.deleteTenant(municipalityId, id);
 		return noContent().build();
+	}
+
+	@Hidden
+	@PostMapping(value = "/kivra", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
+	@Operation(summary = "Creates a tenant in Kivra", description = "Creates a tenant in Kivra and registers it in DRL")
+	ResponseEntity<Void> createKivraTenant(
+		@PathVariable @ValidMunicipalityId final String municipalityId,
+		@RequestBody @Valid final KivraTenantRequest request) {
+		final var id = kivraTenantService.createKivraTenant(municipalityId, request);
+		return created(fromPath("/{municipalityId}/tenants/{id}")
+			.buildAndExpand(municipalityId, id).toUri())
+			.build();
 	}
 }

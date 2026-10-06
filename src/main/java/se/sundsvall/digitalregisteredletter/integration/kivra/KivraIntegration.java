@@ -3,6 +3,7 @@ package se.sundsvall.digitalregisteredletter.integration.kivra;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import se.sundsvall.dept44.exception.ClientProblem;
 import se.sundsvall.dept44.exception.ServerProblem;
@@ -12,6 +13,7 @@ import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.TenantV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.TenantService;
 import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
@@ -158,7 +160,37 @@ public class KivraIntegration {
 		}
 	}
 
+	public String createTenant(final String name, final String legalName, final String orgNumber) {
+		final ResponseEntity<TenantV2> response;
+		try {
+			LOG.info("Creating Kivra tenant for orgNumber: {}", orgNumber);
+			response = kivraClient.createTenant(kivraMapper.toCreateTenantRequest(name, legalName, convertToVAT(orgNumber)));
+			LOG.info("Kivra tenant created successfully for orgNumber: {}", orgNumber);
+		} catch (final ClientProblem e) {
+			LOG.error("Client error when creating Kivra tenant for orgNumber: {}, exception message: {}", orgNumber, e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Could not create Kivra tenant: " + orgNumber);
+		} catch (final ServerProblem e) {
+			LOG.error("Server exception occurred when creating Kivra tenant for orgNumber: {}, exception message: {}", orgNumber, e.getMessage(), e);
+			throw Problem.valueOf(BAD_GATEWAY, "Server exception occurred while creating Kivra tenant: " + orgNumber);
+		} catch (final Exception e) {
+			LOG.error("Exception occurred when creating Kivra tenant for orgNumber: {}, exception message: {}", orgNumber, e.getMessage(), e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Exception occurred while creating Kivra tenant: " + orgNumber);
+		}
+
+		final var tenantKey = response.getHeaders().getFirst("kivra-objkey");
+		if (tenantKey == null) {
+			throw Problem.valueOf(BAD_GATEWAY, "kivra did not return a key");
+		}
+		LOG.info("Kivra tenant for orgNumber '{}': {}", orgNumber, response.getStatusCode().value());
+		return tenantKey;
+	}
+
 	public void healthCheck() {
 		kivraClient.getTenantInformation();
+	}
+
+	// Kivra wants the organization number in VAT format
+	private String convertToVAT(final String orgNumber) {
+		return "SE" + orgNumber + "01";
 	}
 }

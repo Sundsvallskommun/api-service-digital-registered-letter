@@ -6,6 +6,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -136,5 +137,33 @@ class TenantIT extends AbstractAppTest {
 			.withExpectedResponseStatus(NOT_FOUND)
 			.withExpectedResponse(RESPONSE)
 			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test09_createKivraTenant(){
+		setupCall()
+				.withServicePath("/" + MUNICIPALITY_ID + "/tenants/kivra")
+				.withHttpMethod(POST)
+				.withRequest(REQUEST)
+				.withExpectedResponseStatus(CREATED)
+				.withExpectedResponseHeader(LOCATION, List.of("/" + MUNICIPALITY_ID + "/tenants/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+				.withExpectedResponseBodyIsNull()
+				.sendRequestAndVerifyResponse();
+
+		assertThat(tenantRepository.findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, "2120002411"))
+				.isPresent()
+				.hasValueSatisfying(entity -> assertThat(entity.getTenantKey()).isNotEqualTo("new-kivra-tenant-key")); // stored encrypted
+
+	}
+
+	@Test
+	void test10_createKivraTenantAlreadyExists(){
+		setupCall()
+				.withServicePath("/" + MUNICIPALITY_ID + "/tenants/kivra")
+				.withHttpMethod(POST)
+				.withRequest(REQUEST)
+				.withExpectedResponseStatus(CONFLICT)
+				.withExpectedResponse(RESPONSE)
+				.sendRequestAndVerifyResponse();
 	}
 }

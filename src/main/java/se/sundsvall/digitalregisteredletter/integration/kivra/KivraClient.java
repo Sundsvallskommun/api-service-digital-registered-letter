@@ -3,6 +3,7 @@ package se.sundsvall.digitalregisteredletter.integration.kivra;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUser;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.KeyValue;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterResponse;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.TenantV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 
 import static org.springframework.http.MediaType.ALL_VALUE;
@@ -90,5 +92,8 @@ public interface KivraClient {
 	 */
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	void getTenantInformation();
+
+	@PostMapping(value = "/v2/tenant", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	ResponseEntity<TenantV2> createTenant(@RequestBody final TenantV2 tenant);
 
 }

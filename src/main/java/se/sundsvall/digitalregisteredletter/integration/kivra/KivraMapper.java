@@ -4,19 +4,23 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import se.sundsvall.digitalregisteredletter.integration.db.model.AttachmentEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.CompanyIdBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.ContentUserV2Builder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.PartsResponsiveBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterBuilder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.RegisteredLetterHiddenBuilder;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.TenantV2;
+import se.sundsvall.digitalregisteredletter.integration.kivra.model.TenantV2Builder;
 import se.sundsvall.digitalregisteredletter.integration.kivra.model.UserMatchV2SSN;
 import se.sundsvall.digitalregisteredletter.service.util.BlobUtil;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 
 @Component
 public class KivraMapper {
@@ -71,7 +75,7 @@ public class KivraMapper {
 	}
 
 	List<ContentUserV2.PartsResponsive> toPartsResponsives(final List<AttachmentEntity> entities) {
-		return Optional.ofNullable(entities).orElse(emptyList()).stream()
+		return ofNullable(entities).orElse(emptyList()).stream()
 			.map(this::toPartsResponsive)
 			.filter(Objects::nonNull)
 			.toList();
@@ -85,11 +89,20 @@ public class KivraMapper {
 	 *                          content type,
 	 */
 	ContentUserV2.PartsResponsive toPartsResponsive(final AttachmentEntity attachmentEntity) {
-		return Optional.ofNullable(attachmentEntity).map(attachment -> PartsResponsiveBuilder.create()
+		return ofNullable(attachmentEntity).map(attachment -> PartsResponsiveBuilder.create()
 			.withName(attachment.getFileName())
 			.withData(blobUtil.convertBlobToBase64String(attachment.getContent()))
 			.withContentType(attachment.getContentType())
 			.build())
 			.orElse(null);
+	}
+
+	TenantV2 toCreateTenantRequest(final String name, final String legalName, final String orgNr) {
+		return TenantV2Builder.create()
+			.withName(name)
+			.withCompanyIds(List.of(CompanyIdBuilder.create()
+				.withName(StringUtils.defaultIfBlank(legalName, name))
+				.withOrgNr(orgNr).build()))
+			.build();
 	}
 }
