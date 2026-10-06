@@ -49,7 +49,7 @@ class TenantResource {
 	private final TenantService tenantService;
 	private final KivraTenantService kivraTenantService;
 
-	TenantResource(final TenantService tenantService, KivraTenantService kivraTenantService) {
+	TenantResource(final TenantService tenantService, final KivraTenantService kivraTenantService) {
 		this.tenantService = tenantService;
 		this.kivraTenantService = kivraTenantService;
 	}

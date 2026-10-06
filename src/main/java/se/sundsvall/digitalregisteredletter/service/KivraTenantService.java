@@ -23,7 +23,7 @@ public class KivraTenantService {
 
 	public String createKivraTenant(final String municipalityId, final KivraTenantRequest kivraTenantRequest) {
 		final var orgNumber = kivraTenantRequest.orgNumber();
-		if (tenantRepository.findByMunicipalityIdAndOrgNumber(municipalityId, orgNumber).isPresent()) {
+		if (tenantRepository.existsByMunicipalityIdAndOrgNumber(municipalityId, orgNumber)) {
 			throw Problem.valueOf(CONFLICT, "Tenant with orgNumber '%s' already exists for municipalityId '%s'".formatted(orgNumber, municipalityId));
 		}
 		final var tenantKey = kivraIntegration.createTenant(kivraTenantRequest.name(), kivraTenantRequest.legalName(), orgNumber);
