@@ -1,8 +1,5 @@
 package se.sundsvall.digitalregisteredletter.apptest;
 
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.OK;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +11,9 @@ import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalregisteredletter.Application;
 import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
+
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.OK;
 
 @WireMockAppTestSuite(files = "classpath:/EligibilityIT/", classes = Application.class)
 @Sql({
