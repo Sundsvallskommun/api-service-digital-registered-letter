@@ -1,9 +1,5 @@
 package se.sundsvall.digitalregisteredletter.apptest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.OK;
-
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +15,10 @@ import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.model.SigningInformationEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.TenantEntity;
 import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.OK;
 
 @WireMockAppTestSuite(files = "classpath:/SchedulerIT/", classes = Application.class)
 @Sql({
