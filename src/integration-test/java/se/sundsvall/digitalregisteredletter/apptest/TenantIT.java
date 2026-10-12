@@ -1,5 +1,14 @@
 package se.sundsvall.digitalregisteredletter.apptest;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import se.sundsvall.dept44.test.AbstractAppTest;
+import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
+import se.sundsvall.digitalregisteredletter.Application;
+import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.HttpMethod.DELETE;
@@ -11,15 +20,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
-import se.sundsvall.dept44.test.AbstractAppTest;
-import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
-import se.sundsvall.digitalregisteredletter.Application;
-import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 
 @WireMockAppTestSuite(files = "classpath:/TenantIT/", classes = Application.class)
 @Sql({
@@ -140,30 +140,30 @@ class TenantIT extends AbstractAppTest {
 	}
 
 	@Test
-	void test09_createKivraTenant(){
+	void test09_createKivraTenant() {
 		setupCall()
-				.withServicePath("/" + MUNICIPALITY_ID + "/tenants/kivra")
-				.withHttpMethod(POST)
-				.withRequest(REQUEST)
-				.withExpectedResponseStatus(CREATED)
-				.withExpectedResponseHeader(LOCATION, List.of("/" + MUNICIPALITY_ID + "/tenants/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
-				.withExpectedResponseBodyIsNull()
-				.sendRequestAndVerifyResponse();
+			.withServicePath("/" + MUNICIPALITY_ID + "/tenants/kivra")
+			.withHttpMethod(POST)
+			.withRequest(REQUEST)
+			.withExpectedResponseStatus(CREATED)
+			.withExpectedResponseHeader(LOCATION, List.of("/" + MUNICIPALITY_ID + "/tenants/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+			.withExpectedResponseBodyIsNull()
+			.sendRequestAndVerifyResponse();
 
 		assertThat(tenantRepository.findByMunicipalityIdAndOrgNumber(MUNICIPALITY_ID, "2120002411"))
-				.isPresent()
-				.hasValueSatisfying(entity -> assertThat(entity.getTenantKey()).isNotEqualTo("new-kivra-tenant-key")); // stored encrypted
+			.isPresent()
+			.hasValueSatisfying(entity -> assertThat(entity.getTenantKey()).isNotEqualTo("new-kivra-tenant-key")); // stored encrypted
 
 	}
 
 	@Test
-	void test10_createKivraTenantAlreadyExists(){
+	void test10_createKivraTenantAlreadyExists() {
 		setupCall()
-				.withServicePath("/" + MUNICIPALITY_ID + "/tenants/kivra")
-				.withHttpMethod(POST)
-				.withRequest(REQUEST)
-				.withExpectedResponseStatus(CONFLICT)
-				.withExpectedResponse(RESPONSE)
-				.sendRequestAndVerifyResponse();
+			.withServicePath("/" + MUNICIPALITY_ID + "/tenants/kivra")
+			.withHttpMethod(POST)
+			.withRequest(REQUEST)
+			.withExpectedResponseStatus(CONFLICT)
+			.withExpectedResponse(RESPONSE)
+			.sendRequestAndVerifyResponse();
 	}
 }

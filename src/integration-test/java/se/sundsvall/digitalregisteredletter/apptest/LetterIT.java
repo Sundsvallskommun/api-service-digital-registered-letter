@@ -1,15 +1,5 @@
 package se.sundsvall.digitalregisteredletter.apptest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpHeaders.LOCATION;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +17,16 @@ import se.sundsvall.digitalregisteredletter.integration.db.OrganizationRepositor
 import se.sundsvall.digitalregisteredletter.integration.db.TenantRepository;
 import se.sundsvall.digitalregisteredletter.integration.db.UserRepository;
 import se.sundsvall.digitalregisteredletter.service.util.EncryptionUtility;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.LOCATION;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 
 @WireMockAppTestSuite(files = "classpath:/LetterIT/", classes = Application.class)
 @Sql({
