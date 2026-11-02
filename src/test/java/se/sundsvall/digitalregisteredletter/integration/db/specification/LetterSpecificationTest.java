@@ -118,10 +118,10 @@ class LetterSpecificationTest {
 
 	@ParameterizedTest
 	@CsvSource({
-		"2026-01-15, 2026-01-15T00:00+01:00", // vintertid
-		"2026-07-15, 2026-07-15T00:00+02:00", // sommartid
-		"2026-03-29, 2026-03-29T00:00+01:00", // sommartid börjar
-		"2026-10-25, 2026-10-25T00:00+02:00"  // sommartid slutar
+		"2026-01-15, 2026-01-15T00:00+01:00", // wintertime(standard time)
+		"2026-07-15, 2026-07-15T00:00+02:00", // summertime
+		"2026-03-29, 2026-03-29T00:00+01:00", // summertime starts
+		"2026-10-25, 2026-10-25T00:00+02:00"  // summertime ends
 	})
 	void withCreatedEqualOrAfterUsesStartOfDay(final LocalDate date, final OffsetDateTime expectedLowerBound) {
 		doReturn(pathMock).when(rootMock).get(LetterEntity_.CREATED);
@@ -134,10 +134,10 @@ class LetterSpecificationTest {
 
 	@ParameterizedTest
 	@CsvSource({
-		"2026-01-15, 2026-01-16T00:00+01:00", // vintertid
-		"2026-07-15, 2026-07-16T00:00+02:00", // sommartid
-		"2026-03-29, 2026-03-30T00:00+02:00", // sommartid börjar
-		"2026-10-25, 2026-10-26T00:00+01:00"  // sommartid slutar
+		"2026-01-15, 2026-01-16T00:00+01:00", // wintertime(standard)
+		"2026-07-15, 2026-07-16T00:00+02:00", // summertime
+		"2026-03-29, 2026-03-30T00:00+02:00", // summertime starts
+		"2026-10-25, 2026-10-26T00:00+01:00"  // summertime ends
 	})
 	void withCreatedEqualOrBeforeUsesStartOfNextDayExclusive(LocalDate date, OffsetDateTime expectedUpperBound) {
 		doReturn(pathMock).when(rootMock).get(LetterEntity_.CREATED);
