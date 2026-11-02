@@ -1,18 +1,20 @@
 package se.sundsvall.digitalregisteredletter.integration.db.specification;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import org.springframework.data.jpa.domain.Specification;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity;
 import se.sundsvall.digitalregisteredletter.integration.db.model.LetterEntity_;
 import se.sundsvall.digitalregisteredletter.integration.db.model.OrganizationEntity_;
 import se.sundsvall.digitalregisteredletter.integration.db.model.UserEntity_;
 
-import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.ofNullable;
 
 public class LetterSpecification {
 
 	private static final SpecificationBuilder<LetterEntity> BUILDER = new SpecificationBuilder<>();
+	private static final ZoneId ZONE = ZoneId.of("Europe/Stockholm");
 
 	private LetterSpecification() {
 		// To prevent instantiation
@@ -68,11 +70,8 @@ public class LetterSpecification {
 	 * @return       a specification that compares the creation date to the provided value (or match all if value is not
 	 *               provided)
 	 */
-	public static Specification<LetterEntity> withCreatedEqualOrAfter(final OffsetDateTime value) {
-		return BUILDER.buildDateIsEqualOrAfterFilter(LetterEntity_.CREATED,
-			ofNullable(value)
-				.map(odt -> odt.truncatedTo(DAYS))
-				.orElse(null));
+	public static Specification<LetterEntity> withCreatedEqualOrAfter(final LocalDate value) {
+		return BUILDER.buildDateIsEqualOrAfterFilter(LetterEntity_.CREATED, startOfDay(value));
 	}
 
 	/**
@@ -82,12 +81,15 @@ public class LetterSpecification {
 	 * @return       a specification that compares the creation date to the provided value (or match all if value is not
 	 *               provided)
 	 */
-	public static Specification<LetterEntity> withCreatedEqualOrBefore(final OffsetDateTime value) {
-		return BUILDER.buildDateIsEqualOrBeforeFilter(LetterEntity_.CREATED,
-			ofNullable(value)
-				.map(odt -> odt.truncatedTo(DAYS))
-				.map(odt -> odt.plusDays(1))
-				.map(odt -> odt.minusNanos(1))
-				.orElse(null));
+	public static Specification<LetterEntity> withCreatedEqualOrBefore(final LocalDate value) {
+		return BUILDER.buildDateIsBeforeFilter(LetterEntity_.CREATED, startOfDay(ofNullable(value)
+			.map(date -> date.plusDays(1))
+			.orElse(null)));
+	}
+
+	private static OffsetDateTime startOfDay(final LocalDate date) {
+		return ofNullable(date)
+			.map(day -> day.atStartOfDay(ZONE).toOffsetDateTime())
+			.orElse(null);
 	}
 }
