@@ -75,7 +75,7 @@ public class LetterSpecification {
 	}
 
 	/**
-	 * Creates filter for matching creation date to be equal to or later than if provided, else match all
+	 * Creates filter for matching creation date to be equal to or earlier than if provided, else match all
 	 *
 	 * @param  value the value to compare the creation date to
 	 * @return       a specification that compares the creation date to the provided value (or match all if value is not

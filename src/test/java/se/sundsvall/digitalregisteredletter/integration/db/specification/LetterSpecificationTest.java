@@ -130,7 +130,7 @@ class LetterSpecificationTest {
 
 		verify(criteriaBuilderMock).greaterThanOrEqualTo(pathMock, expectedLowerBound);
 		verifyNoMoreInteractions(criteriaBuilderMock);
-	};
+	}
 
 	@ParameterizedTest
 	@CsvSource({
@@ -146,7 +146,7 @@ class LetterSpecificationTest {
 
 		verify(criteriaBuilderMock).lessThan(pathMock, expectedUpperBound);
 		verifyNoMoreInteractions(criteriaBuilderMock);
-	};
+	}
 
 	@Test
 	void withCreatedFiltersApplyNoFilteringWhenDateIsNull() {
@@ -156,6 +156,6 @@ class LetterSpecificationTest {
 		verify(criteriaBuilderMock, times(2)).and();
 		verifyNoMoreInteractions(criteriaBuilderMock);
 		verifyNoInteractions(rootMock);
-	};
+	}
 
 }
