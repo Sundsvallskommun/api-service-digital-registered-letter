@@ -1,7 +1,7 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import se.sundsvall.digitalregisteredletter.support.Builder;
 
@@ -15,7 +15,7 @@ public record LetterFilter(
 
 	@Schema(description = "Optional filter for matching username", examples = "joe01doe", requiredMode = NOT_REQUIRED) String username,
 
-	@Schema(description = "Optional filter with format YYYY-MM-DD for matching earliest date when letter was sent", examples = "2025-08-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdEarliest,
+	@Schema(description = "Optional filter with format YYYY-MM-DD for matching earliest date when letter was sent", examples = "2025-08-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) LocalDate createdEarliest,
 
-	@Schema(description = "Optional filter with format YYYY-MM-DD for matching latest date when letter was sent", examples = "2025-09-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) OffsetDateTime createdLatest) {
+	@Schema(description = "Optional filter with format YYYY-MM-DD for matching latest date when letter was sent", examples = "2025-09-18", requiredMode = NOT_REQUIRED) @DateTimeFormat(iso = DATE) LocalDate createdLatest) {
 }

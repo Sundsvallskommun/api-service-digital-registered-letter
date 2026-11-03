@@ -1,13 +1,13 @@
 package se.sundsvall.digitalregisteredletter.api.model;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LetterFilterTest {
-	private static final OffsetDateTime CREATED_EARLIEST = OffsetDateTime.MIN;
-	private static final OffsetDateTime CREATED_LATEST = OffsetDateTime.MAX;
+	private static final LocalDate CREATED_EARLIEST = LocalDate.MIN;
+	private static final LocalDate CREATED_LATEST = LocalDate.MAX;
 	private static final Long ORG_ID = 44L;
 	private static final String USERNAME = "username";
 

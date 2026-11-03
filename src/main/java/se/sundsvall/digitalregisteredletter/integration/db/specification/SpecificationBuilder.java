@@ -58,14 +58,14 @@ public class SpecificationBuilder<T> {
 	}
 
 	/**
-	 * Method builds a filter depending on sent in time stamp. If value is null, method returns an always-true
-	 * predicate (meaning no filtering will be applied for sent in attribute)
+	 * Creates filter for matching creation date to be equal to or earlier than if provided, else match all.
+	 * The comparison is made against the start of the following day (exclusive) in Europe/Stockholm.
 	 *
-	 * @param  attribute name that will be used in filter
-	 * @param  value     value (or null) to compare against
-	 * @return           Specification<T> matching sent in comparison
+	 * @param  value the latest date (inclusive) to compare the creation date to
+	 * @return       a specification that compares the creation date to the provided value (or match all if value is not
+	 *               provided)
 	 */
-	public Specification<T> buildDateIsEqualOrBeforeFilter(final String attribute, final OffsetDateTime value) {
-		return (entity, cq, cb) -> nonNull(value) ? cb.lessThanOrEqualTo(entity.get(attribute), value) : cb.and();
+	public Specification<T> buildDateIsBeforeFilter(final String attribute, final OffsetDateTime value) {
+		return (entity, cq, cb) -> nonNull(value) ? cb.lessThan(entity.get(attribute), value) : cb.and();
 	}
 }
